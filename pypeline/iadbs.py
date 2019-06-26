@@ -43,3 +43,75 @@ def test_iadbs():
 	      Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput/"),
 	      Path("C:/Symphony/Search/human.fasta"),
 	      Path("C:/Symphony/Search/251.xml"))
+
+
+def write_params_xml_file(path, 
+                          fasta_db='UNIPROT', 
+                          fasta_format='DEF',
+                          min_by_per_peptide=2,
+                          min_peptides_per_protein=1,
+                          min_by_per_protein=5,
+                          max_prot_mass=2500000,
+                          FDR_rate=1):
+	"""Write the file with xml parameters needed for iaDBs analysis.
+
+	Args:
+		path (Path or str): path to where to write the xml file.
+		fasta_db (str): Name of used protein database.
+		fasta_format (str): Format of fastas (check Symphony Pipeline manual).
+		min_by_per_peptide (int): Minimal number of B and Y ions per peptide.
+		min_peptides_per_protein (int): Minimal number of peptides per protein.
+		min_by_per_protein (int): Minimal number of B and Y ions per protein.
+		max_prot_mass (float): Maximal acceptable mass of protein.
+		FDR_rate (float): FDR used by iaDBs.
+	"""
+	params_xml = """<?xml version="1.0" encoding="UTF-8"?>
+	<WORKFLOW_TEMPLATE TITLE="default search" UUID="f499a2d3-22f0-4ab6-b0d9-0999d01e543f" WORKFLOW_TEMPLATE_ID="_13927376466640_5646062711616823">
+	    <PROTEINLYNX_QUERY TYPE="Databank-search">
+	        <DATABANK_SEARCH_QUERY_PARAMETERS>
+	            <SEARCH_ENGINE_TYPE VALUE="PLGS"/>
+	            <SEARCH_DATABASE NAME="{}"/>
+	            <SEARCH_TYPE NAME="Electrospray-Shotgun"/>
+	            <IA_PARAMS>
+	                <FASTA_FORMAT VALUE="{}"/>
+	                <PRECURSOR_MHP_WINDOW_PPM VALUE="-1"/>
+	                <PRODUCT_MHP_WINDOW_PPM VALUE="-1"/>
+	                <NUM_BY_MATCH_FOR_PEPTIDE_MINIMUM VALUE="{}"/>
+	                <NUM_PEPTIDE_FOR_PROTEIN_MINIMUM VALUE="{}"/>
+	                <NUM_BY_MATCH_FOR_PROTEIN_MINIMUM VALUE="{}"/>
+	                <PROTEIN_MASS_MAXIMUM_AMU VALUE="{}"/>
+	                <FALSE_POSITIVE_RATE VALUE="{}"/>
+	                <AQ_PROTEIN_ACCESSION VALUE=""/>
+	                <AQ_PROTEIN_MOLES VALUE="-1"/>
+	                <MANUAL_RESPONSE_FACTOR VALUE="1000"/>
+	                <DIGESTS>
+	                    <ANALYSIS_DIGESTOR MISSED_CLEAVAGES="2">
+	                        <AMINO_ACID_SEQUENCE_DIGESTOR NAME="Trypsin" UUID="50466de0-ff04-4be2-a02f-6ccc7b5fd1f5">
+	                            <CLEAVES_AT AMINO_ACID="K" POSITION="C-TERM">
+	                                <EXCLUDES AMINO_ACID="P" POSITION="N-TERM"/>
+	                            </CLEAVES_AT>
+	                            <CLEAVES_AT AMINO_ACID="R" POSITION="C-TERM">
+	                                <EXCLUDES AMINO_ACID="P" POSITION="N-TERM"/>
+	                            </CLEAVES_AT>
+	                        </AMINO_ACID_SEQUENCE_DIGESTOR>
+	                    </ANALYSIS_DIGESTOR>
+	                </DIGESTS>
+	                <MODIFICATIONS>
+	                    <ANALYSIS_MODIFIER STATUS="FIXED">
+	                        <MODIFIER MCAT_REAGENT="No" NAME="Carbamidomethyl+C">
+	                            <MODIFIES APPLIES_TO="C" DELTA_MASS="57.0215" TYPE="SIDECHAIN"/>
+	                        </MODIFIER>
+	                    </ANALYSIS_MODIFIER>
+	                    <ANALYSIS_MODIFIER ENRICHED="FALSE" STATUS="VARIABLE">
+	                        <MODIFIER MCAT_REAGENT="No" NAME="Oxidation+M">
+	                            <MODIFIES APPLIES_TO="M" DELTA_MASS="15.9949" TYPE="SIDECHAIN"/>
+	                        </MODIFIER>
+	                    </ANALYSIS_MODIFIER>
+	                </MODIFICATIONS>
+	            </IA_PARAMS>
+	        </DATABANK_SEARCH_QUERY_PARAMETERS>
+	    </PROTEINLYNX_QUERY>
+	</WORKFLOW_TEMPLATE>""".format(fasta_db, fasta_format, min_by_per_peptide, min_peptides_per_protein,
+	                               min_by_per_protein, max_prot_mass, FDR_rate)
+	with open(Path(path), 'w') as f:
+		f.write(params_xml)
