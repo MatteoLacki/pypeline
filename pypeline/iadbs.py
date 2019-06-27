@@ -1,17 +1,19 @@
 import subprocess
 from pathlib import Path
 
+import pypeline.default_paths as default
+
 
 def iadbs(input_file,
 	   	  output_dir,
 	   	  fasta_file,
 	   	  parameters_file,
 	   	  write_xml=True,
-	   	  write_binary=True,
+	   	  write_binary=False,
 	   	  write_csv=False,
 	   	  write_binning=False,
-	   	  path_to_iadbs=Path("C:/Symphony/PLGS/iaDBs.exe"),
-	   	  *args):
+	   	  path_to_iadbs=default.iadbspath,
+	   	  **kwds):
 	"""A wrapper around the infamous iaDBs.
 	
 	Args:
@@ -22,23 +24,40 @@ def iadbs(input_file,
 		write_csv (boolean): Write the ions to csv file.
 		write_binning (boolean): Write binning file.
 		path_to_iadbs (Path or str): Path to the "iaDBs.exe" executable.
+		**kwds: other parameters for 'subprocess.run'.
+	Returns:
+        tuple: the completed process and the path to the outcome (preference of xml over bin).
 	"""
 	algo = str(Path(path_to_iadbs))
-	process = subprocess.call([	
-	                          	"powershell.exe", algo,
+	process = subprocess.call([	"powershell.exe", algo,
 				                "-pep3DFilename {}".format(input_file),
 				                "-proteinFASTAFileName {}".format(fasta_file),
 				                "-outputDirName {}".format(output_dir),
 								"-paraXMLFileName {}".format(parameters_file),
 				                "-WriteXML {}".format(int(write_xml)),
 				                "-WriteBinary {}".format(int(write_binary)),
-				                "-bDeveloperCSVOutput {}".format(int(write_csv))
-				              ])
-	return process
+				                "-bDeveloperCSVOutput {}".format(int(write_csv)) ],
+				              **kwds)
+	if '_Pep3D_Spectrum' in input_file.stem:
+		out = input_file.parent/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
+	else:
+		out = input_file.stem + "_IA_workflow"
+		out = input_file.parent/out
+	out_bin = out.with_suffix('.bin')
+	out_xml = out.with_suffix('.xml')
+	if not out_bin.exists() and not out_xml.exists():
+    	raise RuntimeError("The output is missing: iaDBs failed us!!!")
+	if kwds.get('capture_output', False):# otherwise no input was caught.
+        log = output_dir/"iadbs.log"
+        log.write_bytes(process.stdout)
+    if write_xml and out_xml.exists():
+        return out_xml, process
+    if out_bin.exists():
+        return out_bin, process
 
 
 def test_iadbs():
-	"""Test the stupid iaDBs."""
+	"""Test the stupid iaDBs on Windows."""
 	iadbs(Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput/O190302_01_Pep3D_Spectrum.bin"),
 	      Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput/"),
 	      Path("C:/Symphony/Search/human.fasta"),
