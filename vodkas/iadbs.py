@@ -68,7 +68,7 @@ def test_iadbs():
           Path("C:/Symphony/Search/human.fasta"),
           Path("C:/Symphony/Search/251.xml"))
 
-
+#TODO: this could be done rather with the XML module
 def write_params_xml_file(path, 
                           fasta_db='UNIPROT', 
                           fasta_format='DEF',
@@ -76,7 +76,9 @@ def write_params_xml_file(path,
                           min_peptides_per_protein=1,
                           min_by_per_protein=5,
                           max_prot_mass=2500000,
-                          FDR_rate=1):
+                          FDR_rate=1,
+                          workflow_template_title='new workflow',
+                          workflow_template_id='000'):
     """Write the file with xml parameters needed for iaDBs analysis.
 
     Args:
@@ -90,7 +92,7 @@ def write_params_xml_file(path,
         FDR_rate (float): FDR used by iaDBs.
     """
     params_xml = """<?xml version="1.0" encoding="UTF-8"?>
-    <WORKFLOW_TEMPLATE TITLE="default search" UUID="f499a2d3-22f0-4ab6-b0d9-0999d01e543f" WORKFLOW_TEMPLATE_ID="_13927376466640_5646062711616823">
+    <WORKFLOW_TEMPLATE TITLE="{}" UUID="f499a2d3-22f0-4ab6-b0d9-0999d01e543f" WORKFLOW_TEMPLATE_ID="{}">
         <PROTEINLYNX_QUERY TYPE="Databank-search">
             <DATABANK_SEARCH_QUERY_PARAMETERS>
                 <SEARCH_ENGINE_TYPE VALUE="PLGS"/>
@@ -135,7 +137,9 @@ def write_params_xml_file(path,
                 </IA_PARAMS>
             </DATABANK_SEARCH_QUERY_PARAMETERS>
         </PROTEINLYNX_QUERY>
-    </WORKFLOW_TEMPLATE>""".format(fasta_db, fasta_format, min_by_per_peptide, min_peptides_per_protein,
+    </WORKFLOW_TEMPLATE>""".format(workflow_template_title, workflow_template_id,
+                                   fasta_db, fasta_format,
+                                   min_by_per_peptide, min_peptides_per_protein,
                                    min_by_per_protein, max_prot_mass, FDR_rate)
     with open(Path(path), 'w') as f:
         f.write(params_xml)
