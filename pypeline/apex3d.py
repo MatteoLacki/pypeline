@@ -46,26 +46,26 @@ def apex3d(raw_folder,
     algo = str(Path(path_to_apex3d))
     raw_folder = Path(raw_folder)
     output_dir = Path(output_dir)
-    process = subprocess.run([  "powershell.exe", algo,
-                                "-pRawDirName {}".format(raw_folder),
-                                "-outputDirName {}".format(output_dir),
-                                "-lockMassZ2 {}".format(lock_mass_z2),
-                                "-lockmassToleranceAMU {}".format(lock_mass_tol_amu),
-                                "-leThresholdCounts {}".format(int(low_energy_thr)),
-                                "-heThresholdCounts {}".format(int(high_energy_thr)),
-                                "-binIntenThreshold {}".format(int(lowest_intensity_thr)),
-                                "-writeXML {}".format(int(write_xml)),
-                                "-writeBinary {}".format(int(write_binary)),
-                                "-bRawCSVOutput {}".format(int(write_csv)),
-                                "-maxCPUs {}".format(int(max_used_cores)),
-                                "-PLGS {}".format(int(PLGS)),
-                                "-bEnableCuda {}".format(int(cuda)),
-                                "-bEnableUnsupportedGPUs {}".format(int(unsupported_gpu)) ],
-                             **kwds)
+    process = subprocess.run(["powershell.exe", algo,
+        "-pRawDirName {}".format(raw_folder),
+        "-outputDirName {}".format(output_dir),
+        "-lockMassZ2 {}".format(lock_mass_z2),
+        "-lockmassToleranceAMU {}".format(lock_mass_tol_amu),
+        "-leThresholdCounts {}".format(int(low_energy_thr)),
+        "-heThresholdCounts {}".format(int(high_energy_thr)),
+        "-binIntenThreshold {}".format(int(lowest_intensity_thr)),
+        "-writeXML {}".format(int(write_xml)),
+        "-writeBinary {}".format(int(write_binary)),
+        "-bRawCSVOutput {}".format(int(write_csv)),
+        "-maxCPUs {}".format(int(max_used_cores)),
+        "-PLGS {}".format(int(PLGS)),
+        "-bEnableCuda {}".format(int(cuda)),
+        "-bEnableUnsupportedGPUs {}".format(int(unsupported_gpu)) ],
+        **kwds)
     out_bin = output_dir/(raw_folder.stem + "_Apex3D.bin")
     out_xml = out_bin.with_suffix('.xml')
     if not out_bin.exists() and not out_xml.exists():
-        raise RuntimeError("The output is missing: Apex3D failed us!!!")
+        raise RuntimeError("WTF: The output is missing: Apex3D failed.")
     if kwds.get('capture_output', False):# otherwise no input was caught.
         log = output_dir/"apex3d.log"
         log.write_bytes(process.stdout)
@@ -79,6 +79,7 @@ def test_apex3d():
     """test the stupid Apex3D."""
     apex3d(Path("C:/ms_soft/MasterOfPipelines/RAW/O1903/O190302_01.raw"),
            Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput"))
+
 
 
 if __name__ == "__main__":
