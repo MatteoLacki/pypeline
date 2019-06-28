@@ -1,7 +1,7 @@
 import subprocess
 from pathlib import Path
 
-import pypeline.default_paths as default
+import vodkas.default_paths as default
 
 
 def peptide3d(input_file,

@@ -1,8 +1,8 @@
 import subprocess
 from pathlib import Path
 
-from pypeline.misc import get_coresNo
-import pypeline.default_paths as default
+from vodkas.misc import get_coresNo
+import vodkas.default_paths as default
 
 
 def apex3d(raw_folder,

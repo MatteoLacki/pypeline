@@ -1,3 +1,3 @@
-from pypeline.apex3d import apex3d
-from pypeline.peptide3d import peptide3d
-from pypeline.iadbs import iadbs
+from vodkas.apex3d import apex3d
+from vodkas.peptide3d import peptide3d
+from vodkas.iadbs import iadbs
