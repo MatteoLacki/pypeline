@@ -16,7 +16,7 @@ def peptide3d(input_file,
     """A wrapper around the infamous Peptide3D.
     
     Args:
-        input_file (Path or str): a path to the file containing Apex3D's outcomes.
+        input_file (Path or str): a path to the file containing Apex3D's outcomes (a binary file, with extension '.bin').
         output_dir (Path or str): Path to where to place the output.
         write_xml (boolean): Write the output in an xml in the output folder.
         write_binary (boolean): Write the binary output in an xml in the output folder.
@@ -31,15 +31,18 @@ def peptide3d(input_file,
     algo = str(Path(path_to_peptide3d))
     input_file = Path(input_file)
     output_dir = Path(output_dir)
-    process = subprocess.run(["powershell.exe", algo,
-        "-inputFileName {}".format(input_file),
-        "-outputDirName {}".format(output_dir),
-        "-WriteXML {}".format(int(write_xml)),
-        "-WriteBinary {}".format(int(write_binary)),
-        "-WriteAllIonsToCSV {}".format(int(write_csv)),
-        "-WriteBinningFile {}".format(int(write_binning)),
-        "-minLEMHPlus {}".format(min_LEMHPlus)  ],
-        **kwds)
+    if input_file.suffix != '.bin':
+        raise RuntimeError("Peptide3D failed: it accepts 'bin' input files only.")
+    cmd = ["powershell.exe",
+            algo,
+            "-inputFileName {}".format(input_file),
+            "-outputDirName {}".format(output_dir),
+            "-WriteXML {}".format(int(write_xml)),
+            "-WriteBinary {}".format(int(write_binary)),
+            "-WriteAllIonsToCSV {}".format(int(write_csv)),
+            "-WriteBinningFile {}".format(int(write_binning)),
+            "-minLEMHPlus {}".format(min_LEMHPlus) ]
+    process = subprocess.run(cmd, **kwds)
     if '_Apex3D' in input_file.stem:
         out = input_file.parent/input_file.stem.replace('_Apex3D','_Pep3D_Spectrum')
     else:
@@ -48,14 +51,14 @@ def peptide3d(input_file,
     out_bin = out.with_suffix('.bin')
     out_xml = out.with_suffix('.xml')
     if not out_bin.exists() and not out_xml.exists():
-        raise RuntimeError("WTF: output ({}) is missing: Peptide3D failed.".format(input_file.stem+"_Pep3D_Spectrum"))
+        raise RuntimeError("Peptide3D failed: output is missing")
+    if process.stderr:
+        print(process.stderr)
+        raise RuntimeError("Peptide3D failed: WTF")
     if kwds.get('capture_output', False):# otherwise no input was caught.
         log = output_dir/"peptide3d.log"
         log.write_bytes(process.stdout)
-    if write_xml and out_xml.exists():
-        return out_xml, process
-    if out_bin.exists():
-        return out_bin, process
+    return out_bin.with_suffix(''), process
 
 
 def test_peptide3d():

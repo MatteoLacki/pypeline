@@ -11,7 +11,6 @@ def iadbs(input_file,
           write_xml=True,
           write_binary=False,
           write_csv=False,
-          write_binning=False,
           path_to_iadbs=default.iadbspath,
           **kwds):
     """A wrapper around the infamous iaDBs.
@@ -19,25 +18,31 @@ def iadbs(input_file,
     Args:
         input_file (Path or str): a path to the pep3D spectrum file, xml or bin.
         output_dir (Path or str): Path to where to place the output.
+        fasta_file (Path or str): Path to the fasta file used for search.
+        parameters_file (Path or str): Path to the search xml.
         write_xml (boolean): Write the output in an xml in the output folder.
         write_binary (boolean): Write the binary output in an xml in the output folder.
         write_csv (boolean): Write the ions to csv file.
-        write_binning (boolean): Write binning file.
         path_to_iadbs (Path or str): Path to the "iaDBs.exe" executable.
         **kwds: other parameters for 'subprocess.run'.
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
     """
-    algo = str(Path(path_to_iadbs))
-    process = subprocess.call(["powershell.exe", algo,
-        "-pep3DFilename {}".format(input_file),
-        "-proteinFASTAFileName {}".format(fasta_file),
-        "-outputDirName {}".format(output_dir),
-        "-paraXMLFileName {}".format(parameters_file),
-        "-WriteXML {}".format(int(write_xml)),
-        "-WriteBinary {}".format(int(write_binary)),
-        "-bDeveloperCSVOutput {}".format(int(write_csv)) ],
-        **kwds)
+    algo = Path(path_to_iadbs)
+    input_file = Path(input_file)
+    output_dir = Path(output_dir)
+    fasta_file = Path(fasta_file)
+    parameters_file = Path(parameters_file)
+    cmd = [ "powershell.exe",
+            str(algo),
+            "-paraXMLFileName {}".format(parameters_file),
+            "-pep3DFilename {}".format(input_file),
+            "-proteinFASTAFileName {}".format(fasta_file),
+            "-outputDirName {}".format(output_dir),
+            "-WriteXML {}".format(int(write_xml)),
+            "-WriteBinary {}".format(int(write_binary)),
+            "-bDeveloperCSVOutput {}".format(int(write_csv)) ]
+    process = subprocess.run(cmd, **kwds)
     if '_Pep3D_Spectrum' in input_file.stem:
         out = input_file.parent/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
     else:
@@ -47,13 +52,13 @@ def iadbs(input_file,
     out_xml = out.with_suffix('.xml')
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("WTF: output is missing: iaDBs failed.")
+    if process.stderr:
+        print(process.stderr)
+        raise RuntimeError("iaDBs failed: WTF")
     if kwds.get('capture_output', False):# otherwise no input was caught.
         log = output_dir/"iadbs.log"
         log.write_bytes(process.stdout)
-    if write_xml and out_xml.exists():
-        return out_xml, process
-    if out_bin.exists():
-        return out_bin, process
+    return out_bin.with_suffix(''), process
 
 
 def test_iadbs():

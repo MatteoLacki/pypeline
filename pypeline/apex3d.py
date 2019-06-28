@@ -13,7 +13,7 @@ def apex3d(raw_folder,
            high_energy_thr=30,
            lowest_intensity_thr=750,
            write_xml=True,
-           write_binary=False,
+           write_binary=True,
            write_csv=False,
            max_used_cores=get_coresNo(),
            path_to_apex3d=default.apex3Dpath,
@@ -41,12 +41,14 @@ def apex3d(raw_folder,
         unsupported_gpu (boolean): Try using an unsupported GPU for calculations. If it doesn't work, the pipeline switches to CPU which is usually much slower.
         kwds: other parameters for 'subprocess.run'.
     Returns:
-        tuple: the path to the outcome (preference of xml over bin) and the completed process.
+        tuple: the path to the outcome (no extension: choose it yourself and believe more in capitalism) and the completed process.
     """
     algo = str(Path(path_to_apex3d))
     raw_folder = Path(raw_folder)
     output_dir = Path(output_dir)
-    process = subprocess.run(["powershell.exe", algo,
+    process = subprocess.run(["powershell.exe",
+        # '$ErrorActionPreference = "Stop"',#error windows stop appearing.
+        algo,
         "-pRawDirName {}".format(raw_folder),
         "-outputDirName {}".format(output_dir),
         "-lockMassZ2 {}".format(lock_mass_z2),
@@ -65,14 +67,14 @@ def apex3d(raw_folder,
     out_bin = output_dir/(raw_folder.stem + "_Apex3D.bin")
     out_xml = out_bin.with_suffix('.xml')
     if not out_bin.exists() and not out_xml.exists():
-        raise RuntimeError("WTF: The output is missing: Apex3D failed.")
+        raise RuntimeError("Apex3D failed: output is missing")
+    if process.stderr:
+        print(process.stderr)
+        raise RuntimeError("Apex3D failed: WTF")
     if kwds.get('capture_output', False):# otherwise no input was caught.
         log = output_dir/"apex3d.log"
         log.write_bytes(process.stdout)
-    if write_xml and out_xml.exists():
-        return out_xml, process
-    if out_bin.exists():
-        return out_bin, process
+    return out_bin.with_suffix(''), process
 
 
 def test_apex3d():
