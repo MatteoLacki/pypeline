@@ -5,9 +5,15 @@ In my country this results in Vodkas.
 
 # Installation
 
+As easy as
+```bash
+    pip install vodkas
+```
+or
 ```bash
     pip install git+https://github.com/MatteoLacki/vodkas
 ```
+for the developper's version (it's still the master branch).
 
 # Usage
 
