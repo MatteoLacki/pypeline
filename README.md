@@ -1,5 +1,7 @@
 # Rationale
 Use Python to make your experience with Waters' Symphony Pipeline a much nicer experience.
+Otherwise said, add some synthactic sugar to Waters.
+In my country this results in Vodkas.
 
 # Installation
 
