@@ -17,6 +17,6 @@ pep3dOutPath, pep_proc = peptide3d(apexOutBIN, temp,
 # pep3dOutPath = temp/(raw.stem + "_Pep3D_Spectrum")
 pep3dOutXML = pep3dOutPath.with_suffix('.xml')
 iadbsOutPath, iadbs_proc = iadbs(pep3dOutXML, temp, 
-                                 fasta_file="C:/Symphony/Search/human.fasta",
+                                 fasta_file="C:/Symphony/Search/wheat.fasta",
                                  parameters_file="C:/Symphony/Search/251.xml",
                                  capture_output=True)
