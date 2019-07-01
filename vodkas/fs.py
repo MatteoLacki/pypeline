@@ -16,7 +16,8 @@ def cp(source, target, *args):
 	"""
 	s, t = Path(source), Path(target)
 	if platform.system() == 'Windows':
-		proc = subprocess.call(['robocopy', str(s.parent), str(t), str(s.name)] + list(args))
+        cmd = ['robocopy', str(s.parent), str(t), str(s.name)]
+		proc = subprocess.call(cmd + list(args))
 	else:
 		pass
 
