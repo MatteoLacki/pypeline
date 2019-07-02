@@ -12,6 +12,7 @@ def peptide3d(input_file,
               write_binning=False,
               min_LEMHPlus=0,
               path_to_peptide3d=default.peptide3Dpath,
+              debug=False,
               **kwds):
     """A wrapper around the infamous Peptide3D.
     
@@ -24,6 +25,7 @@ def peptide3d(input_file,
         write_binning (boolean): Write binning file.
         min_LEMHPlus (int): The minimal (M)ass of the (L)ow (E)nergy precursor with a single charge (H+).
         path_to_peptide3d (Path or str): Path to the "Peptide3D.exe" executable.
+        debug (boolean): Debug mode.
         **kwds: other parameters for 'subprocess.run'.
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
@@ -42,6 +44,9 @@ def peptide3d(input_file,
             "-WriteAllIonsToCSV {}".format(int(write_csv)),
             "-WriteBinningFile {}".format(int(write_binning)),
             "-minLEMHPlus {}".format(min_LEMHPlus) ]
+    if debug:
+        print('Peptide3D debug:')
+        print(cmd)
     process = subprocess.run(cmd, **kwds)
     if '_Apex3D' in input_file.stem:
         out = input_file.parent/input_file.stem.replace('_Apex3D','_Pep3D_Spectrum')
@@ -50,14 +55,16 @@ def peptide3d(input_file,
         out = input_file.parent/out
     out_bin = out.with_suffix('.bin')
     out_xml = out.with_suffix('.xml')
+    if kwds.get('capture_output', False):# otherwise no input was caught.
+        log = output_dir/"peptide3d.log"
+        log.write_bytes(process.stdout)
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("Peptide3D failed: output is missing")
     if process.stderr:
         print(process.stderr)
         raise RuntimeError("Peptide3D failed: WTF")
-    if kwds.get('capture_output', False):# otherwise no input was caught.
-        log = output_dir/"peptide3d.log"
-        log.write_bytes(process.stdout)
+    if debug:
+        print(out_bin.with_suffix(''))
     return out_bin.with_suffix(''), process
 
 

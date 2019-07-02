@@ -20,6 +20,7 @@ def apex3d(raw_folder,
            PLGS=True,
            cuda=False,
            unsupported_gpu=False,
+           debug=False,
            **kwds):
     """A wrapper around the infamous Apex3D.
     
@@ -39,6 +40,7 @@ def apex3d(raw_folder,
         PLGS (boolean): No idea what it is.
         cuda (boolean): Use CUDA.
         unsupported_gpu (boolean): Try using an unsupported GPU for calculations. If it doesn't work, the pipeline switches to CPU which is usually much slower.
+        debug (boolean): Debug mode.
         kwds: other parameters for 'subprocess.run'.
     Returns:
         tuple: the path to the outcome (no extension: choose it yourself and believe more in capitalism) and the completed process.
@@ -46,8 +48,7 @@ def apex3d(raw_folder,
     algo = str(Path(path_to_apex3d))
     raw_folder = Path(raw_folder)
     output_dir = Path(output_dir)
-    process = subprocess.run(["powershell.exe",
-        # '$ErrorActionPreference = "Stop"',#error windows stop appearing.
+    cmd = ["powershell.exe",
         algo,
         "-pRawDirName {}".format(raw_folder),
         "-outputDirName {}".format(output_dir),
@@ -62,18 +63,23 @@ def apex3d(raw_folder,
         "-maxCPUs {}".format(int(max_used_cores)),
         "-PLGS {}".format(int(PLGS)),
         "-bEnableCuda {}".format(int(cuda)),
-        "-bEnableUnsupportedGPUs {}".format(int(unsupported_gpu)) ],
-        **kwds)
+        "-bEnableUnsupportedGPUs {}".format(int(unsupported_gpu))]
+    if debug:
+        print('Apex3D debug:')
+        print(cmd)
+    process = subprocess.run(cmd,**kwds)
     out_bin = output_dir/(raw_folder.stem + "_Apex3D.bin")
     out_xml = out_bin.with_suffix('.xml')
+    if kwds.get('capture_output', False):# otherwise no input was caught.
+        log = output_dir/"apex3d.log"
+        log.write_bytes(process.stdout)
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("Apex3D failed: output is missing")
     if process.stderr:
         print(process.stderr)
         raise RuntimeError("Apex3D failed: WTF")
-    if kwds.get('capture_output', False):# otherwise no input was caught.
-        log = output_dir/"apex3d.log"
-        log.write_bytes(process.stdout)
+    if debug:
+        print(out_bin.with_suffix(''))
     return out_bin.with_suffix(''), process
 
 

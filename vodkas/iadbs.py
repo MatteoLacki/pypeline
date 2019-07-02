@@ -12,6 +12,7 @@ def iadbs(input_file,
           write_binary=False,
           write_csv=False,
           path_to_iadbs=default.iadbspath,
+          debug=False,
           **kwds):
     """A wrapper around the infamous iaDBs.
     
@@ -24,6 +25,7 @@ def iadbs(input_file,
         write_binary (boolean): Write the binary output in an xml in the output folder.
         write_csv (boolean): Write the ions to csv file.
         path_to_iadbs (Path or str): Path to the "iaDBs.exe" executable.
+        debug (boolean): Debug mode.
         **kwds: other parameters for 'subprocess.run'.
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
@@ -42,6 +44,9 @@ def iadbs(input_file,
             "-WriteXML {}".format(int(write_xml)),
             "-WriteBinary {}".format(int(write_binary)),
             "-bDeveloperCSVOutput {}".format(int(write_csv)) ]
+    if debug:
+        print('iaDBs debug:')
+        print(cmd)
     process = subprocess.run(cmd, **kwds)
     if '_Pep3D_Spectrum' in input_file.stem:
         out = input_file.parent/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
@@ -50,14 +55,16 @@ def iadbs(input_file,
         out = input_file.parent/out
     out_bin = out.with_suffix('.bin')
     out_xml = out.with_suffix('.xml')
+    if kwds.get('capture_output', False):# otherwise no input was caught.
+        log = output_dir/"iadbs.log"
+        log.write_bytes(process.stdout)
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("WTF: output is missing: iaDBs failed.")
     if process.stderr:
         print(process.stderr)
         raise RuntimeError("iaDBs failed: WTF")
-    if kwds.get('capture_output', False):# otherwise no input was caught.
-        log = output_dir/"iadbs.log"
-        log.write_bytes(process.stdout)
+    if debug:
+        print(out_bin.with_suffix(''))
     return out_bin.with_suffix(''), process
 
 
