@@ -9,6 +9,7 @@ def wx2csv(input_file,
            output_file,
            path_to_wx2csv=default.wx2csvpath,
            debug=False,
+           java_minimal_heap_size='512m',
            **kwds):
     """A wrapper around wx2csv.
     
@@ -17,6 +18,7 @@ def wx2csv(input_file,
         output_file (Path or str): Path to where to place the output.
         path_to_wx2csv (Path or str): Path to the "wx2csv.jar" executable.
         debug (boolean): Debug mode.
+        java_minimal_heap_size (str): Minimal heap size for jave.
         **kwds: other parameters for 'subprocess.run'.
     Returns:
         pandas.Dataframe
@@ -26,7 +28,7 @@ def wx2csv(input_file,
     if input_file.suffix != '.xml':
         raise RuntimeError("Peptide3D failed: it accepts 'bin' input files only.")
     cmd = ["powershell.exe",
-           "java -jar",
+           "java -Xms{} -jar".format(java_minimal_heap_size),
             algo,
             "-b -o {}".format(output_file),
             "-i {}".format(input_file)]
