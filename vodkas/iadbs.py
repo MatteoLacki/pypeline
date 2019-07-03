@@ -49,10 +49,9 @@ def iadbs(input_file,
         print(cmd)
     process = subprocess.run(cmd, **kwds)
     if '_Pep3D_Spectrum' in input_file.stem:
-        out = input_file.parent/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
+        out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
     else:
-        out = input_file.stem + "_IA_workflow"
-        out = input_file.parent/out
+        out = output_dir/(input_file.stem + "_IA_workflow")
     out_bin = out.with_suffix('.bin')
     out_xml = out.with_suffix('.xml')
     if kwds.get('capture_output', False):# otherwise no input was caught.
@@ -61,7 +60,8 @@ def iadbs(input_file,
     if debug:
         print(out_bin, out_bin.exists())
         print(out_xml, out_xml.exists())
-    if not out_bin.exists() or not out_xml.exists():
+        print((not out_bin.exists()) or (not out_xml.exists()))
+    if (not out_bin.exists()) and (not out_xml.exists()):# none exists
         raise RuntimeError("WTF: output is missing: iaDBs failed.")
     if process.stderr:
         print(process.stderr)

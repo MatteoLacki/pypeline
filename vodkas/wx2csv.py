@@ -32,6 +32,8 @@ def wx2csv(input_file,
             "-i {}".format(input_file)]
     if debug:
         print('wx2csv debug:')
+        print(input_file)
+        print(output_file)
         print(cmd)
     process = subprocess.run(cmd, **kwds)
     if kwds.get('capture_output', False):# otherwise no input was caught.
