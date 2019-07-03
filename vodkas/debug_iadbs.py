@@ -3,13 +3,11 @@ import subprocess
 
 import vodkas.default_paths as default
 
-
 algo = Path(default.iadbspath)
 input_file = Path("C:/Symphony/Temp/proteome_tools/T1707/T170722_03/T170722_03_Pep3D_Spectrum.xml")
-
-output_dir = Path("C:/Symphony/Temp/proteome_tools/T1707/T170722_03/")
+output_dir = Path("C:/Symphony/Temp/proteome_tools/T1707/T170722_03/215")
 fasta_file = Path("//MSSERVER/restoredData/proteome_tools/automation/db_jorg_pool1/001.fasta")
-parameters_file = Path("//MSSERVER/restoredData/proteome_tools/515.xml")
+parameters_file = Path("//MSSERVER/restoredData/proteome_tools/params/215.xml")
 
 write_xml = True
 write_binary = True
@@ -28,7 +26,21 @@ cmd = [ "powershell.exe",
 if debug:
     print('iaDBs debug:')
     print(cmd)
+process = subprocess.run(cmd)
 
-process = subprocess.run(cmd, capture_output=True)
-(output_dir/'iadbs.log').write_bytes(process.stdout)
+
+
+for parameters_file in (proj_folder/"params").iterdir():
+    if debug:
+        print(parameters_file)
+        print(temp_folder/parameters_file.stem)
+    iadbsOutXML, iadbs_proc = iadbs(pep3dOutXML,
+                                    temp_folder/parameters_file.stem, 
+                                    fasta_file=fasta_file,
+                                    parameters_file=parameters_file,
+                                    capture_output=True,
+                                    debug=True)
+    print(iadbs_proc)
+
+
 

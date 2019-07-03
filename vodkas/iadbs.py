@@ -58,7 +58,10 @@ def iadbs(input_file,
     if kwds.get('capture_output', False):# otherwise no input was caught.
         log = output_dir/"iadbs.log"
         log.write_bytes(process.stdout)
-    if not out_bin.exists() and not out_xml.exists():
+    if debug:
+        print(out_bin, out_bin.exists())
+        print(out_xml, out_xml.exists())
+    if not out_bin.exists() or not out_xml.exists():
         raise RuntimeError("WTF: output is missing: iaDBs failed.")
     if process.stderr:
         print(process.stderr)

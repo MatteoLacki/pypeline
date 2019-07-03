@@ -18,8 +18,8 @@ def apex3d(raw_folder,
            max_used_cores=get_coresNo(),
            path_to_apex3d=default.apex3Dpath,
            PLGS=True,
-           cuda=False,
-           unsupported_gpu=False,
+           cuda=True,
+           unsupported_gpu=True,
            debug=False,
            **kwds):
     """A wrapper around the infamous Apex3D.
