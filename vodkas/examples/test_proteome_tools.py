@@ -61,9 +61,9 @@ for parameters_file in (proj_folder/"params").iterdir():
                                  debug=True)
     if debug:
         print(iadbsOut, iadbs_proc)
-    wx2csv(iadbsOut.with_suffix('.xml'),
-           temp_folder/parameters_file.stem/"report.csv",
-           debug=debug)
+    report, wx2csv_proc = wx2csv(iadbsOut.with_suffix('.xml'),
+                                 temp_folder/parameters_file.stem/"report.csv",
+                                 debug=debug)
 # cp(apexOutBIN,  final_folder)
 # cp(pep3dOutXML, final_folder)
 # cp(iadbsOutXML, final_folder)
