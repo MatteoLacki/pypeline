@@ -3,6 +3,7 @@ from pathlib import Path
 
 from vodkas.misc import get_coresNo
 import vodkas.default_paths as default
+from vodkas.exceptions import StdErr
 
 
 def apex3d(raw_folder,
@@ -77,7 +78,7 @@ def apex3d(raw_folder,
         raise RuntimeError("Apex3D failed: output is missing")
     if process.stderr:
         print(process.stderr)
-        raise RuntimeError("Apex3D failed: WTF")
+        raise StdErr(process)
     if debug:
         print(out_bin.with_suffix(''))
     return out_bin.with_suffix(''), process

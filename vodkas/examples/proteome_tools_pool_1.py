@@ -26,7 +26,7 @@ for rawdatapath, fastapath in settings[1:]:
         rawdatapath= Path(rawdatapath)
         fastapath  = Path(fastapath)
         raw_folder = rawdatapath.stem
-        out_folder = Path("D:/projects/proteome_tools/RES")/raw_folder[0:5]/raw_folder
+        out_folder = Path("D:/projects/proteome_tools/RES/pool1")/raw_folder[0:5]/raw_folder
         if debug:
             print('rawdatapath',    '\n\t', rawdatapath,    '\n\t', str(rawdatapath))
             print('fastapath',      '\n\t', fastapath,      '\n\t', str(fastapath))
