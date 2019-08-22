@@ -22,8 +22,8 @@ setup(
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Chemistry',
         'Programming Language :: Python :: 3.6'],
-    license="GPL-3.0-or-later"
-    install_requires=[pandas],
+    license="GPL-3.0-or-later",
+    install_requires=['pandas'],
     # include_package_data=True,
     # package_data={'data': ['data/contaminants_uniprot_format.fasta']},
     # scripts = ["bin/update_fastas",]
