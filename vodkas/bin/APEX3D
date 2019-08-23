@@ -1,0 +1,19 @@
+import argparse
+from pathlib import Path
+
+from docstring_parser.parser import parse
+
+from vodkas.apex3d import apex3d, append_apex3d_args_to_parser
+from vodkas.misc import create_parser, add_args
+
+debug = True
+
+apex3d_doc = parse(apex3d.__doc__)
+parser = create_parser(apex3d_doc)
+add_args(apex3d_doc, parser)
+
+# append_apex3d_args_to_parser(parser)
+args = parser.parse_args()
+if debug:
+    print(args.__dict__)
+

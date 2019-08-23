@@ -23,11 +23,11 @@ def apex3d(raw_folder,
            unsupported_gpu=True,
            debug=False,
            **kwds):
-    """A wrapper around the infamous Apex3D.
+    """Analyze a Waters Raw Folder with Apex3D.
     
     Args:
-        raw_folder (Path or str): a path to the input folder with raw Waters data.
-        output_dir (Path or str): Path to where to place the output.
+        raw_folder (str): a path to the input folder with raw Waters data.
+        output_dir (str): Path to where to place the output.
         lock_mass_z2 (float): The lock mass for doubly charged ion (which one, dunno, but I guess a very important one).
         lock_mass_tol (float): Tolerance around lock mass (in atomic mass units, amu).
         low_energy_thr (int): The minimal intensity of a precursor ion so that it ain't a noise peak.
@@ -37,7 +37,7 @@ def apex3d(raw_folder,
         write_binary (boolean): Write the binary output in an xml in the output folder.
         write_csv (boolean): Write the output in a csv in the output folder (doesn't work).
         max_used_cores (int): The maximal number of cores to use.
-        path_to_apex3d (Path or str): Path to the "Apex3D.exe" executable.
+        path_to_apex3d (str): Path to the "Apex3D.exe" executable.
         PLGS (boolean): No idea what it is.
         cuda (boolean): Use CUDA.
         unsupported_gpu (boolean): Try using an unsupported GPU for calculations. If it doesn't work, the pipeline switches to CPU which is usually much slower.
@@ -84,12 +84,62 @@ def apex3d(raw_folder,
     return out_bin.with_suffix(''), process
 
 
+def append_apex3d_args_to_parser(parser):
+    """Append arguments to the argparse parser."""
+    parser.add_argument("raw_folder", type=Path,
+        help="Waters Raw Folder.")
+    parser.add_argument("output_dir", type=Path,
+        help="Where to place the output.",
+        default=Path.cwd())
+    parser.add_argument("--lock_mass_z2", type=float,
+        help="The lock mass for doubly charged ion.",
+        default=785.8426)
+    parser.add_argument("--lock_mass_tol", type=float,
+        help="Tolerance around lock mass (in atomic mass units, amu).",
+        default=.25)
+    parser.add_argument("--low_energy_thr", type=int,
+        help="The minimal intensity of a precursor ion so that it ain't a noise peak.",
+        default=300)
+    parser.add_argument("--high_energy_thr", type=int,
+        help="The minimal intensity of a fragment ion so that it ain't a noise peak.",
+        default=30)
+    parser.add_argument("--lowest_intensity_thr", type=int,
+        help="The minimal intensity of a fragment ion so that it ain't a noise peak.",
+        default=750)
+    parser.add_argument("--no_xml",
+        dest="write_xml",
+        action='store_const',
+        const=False,
+        default=True,
+        help="Write the output in an xml in the output folder.")
+    parser.add_argument("--no_binary",
+        dest="write_binary",
+        action='store_const',
+        const=False,
+        default=True,
+        help="Write the binary output in an xml in the output folder.")
+    parser.add_argument("--write_csv",
+        action='store_const',
+        const=True,
+        default=False,
+        help="Write the output in a csv in the output folder (doesn't work).")
+    parser.add_argument("--max_used_cores", type=int,
+        help="The maximal number of cores to use.",
+        default=get_coresNo())
+    parser.add_argument("--path_to_apex3d", type=Path,
+        help="Where to place the output.",
+        default=default.apex3Dpath)
+    parser.add_argument("--no_CUDA",
+        dest="cuda",
+        action='store_const',
+        const=False,
+        default=True,
+        help="Do not use CUDA.")
+
 def test_apex3d():
     """test the stupid Apex3D."""
     apex3d(Path("C:/ms_soft/MasterOfPipelines/RAW/O1903/O190302_01.raw"),
            Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput"))
-
-
 
 if __name__ == "__main__":
     test_apex3d()

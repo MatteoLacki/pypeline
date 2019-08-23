@@ -4,6 +4,8 @@ from functools import wraps, update_wrapper
 from pathlib import Path
 import json
 from datetime import datetime
+import builtins
+import argparse
 
 
 def get_coresNo():
@@ -93,3 +95,20 @@ def store_wrap(*functions):
     functions = mem.wrap(functions)
     functions.append(mem)
     return functions
+
+
+def create_parser(parsed_doc, description=''):
+    """Create a new parser based on the parsed_doc"""
+    if not description:
+        description = parsed_doc.short_description
+    return argparse.ArgumentParser(description=description)
+
+
+def add_args(parsed_doc, parser):
+    """Add parsed parameters to the CLI (arg)parser."""
+    for p in parsed_doc.params:
+        try:
+            _type = getattr(builtins, p.type)
+            parser.add_argument(p.arg_name, type=_type, help=p.description)
+        except AttributeError:
+            parser.add_argument(p.arg_name, help=p.description)
