@@ -41,7 +41,15 @@ def store_args(storage):
 
 
 class StoreWrap(dict):
-    def wrap(self, functions_list):
+    """Store the state of function calls."""
+    def wrap(self, functions):
+        """Wrap functions.
+
+        Args:
+            functions (list): some functions to wrap.
+
+        Returns:
+            list of wrapped functions."""
         def w(f):
             self[f.__name__] = []
             sign = signature(f)
@@ -54,15 +62,17 @@ class StoreWrap(dict):
                 return f(*args, **kwds)
             update_wrapper(wrapper, f)
             return wrapper
-        return [w(f) for f in functions_list]
+        return [w(f) for f in functions]
 
 
 def now():
+    """Current date in format YEAR-MONTH-DAY_HOUR-MINUTE-SECOND."""
     d = datetime.now()
     return "{}-{}-{}_{}-{}-{}".format(d.year,d.month,d.day,d.hour,d.minute,d.second)
 
 
 class GreatWrap(StoreWrap):
+    """Is to StoreWrap as Great Gatsby was to mere Gatsby."""
     def json(self, *output_folders):
         jetzt = now()
         for of in output_folders:
@@ -71,8 +81,15 @@ class GreatWrap(StoreWrap):
                 json.dump(self, f, indent=4)
 
 
-def store_wrap(*functions_list):
+def store_wrap(*functions):
+    """Add to functions a storage for the arguments they were called with.
+
+    Args:
+        *functions: some functions to wrap.
+
+    Returns:
+        The same functions followed by a storage dictionary."""
     mem = GreatWrap()
-    functions_list = mem.wrap(functions_list)
-    functions_list.append(mem)
-    return functions_list
+    functions = mem.wrap(functions)
+    functions.append(mem)
+    return functions
