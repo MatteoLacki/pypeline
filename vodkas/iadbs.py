@@ -31,6 +31,7 @@ def iadbs(input_file,
         tuple: the completed process and the path to the outcome (preference of xml over bin).
     """
     algo = Path(path_to_iadbs)
+    assert algo.exists(), "Executable is missing! '{}' not found.".format(algo)
     input_file = Path(input_file)
     output_dir = Path(output_dir)
     fasta_file = Path(fasta_file)

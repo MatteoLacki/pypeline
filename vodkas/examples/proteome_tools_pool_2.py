@@ -3,6 +3,7 @@ from pathlib import Path
 from pprint import pprint
 import json
 from collections import defaultdict
+import subprocess
 
 from vodkas import apex3d, StdErr, peptide3d, iadbs, wx2csv
 
@@ -34,7 +35,7 @@ analysed = {p.name for p in T1708_folder.glob("*")}
 data = [(r,f) for r,f in settings if Path(r).stem not in analysed]
 assert {Path(r).stem for r,f in data}.intersection(analysed) == set([])
 # rawdatapath, fastapath = data[0]
-
+# data = [data[0]]
 
 for rawdatapath, fastapath in data:
     OK = True
@@ -48,6 +49,7 @@ for rawdatapath, fastapath in data:
         print('raw_folder', '\n\t', raw_folder)
         print('out_folder', '\n\t', out_folder)
         print('parameters_file','\n\t', parameters_file)
+        print('timeout\n\t{} h'.format(timeout/3600))
     try:
         apexOut, apex_proc = apex3d(rawdatapath,
                                     out_folder,
@@ -66,7 +68,6 @@ for rawdatapath, fastapath in data:
         apexOut = out_folder/(out_folder.name + "_Apex3D.bin")
         exceptions[rawdatapath].append(e)
         OK = False
-    
     if OK:
         try:
             pep3dOut, pep_proc = peptide3d(apexOut.with_suffix('.bin'),
@@ -84,7 +85,6 @@ for rawdatapath, fastapath in data:
         except subprocess.TimeoutExpired:
             print("pep3d reached a timeout of {} hour(s).".format(timeout/3600))
             OK = False
-
     if OK:
         try:
             iadbsOut, iadbs_proc = iadbs(pep3dOut.with_suffix('.xml'),
@@ -102,9 +102,8 @@ for rawdatapath, fastapath in data:
         except subprocess.TimeoutExpired:
             print("iadbs reached a timeout of {} hour(s).".format(timeout/3600))
             OK = False
-        # iadbsOut = Path(r"D:/projects/proteome_tools/RES/T1707/T170722_03/T170722_03_IA_workflow")
-        # out_folder= Path(r"D:/projects/proteome_tools/RES/T1707/T170722_03")
-        
+    # iadbsOut = Path(r"D:/projects/proteome_tools/RES/T1707/T170722_03/T170722_03_IA_workflow")
+    # out_folder= Path(r"D:/projects/proteome_tools/RES/T1707/T170722_03")
     if OK:
         try:
             report, wx2csv_proc = wx2csv(iadbsOut.with_suffix('.xml'),

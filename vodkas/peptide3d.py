@@ -30,13 +30,14 @@ def peptide3d(input_file,
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
     """
-    algo = str(Path(path_to_peptide3d))
+    algo = Path(path_to_peptide3d)
+    assert algo.exists(), "Executable is missing! '{}' not found.".format(algo)
     input_file = Path(input_file)
     output_dir = Path(output_dir)
     if input_file.suffix != '.bin':
         raise RuntimeError("Peptide3D failed: it accepts 'bin' input files only.")
     cmd = ["powershell.exe",
-            algo,
+            str(algo),
             "-inputFileName {}".format(input_file),
             "-outputDirName {}".format(output_dir),
             "-WriteXML {}".format(int(write_xml)),

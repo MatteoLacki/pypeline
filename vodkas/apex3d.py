@@ -46,11 +46,12 @@ def apex3d(raw_folder,
     Returns:
         tuple: the path to the outcome (no extension: choose it yourself and believe more in capitalism) and the completed process.
     """
-    algo = str(Path(path_to_apex3d))
+    algo = Path(path_to_apex3d)
+    assert algo.exists(), "Executable is missing! '{}' not found.".format(algo)
     raw_folder = Path(raw_folder)
     output_dir = Path(output_dir)
     cmd = ["powershell.exe",
-        algo,
+        str(algo),
         "-pRawDirName {}".format(raw_folder),
         "-outputDirName {}".format(output_dir),
         "-lockMassZ2 {}".format(lock_mass_z2),
