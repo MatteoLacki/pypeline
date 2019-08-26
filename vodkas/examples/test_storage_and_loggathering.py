@@ -1,4 +1,5 @@
-from vodkas.misc import store_wrap
+from vodkas.misc import monitor, now
+from pathlib import Path
 
 def foo(a, b, c=10, **kwds):
     """abc"""
@@ -8,23 +9,14 @@ def foo2(a, b, c=10, **kwds):
     """abc"""
     return a*b*c
 
-_foo, _foo2, storage = store_wrap(foo, foo2)
+_foo, _foo2, fun_monitor = monitor(foo, foo2)
 _foo(2120, 34, 34)
 _foo2(210, 34, 344230)
 
 fold = Path('C:/SYMPHONY_VODKAS')
 temp_fold = fold/'temp_logs'
-storage.json(temp_fold)
+fun_monitor.json(temp_fold, prefix='human_')
 
-_foo, _foo2, storage = store_wrap(foo, foo2)
-_foo(2120, 34, 34)
-_foo2(210, 34, 343, e=190)
-storage.json(temp_fold)
-
-_foo, _foo2, storage = store_wrap(foo, foo2)
-_foo(2120, 34, 34, f='ava')
-_foo2(210, 34, 343, e='dd')
-storage.json(temp_fold)
 
 # now the bloody parser
 import json
@@ -59,3 +51,4 @@ D = D.append(X, ignore_index=True)
 
 if X.empty:
     print('h')
+

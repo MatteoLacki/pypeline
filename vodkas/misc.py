@@ -1,11 +1,12 @@
-import multiprocessing
-from inspect import signature
-from functools import wraps, update_wrapper
-from pathlib import Path
-import json
-from datetime import datetime
-import builtins
 import argparse
+import builtins
+from datetime import datetime
+from functools import wraps, update_wrapper
+from inspect import signature
+import json
+import multiprocessing
+from pathlib import Path
+from time import time
 
 
 def get_coresNo():
@@ -73,25 +74,52 @@ def now():
     return "{}-{}-{}_{}-{}-{}".format(d.year,d.month,d.day,d.hour,d.minute,d.second)
 
 
-class GreatWrap(StoreWrap):
-    """Is to StoreWrap as Great Gatsby was to mere Gatsby."""
-    def json(self, *output_folders):
+class FuncState(dict):
+    """Store the state of function calls."""
+    def wrap(self, functions):
+        """Wrap functions.
+
+        Args:
+            functions (list): some functions to wrap.
+
+        Returns:
+            list of wrapped functions."""
+        def w(f):
+            self[f.__name__] = []
+            sign = signature(f)
+            def wrapper(*args, **kwds):
+                _args = sign.bind(*args, **kwds)
+                _args.apply_defaults()
+                _args = dict(_args.arguments)
+                _args.update(_args.pop('kwds'))
+                self[f.__name__].append(_args)
+                t0 = time()
+                r = f(*args, **kwds)
+                t1 = time()
+                self[f.__name__][-1]['__runtime__'] = t1 - t0
+                return r
+            update_wrapper(wrapper, f)
+            return wrapper
+        return [w(f) for f in functions]
+
+    def json(self, *output_folders, prefix=''):
+        """Dump all to jsons in possibly different locations."""
         jetzt = now()
         for of in output_folders:
-            of = Path(of)/(jetzt + ".json")
+            of = Path(of)/(prefix + jetzt + ".json")
             with open(of, 'w') as f:
                 json.dump(self, f, indent=4)
 
 
-def store_wrap(*functions):
-    """Add to functions a storage for the arguments they were called with.
+def monitor(*functions):
+    """Get information on function call of enumerated functions.
 
     Args:
         *functions: some functions to wrap.
 
     Returns:
         The same functions followed by a storage dictionary."""
-    mem = GreatWrap()
+    mem = FuncState()
     functions = mem.wrap(functions)
     functions.append(mem)
     return functions
