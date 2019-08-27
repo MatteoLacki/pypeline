@@ -1,5 +1,6 @@
 from vodkas.misc import monitor, now
 from pathlib import Path
+from pprint import pprint
 
 def foo(a, b, c=10, **kwds):
     """abc"""
@@ -9,9 +10,12 @@ def foo2(a, b, c=10, **kwds):
     """abc"""
     return a*b*c
 
-_foo, _foo2, fun_monitor = monitor(foo, foo2)
-_foo(2120, 34, 34)
+_foo1, _foo2, fun_monitor = monitor(foo, foo2)
+_foo1(2120, 34, 34)
 _foo2(210, 34, 344230)
+_foo2(210, 34, 344230, f=12)
+
+pprint(fun_monitor)
 
 fold = Path('C:/SYMPHONY_VODKAS')
 temp_fold = fold/'temp_logs'
