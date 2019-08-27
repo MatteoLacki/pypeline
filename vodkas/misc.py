@@ -8,7 +8,6 @@ import multiprocessing
 from pathlib import Path
 from time import time
 
-
 def get_coresNo():
 	"""Detect the number of cores."""
 	return multiprocessing.cpu_count()

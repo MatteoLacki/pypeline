@@ -9,7 +9,7 @@ def iadbs(input_file,
           fasta_file,
           parameters_file,
           write_xml=True,
-          write_binary=False,
+          write_binary=True,
           write_csv=False,
           path_to_iadbs=default.iadbspath,
           debug=False,
@@ -17,16 +17,16 @@ def iadbs(input_file,
     """A wrapper around the infamous iaDBs.
     
     Args:
-        input_file (Path or str): a path to the pep3D spectrum file, xml or bin.
-        output_dir (Path or str): Path to where to place the output.
-        fasta_file (Path or str): Path to the fasta file used for search.
-        parameters_file (Path or str): Path to the search xml.
+        input_file (str): a path to the pep3D spectrum file, xml or bin.
+        output_dir (str): Path to where to place the output.
+        fasta_file (str): Path to the fasta file used for search.
+        parameters_file (str): Path to the search xml.
         write_xml (boolean): Write the output in an xml in the output folder.
         write_binary (boolean): Write the binary output in an xml in the output folder.
         write_csv (boolean): Write the ions to csv file.
-        path_to_iadbs (Path or str): Path to the "iaDBs.exe" executable.
+        path_to_iadbs (str): Path to the "iaDBs.exe" executable.
         debug (boolean): Debug mode.
-        **kwds: other parameters for 'subprocess.run'.
+        kwds: other parameters for 'subprocess.run'.
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
     """

@@ -7,26 +7,26 @@ import vodkas.default_paths as default
 def peptide3d(input_file,
               output_dir,
               write_xml=True,
-              write_binary=False,
+              write_binary=True,
               write_csv=False,
               write_binning=False,
               min_LEMHPlus=0,
               path_to_peptide3d=default.peptide3Dpath,
               debug=False,
               **kwds):
-    """A wrapper around the infamous Peptide3D.
+    """Run Peptide3D.
     
     Args:
-        input_file (Path or str): a path to the file containing Apex3D's outcomes (a binary file, with extension '.bin').
-        output_dir (Path or str): Path to where to place the output.
-        write_xml (boolean): Write the output in an xml in the output folder.
-        write_binary (boolean): Write the binary output in an xml in the output folder.
-        write_csv (boolean): Write the ions to csv file.
-        write_binning (boolean): Write binning file.
+        input_file (str): a path to the file containing Apex3D's outcomes (a binary file, with extension '.bin').
+        output_dir (str): Path to where to place the output.
+        write_xml (bool): Write the output in an xml in the output folder.
+        write_binary (bool): Write the binary output in an xml in the output folder.
+        write_csv (bool): Write the ions to csv file.
+        write_binning (bool): Write binning file.
         min_LEMHPlus (int): The minimal (M)ass of the (L)ow (E)nergy precursor with a single charge (H+).
-        path_to_peptide3d (Path or str): Path to the "Peptide3D.exe" executable.
-        debug (boolean): Debug mode.
-        **kwds: other parameters for 'subprocess.run'.
+        path_to_peptide3d (str): Path to the "Peptide3D.exe" executable.
+        debug (bool): Debug mode.
+        kwds: other parameters for 'subprocess.run'.
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
     """

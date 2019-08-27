@@ -1,58 +1,9 @@
-from docstr2argparse import foo2parser, parse_arguments
-from subprocess import TimeoutExpired
-
+from vodkas.cli import make_cli
 from vodkas.apex3d import apex3d
-from vodkas.misc import monitor
-from vodkas.default_paths import logs_folder_dict, logs_server_folder_dict
 
-debug = True
-apex3d, fun_monitor = monitor(apex3d)
-parser = foo2parser(apex3d)
-KWDS = dict(parse_arguments(apex3d))
-del KWDS['--write_xml'], KWDS['--write_binary'], KWDS['--cuda']
-KWDS["--no_xml"] = dict(
-    dest="write_xml",
-    action='store_false',
-    help="Don't dump the output to an xml file. [default = True]")
-KWDS["--no_binary"] = dict(
-    dest="write_binary",
-    action='store_false',
-    help="Don't dump the output into a binary format. [default = True]")
-KWDS["--no_CUDA"] = dict(
-    dest="cuda",
-    action='store_false',
-    help="Don't use CUDA, Getruda (haha). [default = False]")
-KWDS["--timeout"] = dict(
-    default=24,
-    type=lambda h: float(h)/3600,
-    help="Timeout [in hours] for the apex3d execution. [default = 24]")
-apex_args = KWDS.copy()
-# monitor arguments
-KWDS["--logs_folder"] = logs_folder_dict
-KWDS["--logs_server_folder"] = logs_server_folder_dict
-KWDS["--show_less_output"] = dict(
-    dest="capture_output",
-    action='store_true',
-    help="Don't show Apex3D output. [default = False]")
-KWDS["--comment"] = dict(help="Your custom comment.", type=str, default="")
-for name, kwds in KWDS.items():
-    parser.add_argument(name, **kwds)
-
-args = parser.parse_args()
-apex_args = args.__dict__.copy()
-del apex_args['logs_folder'], apex_args['logs_server_folder'], apex_args['comment']
-error = ""
-
-try:
-    out_file, process = apex3d(**apex_args)
-except TimeoutExpired:
-    error = 'Timeout of {} hour(s) reached.'.format(args.timeout)
-    print(error)
-except (RuntimeError,FileNotFoundError) as e:
-    error = "RuntimeError."
-    print(error)
-    print(e)
-
-fun_monitor['apex3d'][0]['__error__'] = error
-fun_monitor['apex3d'][0]['__comment__'] = args.comment
-fun_monitor.json(args.logs_folder, args.logs_server_folder, prefix='apex3d_')
+if __name__ == '__main__':
+    custom_kwds = {"--no_CUDA": 
+        dict(dest="cuda",
+             action='store_false',
+             help="Don't use CUDA, Getruda (haha). [default = False]")}
+    make_cli(apex3d, custom_kwds, ['--cuda'])
