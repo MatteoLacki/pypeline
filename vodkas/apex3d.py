@@ -84,9 +84,6 @@ def apex3d(raw_folder,
         print(out_bin.with_suffix(''))
     return out_bin.with_suffix(''), process
 
-
-
-
 def test_apex3d():
     """test the stupid Apex3D."""
     apex3d(Path("C:/ms_soft/MasterOfPipelines/RAW/O1903/O190302_01.raw"),
