@@ -85,7 +85,7 @@ def apex3d(raw_folder,
 
 
 def test_apex3d():
-    """test the stupid Apex3D."""
+    """test Apex3D."""
     apex3d(Path("C:/ms_soft/MasterOfPipelines/RAW/O1903/O190302_01.raw"),
            Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput"))
 
