@@ -73,6 +73,7 @@ def now():
     return "{}-{}-{}_{}-{}-{}".format(d.year,d.month,d.day,d.hour,d.minute,d.second)
 
 
+# this might be reinventing the bloody logging.
 class FuncState(dict):
     """Store the initial state of function calls and their timing."""
     def wrap(self, functions):
@@ -101,11 +102,22 @@ class FuncState(dict):
             return wrapper
         return [w(f) for f in functions]
 
-    def json(self, *output_folders, prefix=''):
-        """Dump all to jsons in possibly different locations."""
+    def json(self,
+             logs_folder='C:/SYMPHONY_VODKAS/temp_logs',
+             logs_server_folder = 'X:/SYMPHONY_VODKAS/temp_logs',
+             log_prefix='',
+             **kwds):
+        """Dump function calls to jsons locally and on server.
+
+        Args:
+            logs_folder (str): Path to the folder storing locally the logs.
+            logs_server_folder (str): Path to the folder storing remotely the logs.
+            log_prefix (str): prefix to the names of the output logs.
+            kwds: other arguments.
+        """
         jetzt = now()
-        for of in output_folders:
-            of = Path(of)/(prefix + jetzt + ".json")
+        for of in (logs_folder, logs_server_folder):
+            of = Path(of)/(log_prefix + jetzt + ".json")
             with open(of, 'w') as f:
                 json.dump(self, f, indent=4)
 

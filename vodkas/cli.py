@@ -1,8 +1,7 @@
 from docstr2argparse import foo2parser, parse_arguments
 from subprocess import TimeoutExpired
 
-from .misc import monitor
-from .default_paths import logs_folder_dict, logs_server_folder_dict
+from .misc import monitor, FuncState
 
 
 def make_cli(script, custom_args={}, custom_delete=[]):
@@ -30,8 +29,9 @@ def make_cli(script, custom_args={}, custom_delete=[]):
         default=24,
         type=lambda h: float(h)/3600,
         help="Timeout (in hours). [default = 24]")
-    K["--logs_folder"] = logs_folder_dict
-    K["--logs_server_folder"] = logs_server_folder_dict
+    K.update(parse_arguments(FuncState.json))
+    # K["--logs_folder"] = logs_folder_dict
+    # K["--logs_server_folder"] = logs_server_folder_dict
     K["--show_less_output"] = dict(
         dest="capture_output",
         action='store_true',

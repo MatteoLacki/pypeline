@@ -1,8 +1,6 @@
 import subprocess
 from pathlib import Path
 
-import vodkas.default_paths as default
-
 
 def iadbs(input_file,
           output_dir,
@@ -11,7 +9,7 @@ def iadbs(input_file,
           write_xml=True,
           write_binary=True,
           write_csv=False,
-          path_to_iadbs=default.iadbspath,
+          path_to_iadbs="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
           debug=False,
           subprocess_run_kwds={},
           **kwds):

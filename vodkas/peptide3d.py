@@ -1,8 +1,6 @@
 import subprocess
 from pathlib import Path
 
-import vodkas.default_paths as default
-
 
 def peptide3d(input_file,
               output_dir,
@@ -11,7 +9,7 @@ def peptide3d(input_file,
               write_csv=False,
               write_binning=False,
               min_LEMHPlus=0,
-              path_to_peptide3d=default.peptide3Dpath,
+              path_to_peptide3d="C:/SYMPHONY_VODKAS/plgs/Peptide3D.exe",
               debug=False,
               subprocess_run_kwds={},
               **kwds):

@@ -1,5 +1,5 @@
 from pathlib import Path
-from vodkas.fs import get_fasta_path
+from vodkas.fs import fastas
 from vodkas.misc import catch_arguments
 
 get_fasta_path('human')

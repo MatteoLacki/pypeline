@@ -2,7 +2,6 @@ import subprocess
 from pathlib import Path
 
 from vodkas.misc import get_coresNo
-import vodkas.default_paths as default
 from vodkas.exceptions import StdErr
 
 
@@ -17,7 +16,7 @@ def apex3d(raw_folder,
            write_binary=True,
            write_csv=False,
            max_used_cores=get_coresNo(),
-           path_to_apex3d=default.apex3Dpath,
+           path_to_apex3d="C:/SYMPHONY_VODKAS/plgs/Apex3D64.exe",
            PLGS=True,
            cuda=True,
            unsupported_gpu=True,

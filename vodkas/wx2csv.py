@@ -2,12 +2,10 @@ import subprocess
 from pathlib import Path
 import pandas as pd
 
-import vodkas.default_paths as default
-
 
 def wx2csv(input_file,
            output_file,
-           path_to_wx2csv=default.wx2csvpath,
+           path_to_wx2csv="C:/SYMPHONY_VODKAS/bin/wx2csv.jar",
            debug=False,
            java_minimal_heap_size='512m',
            **kwds):
