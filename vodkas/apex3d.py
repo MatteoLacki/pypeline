@@ -22,6 +22,7 @@ def apex3d(raw_folder,
            cuda=True,
            unsupported_gpu=True,
            debug=False,
+           subprocess_run_kwds={},
            **kwds):
     """Analyze a Waters Raw Folder with Apex3D.
     
@@ -42,7 +43,8 @@ def apex3d(raw_folder,
         cuda (boolean): Use CUDA.
         unsupported_gpu (boolean): Try using an unsupported GPU for calculations. If it doesn't work, the pipeline switches to CPU which is usually much slower.
         debug (boolean): Debug mode.
-        kwds: other parameters for 'subprocess.run'.
+        subprocess_run_kwds (dict): arguments for the subprocess.run.
+        kwds: other parameters.
     Returns:
         tuple: the path to the outcome (no extension: choose it yourself and believe more in capitalism) and the completed process.
     """
@@ -69,10 +71,10 @@ def apex3d(raw_folder,
     if debug:
         print('Apex3D debug:')
         print(cmd)
-    process = subprocess.run(cmd,**kwds)
+    process = subprocess.run(cmd,**subprocess_run_kwds)
     out_bin = output_dir/(raw_folder.stem + "_Apex3D.bin")
     out_xml = out_bin.with_suffix('.xml')
-    if kwds.get('capture_output', False):# otherwise no input was caught.
+    if subprocess_run_kwds.get('capture_output', False):# otherwise no input was caught.
         log = output_dir/"apex3d.log"
         log.write_bytes(process.stdout)
     if not out_bin.exists() and not out_xml.exists():

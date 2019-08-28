@@ -6,4 +6,5 @@ if __name__ == '__main__':
         dict(dest="cuda",
              action='store_false',
              help="Don't use CUDA, Getruda (haha). [default = False]")}
-    make_cli(apex3d, custom_kwds, ['--cuda'])
+    make_cli(apex3d, custom_kwds,
+             ['--cuda', '--subprocess_run_kwds'])

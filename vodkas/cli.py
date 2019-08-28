@@ -17,7 +17,7 @@ def make_cli(script, custom_args={}, custom_delete=[]):
     K = dict(parse_arguments(script))
     del K['--write_xml'], K['--write_binary'], 
     for c in custom_delete:
-        K[c]
+        del K[c]
     K["--no_xml"] = dict(
         dest="write_xml",
         action='store_false',

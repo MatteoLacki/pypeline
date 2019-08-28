@@ -13,8 +13,9 @@ def iadbs(input_file,
           write_csv=False,
           path_to_iadbs=default.iadbspath,
           debug=False,
+          subprocess_run_kwds={},
           **kwds):
-    """A wrapper around the infamous iaDBs.
+    """Run iaDBs.
     
     Args:
         input_file (str): a path to the pep3D spectrum file, xml or bin.
@@ -26,6 +27,7 @@ def iadbs(input_file,
         write_csv (boolean): Write the ions to csv file.
         path_to_iadbs (str): Path to the "iaDBs.exe" executable.
         debug (boolean): Debug mode.
+        subprocess_run_kwds (dict): arguments for the subprocess.run.
         kwds: other parameters for 'subprocess.run'.
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
@@ -48,14 +50,14 @@ def iadbs(input_file,
     if debug:
         print('iaDBs debug:')
         print(cmd)
-    process = subprocess.run(cmd, **kwds)
+    process = subprocess.run(cmd, **subprocess_run_kwds)
     if '_Pep3D_Spectrum' in input_file.stem:
         out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
     else:
         out = output_dir/(input_file.stem + "_IA_workflow")
     out_bin = out.with_suffix('.bin')
     out_xml = out.with_suffix('.xml')
-    if kwds.get('capture_output', False):# otherwise no input was caught.
+    if subprocess_run_kwds.get('capture_output', False):# otherwise no input was caught.
         log = output_dir/"iadbs.log"
         log.write_bytes(process.stdout)
     if debug:

@@ -41,17 +41,17 @@ def random_folder_name(k=20):
     return ''.join(choice(ascii_letters+digits) for n in range(int(k)))
 
 
-def get_fasta_path(proteome, 
-                   server=r'X:\SYMPHONY_VODKAS\fastas\latest',
-                   local=r'C:\SYMPHONY_VODKAS\fastas',
-                   **kwds):
+def get_fastas(proteome, 
+               server=r'X:\SYMPHONY_VODKAS\fastas\latest',
+               local=r'C:\SYMPHONY_VODKAS\fastas',
+               **kwds):
     """Get the path with the proper fastas.
 
     Args:
         proteome (str): the beginning of the fasta file.
         server (str or Path): path to the fastas on the server.
         local (str or Path): path to the local fastas.
-        **kwds: further arguments to subprocess.run used for copying.
+        kwds: further arguments to subprocess.run used for copying.
 
     Returns:
         Path to the local fasta file.

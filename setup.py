@@ -30,6 +30,6 @@ setup(
     scripts = ["bin/APEX3D",
                "bin/IADBS",
                "bin/PEPTIDE3D",
-               "bin/PLGS",
+               "bin/PLGS"
                ]
 )

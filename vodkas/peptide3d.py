@@ -13,19 +13,21 @@ def peptide3d(input_file,
               min_LEMHPlus=0,
               path_to_peptide3d=default.peptide3Dpath,
               debug=False,
+              subprocess_run_kwds={},
               **kwds):
     """Run Peptide3D.
     
     Args:
         input_file (str): a path to the file containing Apex3D's outcomes (a binary file, with extension '.bin').
         output_dir (str): Path to where to place the output.
-        write_xml (bool): Write the output in an xml in the output folder.
-        write_binary (bool): Write the binary output in an xml in the output folder.
-        write_csv (bool): Write the ions to csv file.
-        write_binning (bool): Write binning file.
+        write_xml (boolean): Write the output in an xml in the output folder.
+        write_binary (boolean): Write the binary output in an xml in the output folder.
+        write_csv (boolean): Write the ions to csv file.
+        write_binning (boolean): Write binning file.
         min_LEMHPlus (int): The minimal (M)ass of the (L)ow (E)nergy precursor with a single charge (H+).
         path_to_peptide3d (str): Path to the "Peptide3D.exe" executable.
-        debug (bool): Debug mode.
+        debug (boolean): Debug mode.
+        subprocess_run_kwds (dict): arguments for the subprocess.run.
         kwds: other parameters for 'subprocess.run'.
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
@@ -48,7 +50,7 @@ def peptide3d(input_file,
     if debug:
         print('Peptide3D debug:')
         print(cmd)
-    process = subprocess.run(cmd, **kwds)
+    process = subprocess.run(cmd, **subprocess_run_kwds)
     if '_Apex3D' in input_file.stem:
         out = input_file.parent/input_file.stem.replace('_Apex3D','_Pep3D_Spectrum')
     else:
@@ -56,7 +58,7 @@ def peptide3d(input_file,
         out = input_file.parent/out
     out_bin = out.with_suffix('.bin')
     out_xml = out.with_suffix('.xml')
-    if kwds.get('capture_output', False):# otherwise no input was caught.
+    if subprocess_run_kwds.get('capture_output', False):# otherwise no input was caught.
         log = output_dir/"peptide3d.log"
         log.write_bytes(process.stdout)
     if not out_bin.exists() and not out_xml.exists():

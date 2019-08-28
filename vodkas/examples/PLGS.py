@@ -1,7 +1,8 @@
 from pathlib import Path
 
 from vodkas import apex3d, peptide3d, iadbs
-from vodkas.misc import store_wrap
+from vodkas.fs import 
+from vodkas.misc import monitor
 
 
 def PLGS(raw_folder,
@@ -10,7 +11,8 @@ def PLGS(raw_folder,
          parameters_file="X:/SYMPHONY_VODKAS/search/251.xml",
          apex_kwds={},
          pep3d_kwds={},
-         iadbs_kwds={}):
+         iadbs_kwds={},
+         subprocess_run_kwds={}):
     """Run PLGS.
 
     A convenience wrapper around apex3d, peptide3d, and iaDBs.
@@ -29,9 +31,11 @@ def PLGS(raw_folder,
     raw_folder = Path(raw_folder)
     out_folder = Path(out_folder)
     fasta_file = Path(fasta_file)
+    get_fasta()
+
     parameters_file = Path(parameters_file)
 
-    apex3d, peptide3d, iadbs, args = store_wrap(apex3d, peptide3d, iadbs)
+    apex3d, peptide3d, iadbs, args = monitor(apex3d, peptide3d, iadbs)
 
     apexOutPath, apex_proc = apex3d(raw_folder, 
                                     out_folder,
@@ -54,8 +58,7 @@ def PLGS(raw_folder,
                                     parameters_file=parameters_file,
                                     capture_output=True,
                                     **iadbs_kwds)
-    
-    args['SUCCESS'] = True
+
     return apexOutBIN, pep3dOutXML, iadbsOutXML
 
     
