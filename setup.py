@@ -15,16 +15,21 @@ setup(
         'Mass Spectrometry',
         'Waters'
         'Symphony Pipeline',
-        'Going Insane'],
+        'Going insane because of a fucking pipeline'],
     classifiers=[
         'Development Status :: 1 - Planning',
         'License :: OSI Approved :: BSD License',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Chemistry',
         'Programming Language :: Python :: 3.6'],
-    license="GPL-3.0-or-later"
-    install_requires=[pandas],
+    license="GPL-3.0-or-later",
+    install_requires=['pandas',
+                      'docstr2argparse'],
     # include_package_data=True,
     # package_data={'data': ['data/contaminants_uniprot_format.fasta']},
-    # scripts = ["bin/update_fastas",]
+    scripts = ["bin/APEX3D",
+               "bin/IADBS",
+               "bin/PEPTIDE3D",
+               "bin/PLGS"
+               ]
 )

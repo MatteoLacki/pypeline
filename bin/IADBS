@@ -1,0 +1,5 @@
+from vodkas.cli import make_cli
+from vodkas.iadbs import iadbs
+
+if __name__ == '__main__':
+    make_cli(iadbs, custom_delete=['--subprocess_run_kwds'])

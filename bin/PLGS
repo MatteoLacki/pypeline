@@ -1,0 +1,30 @@
+import argparse
+import pandas as pd
+from pathlib import Path
+
+from docstr2argparse import parse_arguments
+
+from vodkas.apex3d import apex3d
+from vodkas.peptide3d import peptide3d
+from vodkas.iadbs import iadbs
+from vodkas.fs import get_fastas
+from vodkas.misc import monitor
+
+apex3d, peptide3d, iadbs, fun_monitor = monitor(apex3d, peptide3d, iadbs)
+
+parser = argparse.ArgumentParser(description='Analyze Waters Raw Data with PLGS.')
+_apex3d = dict(parse_arguments(apex3d))
+_peptide3d = dict(parse_arguments(peptide3d))
+_iadbs = dict(parse_arguments(iadbs))
+_args = {**_apex3d, **_peptide3d, **_iadbs}
+
+del _args['--debug'], _args['input_file']
+
+for name, kwds in _args.items():
+    parser.add_argument(name, **kwds)
+args = parser.parse_args()
+
+
+
+
+

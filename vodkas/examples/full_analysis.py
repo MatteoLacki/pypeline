@@ -15,10 +15,10 @@ def run_waters_pipeline(raw_folder,
     A convenience wrapper around apex3d, peptide3d, and iaDBs.
 
     Args:
-        raw_folder (Path or str): a path to the input folder with raw Waters data.
-        fasta_file (Path or str): Path to the fasta file used in iaDBs peptide search.
-        out_folder (Path or str): Path to where to place the output.
-        parameters_file (Path or str): Path to the search parameters used in iaDBs peptide search.
+        raw_folder (str): a path to the input folder with raw Waters data.
+        fasta_file (str): Path to the fasta file used in iaDBs peptide search.
+        out_folder (str): Path to where to place the output.
+        parameters_file (str): Path to the search parameters used in iaDBs peptide search.
         apex_kwds (dict): Other named arguments to apex3d.
         pep3d_kwds (dict): Other named arguments to peptide3d.
         iadbs_kwds (dict): Other named arguments to iaDBs.

@@ -22,14 +22,15 @@ def apex3d(raw_folder,
            cuda=True,
            unsupported_gpu=True,
            debug=False,
+           subprocess_run_kwds={},
            **kwds):
-    """A wrapper around the infamous Apex3D.
+    """Analyze a Waters Raw Folder with Apex3D.
     
     Args:
-        raw_folder (Path or str): a path to the input folder with raw Waters data.
-        output_dir (Path or str): Path to where to place the output.
+        raw_folder (str): a path to the input folder with raw Waters data.
+        output_dir (str): Path to where to place the output.
         lock_mass_z2 (float): The lock mass for doubly charged ion (which one, dunno, but I guess a very important one).
-        lock_mass_tol (float): Tolerance around lock mass (in atomic mass units, amu).
+        lock_mass_tol_amu (float): Tolerance around lock mass (in atomic mass units, amu).
         low_energy_thr (int): The minimal intensity of a precursor ion so that it ain't a noise peak.
         high_energy_thr (int): The minimal intensity of a fragment ion so that it ain't a noise peak.
         lowest_intensity_thr (int): The minimal intensity of a peak to be analyzed.
@@ -37,20 +38,22 @@ def apex3d(raw_folder,
         write_binary (boolean): Write the binary output in an xml in the output folder.
         write_csv (boolean): Write the output in a csv in the output folder (doesn't work).
         max_used_cores (int): The maximal number of cores to use.
-        path_to_apex3d (Path or str): Path to the "Apex3D.exe" executable.
+        path_to_apex3d (str): Path to the "Apex3D.exe" executable.
         PLGS (boolean): No idea what it is.
         cuda (boolean): Use CUDA.
         unsupported_gpu (boolean): Try using an unsupported GPU for calculations. If it doesn't work, the pipeline switches to CPU which is usually much slower.
         debug (boolean): Debug mode.
-        kwds: other parameters for 'subprocess.run'.
+        subprocess_run_kwds (dict): arguments for the subprocess.run.
+        kwds: other parameters.
     Returns:
         tuple: the path to the outcome (no extension: choose it yourself and believe more in capitalism) and the completed process.
     """
-    algo = str(Path(path_to_apex3d))
+    algo = Path(path_to_apex3d)
+    assert algo.exists(), "Executable is missing! '{}' not found.".format(algo)
     raw_folder = Path(raw_folder)
     output_dir = Path(output_dir)
     cmd = ["powershell.exe",
-        algo,
+        str(algo),
         "-pRawDirName {}".format(raw_folder),
         "-outputDirName {}".format(output_dir),
         "-lockMassZ2 {}".format(lock_mass_z2),
@@ -68,10 +71,10 @@ def apex3d(raw_folder,
     if debug:
         print('Apex3D debug:')
         print(cmd)
-    process = subprocess.run(cmd,**kwds)
+    process = subprocess.run(cmd,**subprocess_run_kwds)
     out_bin = output_dir/(raw_folder.stem + "_Apex3D.bin")
     out_xml = out_bin.with_suffix('.xml')
-    if kwds.get('capture_output', False):# otherwise no input was caught.
+    if subprocess_run_kwds.get('capture_output', False):# otherwise no input was caught.
         log = output_dir/"apex3d.log"
         log.write_bytes(process.stdout)
     if not out_bin.exists() and not out_xml.exists():
@@ -83,13 +86,10 @@ def apex3d(raw_folder,
         print(out_bin.with_suffix(''))
     return out_bin.with_suffix(''), process
 
-
 def test_apex3d():
     """test Apex3D."""
     apex3d(Path("C:/ms_soft/MasterOfPipelines/RAW/O1903/O190302_01.raw"),
            Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput"))
-
-
 
 if __name__ == "__main__":
     test_apex3d()

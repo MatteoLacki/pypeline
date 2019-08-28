@@ -23,7 +23,8 @@ def wx2csv(input_file,
     Returns:
         pandas.Dataframe
     """
-    algo = str(Path(path_to_wx2csv))
+    algo = Path(path_to_wx2csv)
+    assert algo.exists(), "Executable is missing! '{}' not found.".format(algo)
     input_file, output_file = Path(input_file), Path(output_file)
     if input_file.suffix != '.xml':
         raise RuntimeError("Peptide3D failed: it accepts 'bin' input files only.")
