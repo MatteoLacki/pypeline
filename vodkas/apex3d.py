@@ -83,6 +83,7 @@ def apex3d(raw_folder,
         raise StdErr(process)
     if debug:
         print(out_bin.with_suffix(''))
+        print('Apex3D finished.')
     return out_bin.with_suffix(''), process
 
 def test_apex3d():

@@ -69,6 +69,7 @@ def iadbs(input_file,
         raise RuntimeError("iaDBs failed: WTF")
     if debug:
         print(out_bin.with_suffix(''))
+        print('iaDBs finished.')
     return out_bin.with_suffix(''), process
 
 

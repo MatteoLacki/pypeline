@@ -66,6 +66,7 @@ def peptide3d(input_file,
         raise RuntimeError("Peptide3D failed: WTF")
     if debug:
         print(out_bin.with_suffix(''))
+        print('peptide3D finished.')
     return out_bin.with_suffix(''), process
 
 
