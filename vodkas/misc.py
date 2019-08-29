@@ -125,6 +125,8 @@ class FuncState(dict):
                 json.dump(self, f, indent=4)
 
 
+
+
 def monitor(*functions):
     """Get information on function call of enumerated functions.
 

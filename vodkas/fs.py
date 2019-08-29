@@ -54,8 +54,8 @@ def fastas(proteome,
 
     Args:
         proteome (str): the beginning of the fasta file.
-        server (str or Path): path to the fastas on the server.
-        local (str or Path): path to the local fastas.
+        server (str): path to the fastas on the server.
+        local (str): path to the local fastas.
         subprocess_run_kwds (dict): arguments for the subprocess.run.
         kwds: further arguments to subprocess.run used for copying.
 

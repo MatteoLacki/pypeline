@@ -4,11 +4,11 @@ from pathlib import Path
 
 def peptide3d(input_file,
               output_dir,
+              min_LEMHPlus=0,
               write_xml=True,
               write_binary=True,
               write_csv=False,
               write_binning=False,
-              min_LEMHPlus=0,
               path_to_peptide3d="C:/SYMPHONY_VODKAS/plgs/Peptide3D.exe",
               debug=False,
               subprocess_run_kwds={},
