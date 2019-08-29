@@ -15,15 +15,17 @@ def get_coresNo():
 
 def catch_arguments(foo):
     """Wrap function so that it returns both the passed arguments and the value."""
+    storage = []
     sign = signature(foo)
     @wraps(foo)
     def wrapper(*args, **kwds):
         _args = sign.bind(*args, **kwds)
         _args.apply_defaults()
         _args = dict(_args.arguments)
-        _args.update(_args.pop('kwds'))
-        return _args, foo(*args, **kwds)
-    return wrapper
+        _args.update(_args.pop('kwds', {}))
+        storage.append(_args)
+        return foo(*args, **kwds)
+    return wrapper, storage
 
 
 def store_args(storage):
@@ -60,6 +62,7 @@ class StoreWrap(dict):
                 _args.apply_defaults()
                 _args = dict(_args.arguments)
                 _args.update(_args.pop('kwds'))
+                _args = {k:repr(v) for k,v in _args.items()}
                 self[f.__name__].append(_args)
                 return f(*args, **kwds)
             update_wrapper(wrapper, f)

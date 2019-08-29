@@ -18,7 +18,6 @@ def cp(source, target, **kwds):
     assert platform.system() == 'Windows', "This command works only on Windows, as Symphony does."
     cmd = ['robocopy', str(s.parent), str(t), str(s.name)]
     return subprocess.run(cmd, **kwds)
-    
 
 
 def test_cp():
@@ -26,6 +25,11 @@ def test_cp():
         cp('C:/test_s/test.ref', 'C:/test_t')
         assert next(Path('C:/test_t').iterdir()) == Path('C:/test_t/test.ref')
         Path('C:/test_t/test.ref').unlink()
+
+
+def copy_folder(source, target):
+    return subprocess.run(['robocopy', str(source), str(target)])
+
 
 
 def random_folder_name(k=20):
@@ -42,8 +46,8 @@ def random_folder_name(k=20):
 
 
 def fastas(proteome, 
-           server=r'X:\SYMPHONY_VODKAS\fastas\latest',
-           local=r'C:\SYMPHONY_VODKAS\fastas',
+           server=r'X:/SYMPHONY_VODKAS/fastas/latest',
+           local=r'C:/SYMPHONY_VODKAS/fastas',
            subprocess_run_kwds={},
            **kwds):
     """Get the path with the proper fastas.
