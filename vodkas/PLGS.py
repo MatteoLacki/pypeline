@@ -72,6 +72,13 @@ def plgs(raw_folder,
         json.dump(params, f, indent=2) # for projectizer2.0
     if net_out:
         copy_folder(out, net_out)
+        for f in out.glob('*'):
+            f.unlink() # cleaning temp after use
+        out.rmdir()
+    #todo: it might be wiser not to base the naming convention only
+    # upon the existing folders. There should be some depot with all 
+    # used names and it should be searched for the current entry and
+    # should be updated.
 
     xml_params['apex3d']['local_raw_folder'] = str(out)
     xml_params['apex3d']['server_raw_folder'] = str(net_out)
