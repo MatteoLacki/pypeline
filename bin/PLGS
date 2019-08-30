@@ -31,9 +31,10 @@ try:
     args['error'] = ''
 except Exception as e:
     args['error'] = repr(e)
+    print(e)
 
 for algo, d in xml_params.items():
-    for k,v in d:
+    for k,v in d.items():
         args["{}:{}".format(algo, k)] = v
 write_log(args, 'plgs_', **args)
 
