@@ -8,7 +8,14 @@ from vodkas.fs import copy_folder, fastas
 from vodkas.xml_parser import parse_xmls
 
 
-def PLGS(raw_folder,
+def _2xml(p):
+    return p.with_suffix('.xml')
+
+def _2bin(p):
+    return p.with_suffix('.bin')
+
+
+def plgs(raw_folder,
          proteome,
          out_folder="C:/SYMPHONY_VODKAS/temp",
          network_out_folder="J:/test_RES",
@@ -28,25 +35,27 @@ def PLGS(raw_folder,
     Returns:
         dict: parsed parameters from the xml files.
     """
-    raw_folder = Path(raw_folder)
-    out_folder = Path(out_folder)
-    network_out_folder = Path(network_out_folder)
-    proj_tag = raw_folder.name[:5]
+    raw = Path(raw_folder)
+    out = Path(out_folder)
+    net_out = Path(network_out_folder)
+    proj_tag = raw.name[:5] # I1907, O1908, ...
     if proj_tag[0] in ('O','I'):
-        out_folder /= proj_tag
-    fasta_file = fastas(proteome, **kwds)
-    parameters_file = Path(parameters_file)
-    apexOut, _apex = apex3d(raw_folder, out_folder,**kwds)
-    pep3dOut, _pep = peptide3d(apexOut.with_suffix('.bin'), out_folder, **kwds)
-    iadbsOut, _iadbs = iadbs(pep3dOut.with_suffix('.xml'),
-                             out_folder,
-                             fasta_file,
-                             parameters_file,
-                             **kwds)    
-    # for projectizer2.0
-    xml_params, params = parse_xmls(apexOut, pep3dOut, iadbsOut)
-    with open(out_folder/'params.json', 'w') as f:
-        json.dump(params, f, indent=2)
-    # move the whole folder to the final location
-    copy_folder(out_folder, network_out_folder/proj_tag)
-    return xml_params
+        out /= proj_tag
+        if net_out:
+            net_out /= proj_tag
+    fas = fastas(proteome, **kwds)
+    par_f = Path(parameters_file) # 215.xml, ...
+    T = {}
+    a_p, _, T['apex3d'] = apex3d(raw, out, **kwds)
+    p_p, _, T['pep3d'] = peptide3d(_2bin(a_p), out, **kwds)
+    i_p, _, T['iadbs'] = iadbs(_2xml(p_p), out, fas, par_f,**kwds)
+
+    xml_params, params = parse_xmls(a_p, p_p, i_p)
+    with open(out/'params.json', 'w') as f:
+        json.dump(params, f, indent=2) # for projectizer2.0
+
+    if net_out:
+        copy_folder(out, net_out/proj_tag)
+
+    xml_params['pep3d']['fasta'] = fas
+    return xml_params, T

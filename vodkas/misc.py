@@ -125,8 +125,6 @@ class FuncState(dict):
                 json.dump(self, f, indent=4)
 
 
-
-
 def monitor(*functions):
     """Get information on function call of enumerated functions.
 
@@ -139,3 +137,25 @@ def monitor(*functions):
     functions = mem.wrap(functions)
     functions.append(mem)
     return functions
+
+
+def write_log(to_log,
+              log_prefix='',
+              logs_folder='C:/SYMPHONY_VODKAS/temp_logs',
+              logs_server_folder='X:/SYMPHONY_VODKAS/temp_logs',
+              **kwds):
+    """Log things to jsons.
+
+    Args:
+        to_log (dict): Things to log.
+        log_prefix (str): Prefix to the filename.
+        logs_folder (str): Path to the folder storing locally the logs.
+        logs_server_folder (str): Path to the folder storing remotely the logs.
+        kwds: further arguments.
+    """
+    local = Path(logs_folder)/(log_prefix + now() + '.json')
+    server = Path(logs_server_folder)/(log_prefix + now() + '.json')
+    with open(local, 'w') as f:
+        json.dump(to_log, f, indent=4)
+    with open(server, 'w') as f:
+        json.dump(to_log, f, indent=4)

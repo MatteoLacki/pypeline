@@ -1,5 +1,6 @@
 import subprocess
 from pathlib import Path
+from time import time
 
 
 def iadbs(input_file,
@@ -48,7 +49,9 @@ def iadbs(input_file,
     if debug:
         print('iaDBs debug:')
         print(cmd)
+    T0 = time()
     process = subprocess.run(cmd, **subprocess_run_kwds)
+    runtime = time() - T0
     if '_Pep3D_Spectrum' in input_file.stem:
         out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
     else:
@@ -70,7 +73,7 @@ def iadbs(input_file,
     if debug:
         print(out_bin.with_suffix(''))
         print('iaDBs finished.')
-    return out_bin.with_suffix(''), process
+    return out_bin.with_suffix(''), process, runtime
 
 
 def test_iadbs():

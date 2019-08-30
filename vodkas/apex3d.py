@@ -1,5 +1,6 @@
 import subprocess
 from pathlib import Path
+from time import time
 
 from vodkas.misc import get_coresNo
 from vodkas.exceptions import StdErr
@@ -70,7 +71,9 @@ def apex3d(raw_folder,
     if debug:
         print('Apex3D debug:')
         print(cmd)
+    T0 = time()
     process = subprocess.run(cmd,**subprocess_run_kwds)
+    runtime = time() - T0
     out_bin = output_dir/(raw_folder.stem + "_Apex3D.bin")
     out_xml = out_bin.with_suffix('.xml')
     if subprocess_run_kwds.get('capture_output', False):# otherwise no input was caught.
@@ -84,7 +87,7 @@ def apex3d(raw_folder,
     if debug:
         print(out_bin.with_suffix(''))
         print('Apex3D finished.')
-    return out_bin.with_suffix(''), process
+    return out_bin.with_suffix(''), process, runtime
 
 def test_apex3d():
     """test the stupid Apex3D."""

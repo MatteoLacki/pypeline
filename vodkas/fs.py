@@ -46,24 +46,24 @@ def random_folder_name(k=20):
 
 
 def fastas(proteome, 
-           server=r'X:/SYMPHONY_VODKAS/fastas/latest',
-           local=r'C:/SYMPHONY_VODKAS/fastas',
+           fasta_db_server=r'X:/SYMPHONY_VODKAS/fastas/latest',
+           fasta_db_local=r'C:/SYMPHONY_VODKAS/fastas',
            subprocess_run_kwds={},
            **kwds):
     """Get the path with the proper fastas.
 
     Args:
         proteome (str): the beginning of the fasta file.
-        server (str): path to the fastas on the server.
-        local (str): path to the local fastas.
+        fasta_db_server (str): path to the fastas on the server.
+        fasta_db_local (str): path to the local fastas.
         subprocess_run_kwds (dict): arguments for the subprocess.run.
         kwds: further arguments to subprocess.run used for copying.
 
     Returns:
         Path to the local fasta file.
     """
-    f_loc = Path(local)
-    f_ser = Path(server)
+    f_loc = Path(fasta_db_local)
+    f_ser = Path(fasta_db_server)
     try:
         f_ser = next(f_ser.glob(f"*/PLGS/{proteome}*.fasta"))
         if not (f_loc/f_ser.name).exists():

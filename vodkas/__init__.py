@@ -3,4 +3,5 @@ from .exceptions import StdErr
 from .peptide3d import peptide3d
 from .iadbs import iadbs
 from .wx2csv import wx2csv
-from .PLGS import PLGS
+from .plgs import plgs
+from .fs import fastas

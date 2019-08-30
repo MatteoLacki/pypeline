@@ -2,48 +2,39 @@ import argparse
 from pprint import pprint
 from docstr2argparse import parse_arguments
 import json
-from vodkas import apex3d, peptide3d, iadbs, PLGS
-from vodkas.fs import fastas
 from pathlib import Path
 
+from vodkas import apex3d, peptide3d, iadbs, plgs, fastas
+from vodkas.misc import write_log
 
 parser = argparse.ArgumentParser(description='Analyze Waters Raw Data with PLGS.')
-
-_plgs = dict(parse_arguments(PLGS))
-pprint(_plgs)
-
-#configuring output
-_fastas = dict(parse_arguments(fastas))
-_apex3d = dict(parse_arguments(apex3d))
-_peptide3d = dict(parse_arguments(peptide3d))
-_iadbs = dict(parse_arguments(iadbs))
-_a = {**_fastas,**_apex3d,**_peptide3d,**_iadbs}
-del _a['input_file'], _a['output_dir']
-del _a['fasta_file'], _a['parameters_file']
+parse = lambda x: dict(parse_arguments(x))
+_plgs = parse(plgs)
+_fastas = parse(fastas)
+_apex3d = parse(apex3d)
+_peptide3d = parse(peptide3d)
+_iadbs = parse(iadbs)
+_write_log = parse(write_log)
+_a = {**_fastas,**_apex3d,**_peptide3d,
+      **_iadbs,**_write_log}
+del _a['input_file'], _a['output_dir'], _a['to_log']
+del _a['fasta_file'], _a['parameters_file'], _a['--PLGS']
+del _a['--log_prefix']
 _a.update(_plgs)
-_a['--logs_folder'] = dict(
-    default='C:/SYMPHONY_VODKAS/temp_logs',
-    help="Path to the folder storing locally the logs.",
-    type=str)
-_a['--logs_server_folder'] = dict(
-    default='X:/SYMPHONY_VODKAS/temp_logs',
-    help='Path to the folder storing remotely the logs.',
-    type=str)
-
 for name, kwds in sorted(_a.items()):
     parser.add_argument(name, **kwds)
-
 args = parser.parse_args().__dict__
+
+xml_params = {}
 try:
-    # PLGS(**args)
+    xml_params, T = plgs(**args)
     args['error'] = ''
 except Exception as e:
     args['error'] = repr(e)
 
-print(args)
-# with open(Path(args['logs_folder']), 'w') as f:
-#     json.dump(args, f, indent=4)
-with open(Path(args['logs_server_folder']), 'w') as f:
-    json.dump(args, f, indent=4)
+for algo, d in xml_params.items():
+    for k,v in d:
+        args["{}:{}".format(algo, k)] = v
+write_log(args, 'plgs_', **args)
 
 print("PLGS finished.")
