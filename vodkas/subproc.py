@@ -10,13 +10,19 @@ def run_win_proc(cmd,
 
     Args:
         cmd (list): the command to be executed.
-        timeout (float): Timeout for the program execution.
+        timeout (float): Minute timeout for the program execution.
         log (str): Path to where to write the log.
     """
     kill = Path(cmd[1]).name
     kill = "Taskkill /IM {} /F".format(kill)
+    timeout *= 60 # seconds to minutes
     try:
-        out = open(log, "w") if log else None
+        if log:
+            log = Path(log)
+            log.parent.mkdir(parents=True, exist_ok=True)
+            out = open(log, "w")
+        else:
+            out = None
         T0 = time()
         pr = Popen(cmd, stdout=out)
         pr.communicate(timeout=timeout)

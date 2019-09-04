@@ -20,7 +20,7 @@ def apex3d(raw_folder,
            PLGS=True,
            cuda=True,
            unsupported_gpu=True,
-           timeout=60,
+           timeout_apex3d=60,
            make_log=True,
            **kwds):
     """Analyze a Waters Raw Folder with Apex3D.
@@ -41,7 +41,7 @@ def apex3d(raw_folder,
         PLGS (boolean): No idea what it is.
         cuda (boolean): Use CUDA.
         unsupported_gpu (boolean): Try using an unsupported GPU for calculations. If it doesn't work, the pipeline switches to CPU which is usually much slower.
-        timeout (float): Timeout in minutes.
+        timeout_apex3d (float): Timeout in minutes.
         make_log (boolean): Make log.
         kwds: other parameters.
     Returns:
@@ -69,7 +69,9 @@ def apex3d(raw_folder,
         f"-bEnableCuda {int(cuda)}",
         f"-bEnableUnsupportedGPUs {int(unsupported_gpu)}"]
 
-    pr, runtime = run_win_proc(cmd, timeout, log_path)
+    pr, runtime = run_win_proc(cmd, 
+                               timeout_apex3d,
+                               log_path)
 
     out_bin = output_dir/(raw_folder.stem + "_Apex3D.bin")
     out_xml = out_bin.with_suffix('.xml')

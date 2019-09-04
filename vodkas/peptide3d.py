@@ -11,7 +11,7 @@ def peptide3d(input_file,
               write_csv=False,
               write_binning=False,
               path_to_peptide3d="C:/SYMPHONY_VODKAS/plgs/Peptide3D.exe",
-              timeout=60,
+              timeout_peptide3d=60,
               make_log=True,
               **kwds):
     """Run Peptide3D.
@@ -25,7 +25,7 @@ def peptide3d(input_file,
         write_binning (boolean): Write binning file.
         min_LEMHPlus (int): The minimal (M)ass of the (L)ow (E)nergy precursor with a single charge (H+).
         path_to_peptide3d (str): Path to the "Peptide3D.exe" executable.
-        timeout (float): Timeout in minutes.
+        timeout_peptide3d (float): Timeout in minutes.
         make_log (boolean): Make log.
         kwds: other parameters.
     Returns:
@@ -49,7 +49,9 @@ def peptide3d(input_file,
             f"-WriteBinningFile {int(write_binning)}",
             f"-minLEMHPlus {min_LEMHPlus}"]
 
-    pr, runtime = run_win_proc(cmd, timeout, log_path)
+    pr, runtime = run_win_proc(cmd,
+                               timeout_peptide3d,
+                               log_path)
 
     if '_Apex3D' in input_file.stem:
         out = input_file.parent/input_file.stem.replace('_Apex3D','_Pep3D_Spectrum')

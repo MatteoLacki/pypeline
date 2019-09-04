@@ -21,16 +21,23 @@ del _a['input_file'], _a['output_dir'], _a['to_log']
 del _a['fasta_file'], _a['parameters_file'], _a['--PLGS']
 del _a['--log_prefix']
 _a.update(_plgs)
+_a["--no_logs"] = dict(
+    dest="make_log",
+    action='store_false',
+    help="Don't make logs.")
+
 for name, kwds in sorted(_a.items()):
     parser.add_argument(name, **kwds)
 args = parser.parse_args().__dict__
 
 xml_params = {}
+no_error = True
 try:
     xml_params, T = plgs(**args)
     args['error'] = ''
 except Exception as e:
     args['error'] = repr(e)
+    no_error = False
     print(e)
 
 for algo, d in xml_params.items():
@@ -38,4 +45,7 @@ for algo, d in xml_params.items():
         args["{}:{}".format(algo, k)] = v
 write_log(args, 'plgs_', **args)
 
-print("PLGS finished.")
+if no_error:
+    print("PLGS finished correctly.")
+else:
+    print("PLGS had errors.")

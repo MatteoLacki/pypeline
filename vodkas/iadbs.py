@@ -12,7 +12,7 @@ def iadbs(input_file,
           write_binary=True,
           write_csv=False,
           path_to_iadbs="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
-          timeout=60,
+          timeout_iadbs=60,
           make_log=True,
           **kwds):
     """Run iaDBs.
@@ -26,7 +26,7 @@ def iadbs(input_file,
         write_binary (boolean): Write the binary output in an xml in the output folder.
         write_csv (boolean): Write the ions to csv file.
         path_to_iadbs (str): Path to the "iaDBs.exe" executable.
-        timeout (float): Timeout in minutes.
+        timeout_iadbs (float): Timeout in minutes.
         make_log (boolean): Make log.
         kwds: other parameters.
     Returns:
@@ -49,7 +49,9 @@ def iadbs(input_file,
             f"-WriteBinary {int(write_binary)}",
             f"-bDeveloperCSVOutput {int(write_csv)}" ]
 
-    pr, runtime = run_win_proc(cmd, timeout, log_path)
+    pr, runtime = run_win_proc(cmd,
+                               timeout_iadbs,
+                               log_path)
 
     if '_Pep3D_Spectrum' in input_file.stem:
         out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
