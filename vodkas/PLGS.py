@@ -1,5 +1,7 @@
 import json
 from pathlib import Path
+from subprocess import TimeoutExpired
+from time import sleep
 
 from vodkas.apex3d import apex3d
 from vodkas.peptide3d import peptide3d
@@ -69,14 +71,23 @@ def plgs(raw_folder,
     fas = fastas(proteome, **kwds)
     par_f = Path(parameters_file) # 215.xml, ...
     T = {}
+
+    print('Apex3D')
     kwds['run_kwds']['timeout'] = timeout_apex3d
-    a_p, _, T['apex3d'] = apex3d(raw, out, **kwds)
+    kwds['run_kwds']['capture_output'] = False
+    kwds['run_kwds']['check'] = True
+    a_p, process, T['apex3d'] = apex3d(raw, out, **kwds)
+    sleep(10)
 
-    kwds['run_kwds']['timeout'] = timeout_peptide3d
-    p_p, _, T['pep3d'] = peptide3d(_2bin(a_p), out, **kwds)
+    # print('Peptide3D')
+    # kwds['run_kwds']['timeout'] = timeout_peptide3d
+    # p_p, _, T['pep3d'] = peptide3d(_2bin(a_p), out, **kwds)
+    # sleep(10)
 
-    kwds['run_kwds']['timeout'] = timeout_iadbs
-    i_p, _, T['iadbs'] = iadbs(_2xml(p_p), out, fas, par_f, **kwds)
+    # print('iadbs')
+    # kwds['run_kwds']['timeout'] = timeout_iadbs
+    # i_p, _, T['iadbs'] = iadbs(_2xml(p_p), out, fas, par_f, **kwds)
+    # sleep(10)
 
     xml_params, params = parse_xmls(a_p, p_p, i_p)
 

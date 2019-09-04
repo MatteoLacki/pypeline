@@ -1,6 +1,6 @@
-import subprocess
 from pathlib import Path
-from time import time
+
+from vodkas.subproc import run_win_proc
 
 
 def peptide3d(input_file,
@@ -11,8 +11,8 @@ def peptide3d(input_file,
               write_csv=False,
               write_binning=False,
               path_to_peptide3d="C:/SYMPHONY_VODKAS/plgs/Peptide3D.exe",
-              debug=False,
-              run_kwds={},
+              timeout=60,
+              make_log=True,
               **kwds):
     """Run Peptide3D.
     
@@ -25,9 +25,9 @@ def peptide3d(input_file,
         write_binning (boolean): Write binning file.
         min_LEMHPlus (int): The minimal (M)ass of the (L)ow (E)nergy precursor with a single charge (H+).
         path_to_peptide3d (str): Path to the "Peptide3D.exe" executable.
-        debug (boolean): Debug mode.
-        run_kwds (dict): arguments for the subprocess.run.
-        kwds: other parameters for 'subprocess.run'.
+        timeout (float): Timeout in minutes.
+        make_log (boolean): Make log.
+        kwds: other parameters.
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
     """
@@ -37,21 +37,20 @@ def peptide3d(input_file,
     output_dir = Path(output_dir)
     if input_file.suffix != '.bin':
         raise RuntimeError("Peptide3D failed: it accepts 'bin' input files only.")
+    log_path = output_dir/"peptide3d.log" if make_log else ""
+
     cmd = ["powershell.exe",
             str(algo),
-            "-inputFileName {}".format(input_file),
-            "-outputDirName {}".format(output_dir),
-            "-WriteXML {}".format(int(write_xml)),
-            "-WriteBinary {}".format(int(write_binary)),
-            "-WriteAllIonsToCSV {}".format(int(write_csv)),
-            "-WriteBinningFile {}".format(int(write_binning)),
-            "-minLEMHPlus {}".format(min_LEMHPlus) ]
-    if debug:
-        print('Peptide3D debug:')
-        print(cmd)
-    T0 = time()
-    process = subprocess.run(cmd, **run_kwds)
-    runtime = time() - T0
+            f"-inputFileName {input_file}",
+            f"-outputDirName {output_dir}",
+            f"-WriteXML {int(write_xml)}",
+            f"-WriteBinary {int(write_binary)}",
+            f"-WriteAllIonsToCSV {int(write_csv)}",
+            f"-WriteBinningFile {int(write_binning)}",
+            f"-minLEMHPlus {min_LEMHPlus}"]
+
+    pr, runtime = run_win_proc(cmd, timeout, log_path)
+
     if '_Apex3D' in input_file.stem:
         out = input_file.parent/input_file.stem.replace('_Apex3D','_Pep3D_Spectrum')
     else:
@@ -59,18 +58,15 @@ def peptide3d(input_file,
         out = input_file.parent/out
     out_bin = out.with_suffix('.bin')
     out_xml = out.with_suffix('.xml')
-    if subprocess_run_kwds.get('capture_output', False):# otherwise no input was caught.
-        log = output_dir/"peptide3d.log"
-        log.write_bytes(process.stdout)
+
     if not out_bin.exists() and not out_xml.exists():
-        raise RuntimeError("Peptide3D failed: output is missing")
-    if process.stderr:
-        print(process.stderr)
+        raise RuntimeError("Peptide3D's output missing.")
+    
+    if pr.stderr:
+        print(pr.stderr)
         raise RuntimeError("Peptide3D failed: WTF")
-    if debug:
-        print(out_bin.with_suffix(''))
-        print('peptide3D finished.')
-    return out_bin.with_suffix(''), process, runtime
+
+    return out_bin.with_suffix(''), pr, runtime
 
 
 def test_peptide3d():

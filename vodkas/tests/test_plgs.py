@@ -35,24 +35,3 @@ net_out = Path(network_out_folder)
 proj_tag = raw.name[:5]
 
 
-def get_paths(raw_folder, out_folder, network_out_folder):
-    """Get proper names for the folders.
-
-    Checks, if the folder already exists somewhere.
-    Maybe it's stupid. Maybe it should check if it existed before?
-    """
-    raw = Path(raw_folder)
-    out = Path(out_folder)
-    net_out = Path(network_out_folder)
-    proj_tag = raw.name[:5]
-    if proj_tag[0] in ('O','I'):
-        used = {p.name for x in (out, net_out) for p in x.glob(proj_tag+'*')}
-        if used:
-            used_No = {int(t.split('_')[1]) for t in used if "_" in t}
-            if (out/proj_tag).exists() or (net_out/proj_tag).exists():
-                used_No.add(0)
-            proj_tag = "{}_{}".format(proj_tag, max(used_No) + 1)
-        out /= proj_tag
-        if net_out:
-            net_out /= proj_tag
-    return raw, out, net_out

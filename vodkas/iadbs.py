@@ -1,6 +1,7 @@
-import subprocess
 from pathlib import Path
 from time import time
+
+from vodkas.subproc import run_win_proc
 
 
 def iadbs(input_file,
@@ -11,8 +12,8 @@ def iadbs(input_file,
           write_binary=True,
           write_csv=False,
           path_to_iadbs="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
-          debug=False,
-          run_kwds={},
+          timeout=60,
+          make_log=True,
           **kwds):
     """Run iaDBs.
     
@@ -25,9 +26,9 @@ def iadbs(input_file,
         write_binary (boolean): Write the binary output in an xml in the output folder.
         write_csv (boolean): Write the ions to csv file.
         path_to_iadbs (str): Path to the "iaDBs.exe" executable.
-        debug (boolean): Debug mode.
-        run_kwds (dict): arguments for the subprocess.run.
-        kwds: other parameters for 'subprocess.run'.
+        timeout (float): Timeout in minutes.
+        make_log (boolean): Make log.
+        kwds: other parameters.
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
     """
@@ -37,43 +38,34 @@ def iadbs(input_file,
     output_dir = Path(output_dir)
     fasta_file = Path(fasta_file)
     parameters_file = Path(parameters_file)
-    cmd = [ "powershell.exe",
-            str(algo),
-            "-paraXMLFileName {}".format(parameters_file),
-            "-pep3DFilename {}".format(input_file),
-            "-proteinFASTAFileName {}".format(fasta_file),
-            "-outputDirName {}".format(output_dir),
-            "-WriteXML {}".format(int(write_xml)),
-            "-WriteBinary {}".format(int(write_binary)),
-            "-bDeveloperCSVOutput {}".format(int(write_csv)) ]
-    if debug:
-        print('iaDBs debug:')
-        print(cmd)
-    T0 = time()
-    process = subprocess.run(cmd, **run_kwds)
-    runtime = time() - T0
+    log_path = output_dir/"iadbs.log" if make_log else ""
+
+    cmd = [ "powershell.exe", str(algo),
+            f"-paraXMLFileName {parameters_file}",
+            f"-pep3DFilename {input_file}",
+            f"-proteinFASTAFileName {fasta_file}",
+            f"-outputDirName {output_dir}",
+            f"-WriteXML {int(write_xml)}",
+            f"-WriteBinary {int(write_binary)}",
+            f"-bDeveloperCSVOutput {int(write_csv)}" ]
+
+    pr, runtime = run_win_proc(cmd, timeout, log_path)
+
     if '_Pep3D_Spectrum' in input_file.stem:
         out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
     else:
         out = output_dir/(input_file.stem + "_IA_workflow")
     out_bin = out.with_suffix('.bin')
     out_xml = out.with_suffix('.xml')
-    if subprocess_run_kwds.get('capture_output', False):# otherwise no input was caught.
-        log = output_dir/"iadbs.log"
-        log.write_bytes(process.stdout)
-    if debug:
-        print(out_bin, out_bin.exists())
-        print(out_xml, out_xml.exists())
-        print((not out_bin.exists()) or (not out_xml.exists()))
-    if (not out_bin.exists()) and (not out_xml.exists()):# none exists
-        raise RuntimeError("WTF: output is missing: iaDBs failed.")
-    if process.stderr:
-        print(process.stderr)
+    
+    if not out_bin.exists() and not out_xml.exists():
+        raise RuntimeError("iaDBs' output missing.")
+
+    if pr.stderr:
+        print(pr.stderr)
         raise RuntimeError("iaDBs failed: WTF")
-    if debug:
-        print(out_bin.with_suffix(''))
-        print('iaDBs finished.')
-    return out_bin.with_suffix(''), process, runtime
+
+    return out_bin.with_suffix(''), pr, runtime
 
 
 def test_iadbs():
