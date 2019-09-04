@@ -12,7 +12,7 @@ def iadbs(input_file,
           write_csv=False,
           path_to_iadbs="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
           debug=False,
-          subprocess_run_kwds={},
+          run_kwds={},
           **kwds):
     """Run iaDBs.
     
@@ -26,7 +26,7 @@ def iadbs(input_file,
         write_csv (boolean): Write the ions to csv file.
         path_to_iadbs (str): Path to the "iaDBs.exe" executable.
         debug (boolean): Debug mode.
-        subprocess_run_kwds (dict): arguments for the subprocess.run.
+        run_kwds (dict): arguments for the subprocess.run.
         kwds: other parameters for 'subprocess.run'.
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
@@ -50,7 +50,7 @@ def iadbs(input_file,
         print('iaDBs debug:')
         print(cmd)
     T0 = time()
-    process = subprocess.run(cmd, **subprocess_run_kwds)
+    process = subprocess.run(cmd, **run_kwds)
     runtime = time() - T0
     if '_Pep3D_Spectrum' in input_file.stem:
         out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')

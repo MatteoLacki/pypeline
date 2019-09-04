@@ -12,7 +12,7 @@ def peptide3d(input_file,
               write_binning=False,
               path_to_peptide3d="C:/SYMPHONY_VODKAS/plgs/Peptide3D.exe",
               debug=False,
-              subprocess_run_kwds={},
+              run_kwds={},
               **kwds):
     """Run Peptide3D.
     
@@ -26,7 +26,7 @@ def peptide3d(input_file,
         min_LEMHPlus (int): The minimal (M)ass of the (L)ow (E)nergy precursor with a single charge (H+).
         path_to_peptide3d (str): Path to the "Peptide3D.exe" executable.
         debug (boolean): Debug mode.
-        subprocess_run_kwds (dict): arguments for the subprocess.run.
+        run_kwds (dict): arguments for the subprocess.run.
         kwds: other parameters for 'subprocess.run'.
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
@@ -50,7 +50,7 @@ def peptide3d(input_file,
         print('Peptide3D debug:')
         print(cmd)
     T0 = time()
-    process = subprocess.run(cmd, **subprocess_run_kwds)
+    process = subprocess.run(cmd, **run_kwds)
     runtime = time() - T0
     if '_Apex3D' in input_file.stem:
         out = input_file.parent/input_file.stem.replace('_Apex3D','_Pep3D_Spectrum')

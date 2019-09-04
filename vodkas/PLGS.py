@@ -44,6 +44,9 @@ def plgs(raw_folder,
          out_folder="C:/SYMPHONY_VODKAS/temp",
          network_out_folder="J:/test_RES",
          parameters_file="X:/SYMPHONY_VODKAS/search/215.xml",
+         timeout_apex3d=None,
+         timeout_peptide3d=None,
+         timeout_iadbs=None,
          **kwds):
     """Run PLGS.
 
@@ -55,6 +58,9 @@ def plgs(raw_folder,
         out_folder (str): Path to where to temporary storage.
         network_out_folder (str): Path to where to place the output on the server.
         parameters_file (str): Path to the search parameters used in iaDBs peptide search.
+        timeout_apex3d (float): Timeout for Apex3D.
+        timeout_peptide3d (float): Timeout for Peptide3D.
+        timeout_iadbs (float): Timeout for iaDBs.
         kwds: other named arguments.
     Returns:
         dict: parsed parameters from the xml files.
@@ -63,13 +69,20 @@ def plgs(raw_folder,
     fas = fastas(proteome, **kwds)
     par_f = Path(parameters_file) # 215.xml, ...
     T = {}
+    kwds['run_kwds']['timeout'] = timeout_apex3d
     a_p, _, T['apex3d'] = apex3d(raw, out, **kwds)
+
+    kwds['run_kwds']['timeout'] = timeout_peptide3d
     p_p, _, T['pep3d'] = peptide3d(_2bin(a_p), out, **kwds)
-    i_p, _, T['iadbs'] = iadbs(_2xml(p_p), out, fas, par_f,**kwds)
+
+    kwds['run_kwds']['timeout'] = timeout_iadbs
+    i_p, _, T['iadbs'] = iadbs(_2xml(p_p), out, fas, par_f, **kwds)
+
     xml_params, params = parse_xmls(a_p, p_p, i_p)
 
     with open(out/'params.json', 'w') as f:
         json.dump(params, f, indent=2) # for projectizer2.0
+
     if net_out:
         copy_folder(out, net_out)
         for f in out.glob('*'):
