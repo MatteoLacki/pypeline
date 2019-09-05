@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from vodkas.fs import check_algo
 from vodkas.subproc import run_win_proc
 
 
@@ -13,6 +14,7 @@ def peptide3d(input_file,
               path_to_peptide3d="C:/SYMPHONY_VODKAS/plgs/Peptide3D.exe",
               timeout_peptide3d=60,
               make_log=True,
+              verbose=False,
               **kwds):
     """Run Peptide3D.
     
@@ -27,12 +29,12 @@ def peptide3d(input_file,
         path_to_peptide3d (str): Path to the "Peptide3D.exe" executable.
         timeout_peptide3d (float): Timeout in minutes.
         make_log (boolean): Make log.
+        verbose (boolean): Make output verbose.
         kwds: other parameters.
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
     """
-    algo = Path(path_to_peptide3d)
-    assert algo.exists(), "Executable is missing! '{}' not found.".format(algo)
+    algo = check_algo(path_to_peptide3d, verbose)
     input_file = Path(input_file)
     output_dir = Path(output_dir)
     if input_file.suffix != '.bin':
@@ -63,10 +65,9 @@ def peptide3d(input_file,
 
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("Peptide3D's output missing.")
-    
-    if pr.stderr:
-        print(pr.stderr)
-        raise RuntimeError("Peptide3D failed: WTF")
+
+    if verbose:
+        print(f'Peptide3D finished in {runtime} minutes.')
 
     return out_bin.with_suffix(''), pr, runtime
 

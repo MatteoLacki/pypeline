@@ -15,7 +15,7 @@ def run_win_proc(cmd,
     """
     kill = Path(cmd[1]).name
     kill = "Taskkill /IM {} /F".format(kill)
-    timeout *= 60 # seconds to minutes
+    timeout *= 60 # seconds to minute
     try:
         if log:
             log = Path(log)

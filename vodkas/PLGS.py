@@ -65,16 +65,9 @@ def plgs(raw_folder,
     fas = fastas(proteome, **kwds)
     par_f = Path(parameters_file) # 215.xml, ...
     T = {}
-
-    print('Running Apex3D')
-    a_p, process, T['apex3d'] = apex3d(raw, out, **kwds)
-
-    print('Running Peptide3D')
-    p_p, _, T['pep3d'] = peptide3d(_2bin(a_p), out, **kwds)
-
-    print('Running iaDBs')
-    i_p, _, T['iadbs'] = iadbs(_2xml(p_p), out, fas, par_f, **kwds)
-
+    a_p, process, T['apex3d'] = apex3d(raw, out,**kwds)
+    p_p, _, T['pep3d'] = peptide3d(_2bin(a_p), out,**kwds)
+    i_p, _, T['iadbs'] = iadbs(_2xml(p_p), out, fas, par_f,**kwds)
     xml_params, params = parse_xmls(a_p, p_p, i_p)
 
     with open(out/'params.json', 'w') as f:
@@ -89,7 +82,6 @@ def plgs(raw_folder,
     # upon the existing folders. There should be some depot with all 
     # used names and it should be searched for the current entry and
     # should be updated.
-
     xml_params['apex3d']['local_raw_folder'] = str(out)
     xml_params['apex3d']['server_raw_folder'] = str(net_out)
     xml_params['peptide3d']['fasta'] = str(fas)

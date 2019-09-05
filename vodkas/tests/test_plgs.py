@@ -35,3 +35,10 @@ net_out = Path(network_out_folder)
 proj_tag = raw.name[:5]
 
 
+from vodkas import apex3d
+from pathlib import Path
+pr = apex3d('a','b')
+pr.communicate()
+pr.poll()
+pr.stderr
+

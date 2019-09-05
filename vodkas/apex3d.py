@@ -1,8 +1,8 @@
 from pathlib import Path
 
+from vodkas.fs import check_algo
 from vodkas.misc import get_coresNo
 from vodkas.subproc import run_win_proc
-from vodkas.exceptions import StdErr
 
 
 def apex3d(raw_folder,
@@ -22,6 +22,7 @@ def apex3d(raw_folder,
            unsupported_gpu=True,
            timeout_apex3d=60,
            make_log=True,
+           verbose=False,
            **kwds):
     """Analyze a Waters Raw Folder with Apex3D.
     
@@ -43,12 +44,12 @@ def apex3d(raw_folder,
         unsupported_gpu (boolean): Try using an unsupported GPU for calculations. If it doesn't work, the pipeline switches to CPU which is usually much slower.
         timeout_apex3d (float): Timeout in minutes.
         make_log (boolean): Make log.
+        verbose (boolean): Make output verbose.
         kwds: other parameters.
     Returns:
         tuple: the path to the outcome (no extension: choose it yourself and believe more in capitalism) and the completed process.
     """
-    algo = Path(path_to_apex3d)
-    assert algo.exists(), "Executable is missing! '{}' not found.".format(algo)
+    algo = check_algo(path_to_apex3d, verbose)
     raw_folder = Path(raw_folder)
     output_dir = Path(output_dir)
     log_path = output_dir/"apex3d.log" if make_log else ""
@@ -79,9 +80,8 @@ def apex3d(raw_folder,
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("Apex3D's output missing.")
 
-    if pr.stderr:
-        print(pr.stderr)
-        raise StdErr(pr)
+    if verbose:
+        print(f'Apex3 finished in {runtime} minutes.')
 
     return out_bin.with_suffix(''), pr, runtime
 

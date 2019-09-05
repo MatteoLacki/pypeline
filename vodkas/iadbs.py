@@ -1,6 +1,7 @@
 from pathlib import Path
 from time import time
 
+from vodkas.fs import check_algo
 from vodkas.subproc import run_win_proc
 
 
@@ -14,6 +15,7 @@ def iadbs(input_file,
           path_to_iadbs="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
           timeout_iadbs=60,
           make_log=True,
+          verbose=False,
           **kwds):
     """Run iaDBs.
     
@@ -28,12 +30,12 @@ def iadbs(input_file,
         path_to_iadbs (str): Path to the "iaDBs.exe" executable.
         timeout_iadbs (float): Timeout in minutes.
         make_log (boolean): Make log.
+        verbose (boolean): Make output verbose.
         kwds: other parameters.
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
     """
-    algo = Path(path_to_iadbs)
-    assert algo.exists(), "Executable is missing! '{}' not found.".format(algo)
+    algo = check_algo(path_to_iadbs, verbose)
     input_file = Path(input_file)
     output_dir = Path(output_dir)
     fasta_file = Path(fasta_file)
@@ -56,16 +58,15 @@ def iadbs(input_file,
     if '_Pep3D_Spectrum' in input_file.stem:
         out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
     else:
-        out = output_dir/(input_file.stem + "_IA_workflow")
+        out = output_dir/(input_file.stem+"_IA_workflow")
     out_bin = out.with_suffix('.bin')
     out_xml = out.with_suffix('.xml')
     
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("iaDBs' output missing.")
 
-    if pr.stderr:
-        print(pr.stderr)
-        raise RuntimeError("iaDBs failed: WTF")
+    if verbose:
+        print(f'iaDBs finished in {runtime} minutes.')
 
     return out_bin.with_suffix(''), pr, runtime
 

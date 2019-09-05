@@ -32,6 +32,7 @@ args = parser.parse_args().__dict__
 
 xml_params = {}
 no_error = True
+
 try:
     xml_params, T = plgs(**args)
     args['error'] = ''

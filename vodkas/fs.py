@@ -75,3 +75,13 @@ def fastas(proteome,
         return f_loc/f_ser.name
     except StopIteration:
         raise FileNotFoundError(f'There is no file starting with "{proteome}" on the server under "{f_ser}".')
+
+
+def check_algo(path_to_algorithm, 
+               verbose=False):
+    """Check if the algorithm's executable is there."""
+    algo = Path(path_to_algorithm)
+    assert algo.exists(), f"No '{algo}' found!"
+    if verbose:
+        print(f"Running {algo.name}")
+    return algo
