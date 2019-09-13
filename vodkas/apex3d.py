@@ -1,10 +1,9 @@
 import logging
-import subprocess
 from pathlib import Path
 
+from vodkas.fs import check_algo
 from vodkas.misc import get_coresNo
-import vodkas.default_paths as default
-from vodkas.exceptions import StdErr
+from vodkas.subproc import run_win_proc
 
 
 logger = logging.getLogger(__name__)
@@ -21,12 +20,13 @@ def apex3d(raw_folder,
            write_binary=True,
            write_csv=False,
            max_used_cores=get_coresNo(),
-           path_to_apex3d=default.apex3Dpath,
+           path_to_apex3d="C:/SYMPHONY_VODKAS/plgs/Apex3D64.exe",
            PLGS=True,
            cuda=True,
            unsupported_gpu=True,
-           debug=False,
-           subprocess_run_kwds={},
+           timeout_apex3d=60,
+           make_log=True,
+           verbose=False,
            **kwds):
     """Analyze a Waters Raw Folder with Apex3D.
     
@@ -46,49 +46,50 @@ def apex3d(raw_folder,
         PLGS (boolean): No idea what it is.
         cuda (boolean): Use CUDA.
         unsupported_gpu (boolean): Try using an unsupported GPU for calculations. If it doesn't work, the pipeline switches to CPU which is usually much slower.
-        debug (boolean): Debug mode.
-        subprocess_run_kwds (dict): arguments for the subprocess.run.
+        timeout_apex3d (float): Timeout in minutes.
+        make_log (boolean): Make log.
+        verbose (boolean): Make output verbose.
         kwds: other parameters.
     Returns:
         tuple: the path to the outcome (no extension: choose it yourself and believe more in capitalism) and the completed process.
     """
-    algo = Path(path_to_apex3d)
-    assert algo.exists(), "Executable is missing! '{}' not found.".format(algo)
+    algo = check_algo(path_to_apex3d, verbose)
     raw_folder = Path(raw_folder)
     output_dir = Path(output_dir)
-    cmd = ["powershell.exe",
-        str(algo),
-        "-pRawDirName {}".format(raw_folder),
-        "-outputDirName {}".format(output_dir),
-        "-lockMassZ2 {}".format(lock_mass_z2),
-        "-lockmassToleranceAMU {}".format(lock_mass_tol_amu),
-        "-leThresholdCounts {}".format(int(low_energy_thr)),
-        "-heThresholdCounts {}".format(int(high_energy_thr)),
-        "-binIntenThreshold {}".format(int(lowest_intensity_thr)),
-        "-writeXML {}".format(int(write_xml)),
-        "-writeBinary {}".format(int(write_binary)),
-        "-bRawCSVOutput {}".format(int(write_csv)),
-        "-maxCPUs {}".format(int(max_used_cores)),
-        "-PLGS {}".format(int(PLGS)),
-        "-bEnableCuda {}".format(int(cuda)),
-        "-bEnableUnsupportedGPUs {}".format(int(unsupported_gpu))]
-    if debug:
-        print('Apex3D debug:')
-        print(cmd)
-    process = subprocess.run(cmd,**subprocess_run_kwds)
+    log_path = output_dir/"apex3d.log" if make_log else ""
+
+    cmd = ["powershell.exe", str(algo),
+        f"-pRawDirName {raw_folder}",
+        f"-outputDirName {output_dir}",
+        f"-lockMassZ2 {lock_mass_z2}",
+        f"-lockmassToleranceAMU {lock_mass_tol_amu}",
+        f"-leThresholdCounts {low_energy_thr}",
+        f"-heThresholdCounts {high_energy_thr}",
+        f"-binIntenThreshold {lowest_intensity_thr}",
+        f"-writeXML {int(write_xml)}",
+        f"-writeBinary {int(write_binary)}",
+        f"-bRawCSVOutput {int(write_csv)}",
+        f"-maxCPUs {int(max_used_cores)}",
+        f"-PLGS {int(PLGS)}",
+        f"-bEnableCuda {int(cuda)}",
+        f"-bEnableUnsupportedGPUs {int(unsupported_gpu)}"]
+
+    pr, runtime = run_win_proc(cmd, 
+                               timeout_apex3d,
+                               log_path)
+
     out_bin = output_dir/(raw_folder.stem + "_Apex3D.bin")
     out_xml = out_bin.with_suffix('.xml')
-    if subprocess_run_kwds.get('capture_output', False):# otherwise no input was caught.
-        log = output_dir/"apex3d.log"
-        log.write_bytes(process.stdout)
+
     if not out_bin.exists() and not out_xml.exists():
-        raise RuntimeError("Apex3D failed: output is missing")
-    if process.stderr:
-        print(process.stderr)
-        raise StdErr(process)
-    if debug:
-        print(out_bin.with_suffix(''))
-    return out_bin.with_suffix(''), process
+        raise RuntimeError("Apex3D's output missing.")
+
+    if verbose:
+        print(f'Apex3 finished in {runtime} minutes.')
+
+    return out_bin.with_suffix(''), pr, runtime
+
+
 
 def test_apex3d():
     """test Apex3D."""
