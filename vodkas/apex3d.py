@@ -1,9 +1,13 @@
+import logging
 import subprocess
 from pathlib import Path
 
 from vodkas.misc import get_coresNo
 import vodkas.default_paths as default
 from vodkas.exceptions import StdErr
+
+
+logger = logging.getLogger(__name__)
 
 
 def apex3d(raw_folder,
