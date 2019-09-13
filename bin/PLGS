@@ -8,42 +8,30 @@ from vodkas.fs import copy_folder
 
 
 # if __name__ == '__main__':
-parser = argparse.ArgumentParser(description='Analyze Waters Raw Data with PLGS.')
-parse = lambda x: dict(parse_arguments(x))
-_plgs = parse(plgs)
-_fastas = parse(get_fastas)
-_apex3d = parse(apex3d)
-_peptide3d = parse(peptide3d)
-_iadbs = parse(iadbs)
-_a = {**_fastas,**_apex3d,**_peptide3d,**_iadbs}
-del _a['input_file'], _a['output_dir']
-del _a['fasta_file'], _a['--PLGS']
-
-_a.update(_plgs)
-_a["--no_log"] = dict(
-    dest="make_log",
-    action='store_false',
-    help="Do not log.")
-
+P = lambda x: dict(parse_arguments(x))
+A = {**P(get_fastas),**P(apex3d),**P(peptide3d),**P(iadbs)}
+A.update(P(plgs))
+del A['input_file'], A['output_dir']
+del A['fasta_file'], A['--PLGS']
+A["--no_log"] = dict(dest="make_log", action='store_false', help="Do not log.")
 default_log = 'C:/SYMPHONY_VODKAS/temp_logs/plgs.log'
-_a["--log_folder"] = dict(default=default_log,
+A["--log_folder"] = dict(default=default_log,
     help=f"Local folder for logs [default = {default_log}].")
 default_server = 'X:/SYMPHONY_VODKAS/temp_logs'
-_a["--log_server_folder"] = dict(
+A["--log_server_folder"] = dict(
     default=default_server,
     help=f"Network folder for logs [default = {default_server}].")
-
-for name, kwds in sorted(_a.items()):
+parser = argparse.ArgumentParser(description='Analyze Waters Raw Data with PLGS.')
+for name, kwds in sorted(A.items()):
     parser.add_argument(name, **kwds)
 args = parser.parse_args().__dict__
+
 
 if args.make_log:
     logging.basicConfig(filename=args.logs_folder,
                         format='PLGS %(asctime)s:%(name)s:%(levelname)s:%(message)s:',
                         level=logging.INFO)
 
-xml_params = {}
-no_error = True
 
 def get_paths(raw_folder, out_folder, network_out_folder):
     """Get proper names for the folders.
@@ -69,19 +57,25 @@ def get_paths(raw_folder, out_folder, network_out_folder):
     return raw, out, net_out
 
 
+raw_folder = ''
+
+
+try parse_header_txt()
+
+
 try:
-    xml_params, T = plgs(**args)
-    args['error'] = ''
+    args['raw_folder'], args['out_folder']
+    plgs(**args)
+    # copying to the server
+
+
 except Exception as e:
-    args['error'] = repr(e)
-    no_error = False
-    print(e)
+    logger.critical(repr(e))
 
-for algo, d in xml_params.items():
-    for k,v in d.items():
-        args["{}:{}".format(algo, k)] = v
+# for algo, d in xml_params.items():
+#     for k,v in d.items():
+#         args["{}:{}".format(algo, k)] = v
 # write_log(args, 'plgs_', **args)
-
 # network_out_folder="J:/test_RES",
 # network_out_folder (str): Path to where to place the output on the server.
 if net_out:

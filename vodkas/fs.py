@@ -4,7 +4,7 @@ import platform
 
 
 def cp(source, target, **kwds):
-    """Copy a file, or rather synchornize it.
+    """Copy a file, or rather synchronize it.
 
     On Windows, use robocopy.
     One would have to wrap the executables and use Wine on Linux.

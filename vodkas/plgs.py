@@ -4,7 +4,7 @@ from time import sleep
 from . import apex3d, peptide3d, iadbs
 from .fastas import get_fastas
 from .misc import call_info
-from .xml_parser import extract_params_from_xmls
+from .xml_parser import create_params_file
 
 
 logger = logging.getLogger(__name__)
@@ -28,9 +28,6 @@ def plgs(raw_folder, out_folder, **kwds):
     a, _ = apex3d(raw_folder, out_folder, **kwds)
     p, _ = peptide3d(a.with_suffix('bin'), out_folder,**kwds)
     i, _ = iadbs(p.with_suffix('xml'), out_folder, fastas, **kwds)
-    extract_params_from_xmls(a, p, i)
+    create_params_file(a, p, i)# for projectizer2.0
+    
     logger.info('PLGS finished.')
-    # xml_params, params = parse_xmls(a, p, i)
-    # with open(out/'params.json', 'w') as f:
-    #     json.dump(params, f, indent=2) # for projectizer2.0
-

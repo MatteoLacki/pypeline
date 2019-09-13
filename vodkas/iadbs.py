@@ -45,7 +45,7 @@ def iadbs(input_file,
     fasta_file = Path(fasta_file)
     parameters_file = Path(parameters_file)
 
-    cmd = [ "powershell.exe", str(algo),
+    cmd = [ "powershell.exe", algo,
             f"-paraXMLFileName {parameters_file}",
             f"-pep3DFilename {input_file}",
             f"-proteinFASTAFileName {fasta_file}",
