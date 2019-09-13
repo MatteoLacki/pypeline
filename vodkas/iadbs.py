@@ -1,21 +1,24 @@
+import logging
 from pathlib import Path
 from time import time
 
-from vodkas.fs import check_algo
-from vodkas.subproc import run_win_proc
+from .fs import check_algo
+from .misc import call_info
+from .subproc import run_win_proc
+
+
+logger = logging.getLogger(__name__)
 
 
 def iadbs(input_file,
           output_dir,
           fasta_file,
-          parameters_file,
+          parameters_file="X:/SYMPHONY_VODKAS/search/215.xml",
           write_xml=True,
           write_binary=True,
           write_csv=False,
           path_to_iadbs="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
           timeout_iadbs=60,
-          make_log=True,
-          verbose=False,
           **kwds):
     """Run iaDBs.
     
@@ -29,18 +32,18 @@ def iadbs(input_file,
         write_csv (boolean): Write the ions to csv file.
         path_to_iadbs (str): Path to the "iaDBs.exe" executable.
         timeout_iadbs (float): Timeout in minutes.
-        make_log (boolean): Make log.
-        verbose (boolean): Make output verbose.
         kwds: other parameters.
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
     """
-    algo = check_algo(path_to_iadbs, verbose)
+    logger.info('Running Peptide3D.')
+    logger.info(call_info(locals()))
+
+    algo = check_algo(path_to_iadbs)
     input_file = Path(input_file)
     output_dir = Path(output_dir)
     fasta_file = Path(fasta_file)
     parameters_file = Path(parameters_file)
-    log_path = output_dir/"iadbs.log" if make_log else ""
 
     cmd = [ "powershell.exe", str(algo),
             f"-paraXMLFileName {parameters_file}",
@@ -51,9 +54,7 @@ def iadbs(input_file,
             f"-WriteBinary {int(write_binary)}",
             f"-bDeveloperCSVOutput {int(write_csv)}" ]
 
-    pr, runtime = run_win_proc(cmd,
-                               timeout_iadbs,
-                               log_path)
+    pr, runtime = run_win_proc(cmd, timeout_iadbs)
 
     if '_Pep3D_Spectrum' in input_file.stem:
         out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
@@ -65,18 +66,17 @@ def iadbs(input_file,
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("iaDBs' output missing.")
 
-    if verbose:
-        print(f'iaDBs finished in {runtime} minutes.')
+    logger.info(f'iaDBs took {runtime} minutes.')
 
-    return out_bin.with_suffix(''), pr, runtime
+    return out_bin.with_suffix(''), pr
 
 
-def test_iadbs():
-    """Test the stupid iaDBs on Windows."""
-    iadbs(Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput/O190302_01_Pep3D_Spectrum.bin"),
-          Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput/"),
-          Path("C:/Symphony/Search/human.fasta"),
-          Path("C:/Symphony/Search/251.xml"))
+# def test_iadbs():
+#     """Test the stupid iaDBs on Windows."""
+#     iadbs(Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput/O190302_01_Pep3D_Spectrum.bin"),
+#           Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput/"),
+#           Path("C:/Symphony/Search/human.fasta"),
+#           Path("C:/Symphony/Search/251.xml"))
 
 #TODO: this could be done rather with the XML module
 def write_params_xml_file(path, 

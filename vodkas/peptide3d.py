@@ -1,7 +1,12 @@
+import logging
 from pathlib import Path
 
-from vodkas.fs import check_algo
-from vodkas.subproc import run_win_proc
+from .fs import check_algo
+from .misc import call_info
+from .subproc import run_win_proc
+
+
+logger = logging.getLogger(__name__)
 
 
 def peptide3d(input_file,
@@ -13,8 +18,6 @@ def peptide3d(input_file,
               write_binning=False,
               path_to_peptide3d="C:/SYMPHONY_VODKAS/plgs/Peptide3D.exe",
               timeout_peptide3d=60,
-              make_log=True,
-              verbose=False,
               **kwds):
     """Run Peptide3D.
     
@@ -28,21 +31,20 @@ def peptide3d(input_file,
         min_LEMHPlus (int): The minimal (M)ass of the (L)ow (E)nergy precursor with a single charge (H+).
         path_to_peptide3d (str): Path to the "Peptide3D.exe" executable.
         timeout_peptide3d (float): Timeout in minutes.
-        make_log (boolean): Make log.
-        verbose (boolean): Make output verbose.
         kwds: other parameters.
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
     """
-    algo = check_algo(path_to_peptide3d, verbose)
+    logger.info('Running Peptide3D.')
+    logger.info(call_info(locals()))
+
+    algo = check_algo(path_to_peptide3d)
     input_file = Path(input_file)
     output_dir = Path(output_dir)
     if input_file.suffix != '.bin':
         raise RuntimeError("Peptide3D failed: it accepts 'bin' input files only.")
-    log_path = output_dir/"peptide3d.log" if make_log else ""
 
-    cmd = ["powershell.exe",
-            str(algo),
+    cmd = ["powershell.exe", algo,
             f"-inputFileName {input_file}",
             f"-outputDirName {output_dir}",
             f"-WriteXML {int(write_xml)}",
@@ -51,9 +53,7 @@ def peptide3d(input_file,
             f"-WriteBinningFile {int(write_binning)}",
             f"-minLEMHPlus {min_LEMHPlus}"]
 
-    pr, runtime = run_win_proc(cmd,
-                               timeout_peptide3d,
-                               log_path)
+    pr, runtime = run_win_proc(cmd, timeout_peptide3d)
 
     if '_Apex3D' in input_file.stem:
         out = input_file.parent/input_file.stem.replace('_Apex3D','_Pep3D_Spectrum')
@@ -65,14 +65,13 @@ def peptide3d(input_file,
 
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("Peptide3D's output missing.")
+    
+    logger.info(f'Peptide3D took {runtime} minutes.')
 
-    if verbose:
-        print(f'Peptide3D finished in {runtime} minutes.')
-
-    return out_bin.with_suffix(''), pr, runtime
+    return out_bin.with_suffix(''), pr
 
 
-def test_peptide3d():
-    """Test the stupid Peptide3D."""
-    peptide3d(Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput/O190302_01_Apex3D.bin"),
-              Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput"))
+# def test_peptide3d():
+#     """Test the stupid Peptide3D."""
+#     peptide3d(Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput/O190302_01_Apex3D.bin"),
+#               Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput"))

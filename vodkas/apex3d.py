@@ -1,9 +1,9 @@
 import logging
 from pathlib import Path
 
-from vodkas.fs import check_algo
-from vodkas.misc import get_coresNo
-from vodkas.subproc import run_win_proc
+from .fs import check_algo
+from .misc import get_coresNo, call_info
+from .subproc import run_win_proc
 
 
 logger = logging.getLogger(__name__)
@@ -25,15 +25,13 @@ def apex3d(raw_folder,
            cuda=True,
            unsupported_gpu=True,
            timeout_apex3d=60,
-           make_log=True,
-           verbose=False,
            **kwds):
     """Analyze a Waters Raw Folder with Apex3D.
     
     Args:
         raw_folder (str): a path to the input folder with raw Waters data.
         output_dir (str): Path to where to place the output.
-        lock_mass_z2 (float): The lock mass for doubly charged ion (which one, dunno, but I guess a very important one).
+        lock_mass_z2 (float): The lock mass for doubly charged ion.
         lock_mass_tol_amu (float): Tolerance around lock mass (in atomic mass units, amu).
         low_energy_thr (int): The minimal intensity of a precursor ion so that it ain't a noise peak.
         high_energy_thr (int): The minimal intensity of a fragment ion so that it ain't a noise peak.
@@ -47,18 +45,18 @@ def apex3d(raw_folder,
         cuda (boolean): Use CUDA.
         unsupported_gpu (boolean): Try using an unsupported GPU for calculations. If it doesn't work, the pipeline switches to CPU which is usually much slower.
         timeout_apex3d (float): Timeout in minutes.
-        make_log (boolean): Make log.
-        verbose (boolean): Make output verbose.
         kwds: other parameters.
     Returns:
         tuple: the path to the outcome (no extension: choose it yourself and believe more in capitalism) and the completed process.
     """
-    algo = check_algo(path_to_apex3d, verbose)
+    logger.info('Running Apex3D.')
+    logger.info(call_info(locals()))
+
+    algo = check_algo(path_to_apex3d)
     raw_folder = Path(raw_folder)
     output_dir = Path(output_dir)
-    log_path = output_dir/"apex3d.log" if make_log else ""
 
-    cmd = ["powershell.exe", str(algo),
+    cmd = ["powershell.exe", algo,
         f"-pRawDirName {raw_folder}",
         f"-outputDirName {output_dir}",
         f"-lockMassZ2 {lock_mass_z2}",
@@ -74,27 +72,23 @@ def apex3d(raw_folder,
         f"-bEnableCuda {int(cuda)}",
         f"-bEnableUnsupportedGPUs {int(unsupported_gpu)}"]
 
-    pr, runtime = run_win_proc(cmd, 
-                               timeout_apex3d,
-                               log_path)
+    pr, runtime = run_win_proc(cmd, timeout_apex3d)
 
     out_bin = output_dir/(raw_folder.stem + "_Apex3D.bin")
     out_xml = out_bin.with_suffix('.xml')
 
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("Apex3D's output missing.")
-
-    if verbose:
-        print(f'Apex3 finished in {runtime} minutes.')
-
-    return out_bin.with_suffix(''), pr, runtime
-
+    
+    logger.info(f'Apex3 took {runtime} minutes.')
+    
+    return out_bin.with_suffix(''), pr
 
 
-def test_apex3d():
-    """test Apex3D."""
-    apex3d(Path("C:/ms_soft/MasterOfPipelines/RAW/O1903/O190302_01.raw"),
-           Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput"))
+# def test_apex3d():
+#     """test Apex3D."""
+#     apex3d(Path("C:/ms_soft/MasterOfPipelines/RAW/O1903/O190302_01.raw"),
+#            Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput"))
 
-if __name__ == "__main__":
-    test_apex3d()
+# if __name__ == "__main__":
+#     test_apex3d()

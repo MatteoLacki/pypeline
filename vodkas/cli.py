@@ -28,7 +28,7 @@ def make_cli(script, custom_args={}, custom_delete=[]):
     K["--no_logs"] = dict(
         dest="make_log",
         action='store_false',
-        help="Don't make logs.")
+        help="Do not log.")
     K["--timeout"] = dict(
         default=24,
         type=lambda h: float(h)/3600,

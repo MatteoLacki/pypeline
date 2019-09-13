@@ -44,3 +44,11 @@ def parse_xmls(apex_xml, pept_xml, work_xml):
              ('work:','iadbs')) for k,v in x[w].items()}
     return x, flat
     
+
+def extract_params_from_xmls(apex_xml, pept_xml, work_xml):
+    params = {p+k:v for p,w in 
+              (('apex:','apex3d'),
+               ('spec:','peptide3d'),
+               ('work:','iadbs')) for k,v in x[w].items()}
+    with open() as f:
+        json.dump(params)
