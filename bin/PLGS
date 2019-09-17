@@ -25,7 +25,7 @@ default_net_db = 'J:/test_RES' if DEBUG else 'Y:/RES'
 
 A["--out_folder"] = {
     'default': default_out,
-    'help': f"Local folder to save data to (we will append) [default = {default_out}]."}
+    'help': f"Local folder to save data to (there we will place the results) [default = {default_out}]."}
 
 A["--log_folder"] = {
     'default': default_log,
