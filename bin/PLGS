@@ -40,29 +40,8 @@ A["--network_db_folder"] = {
     'help': f'Network folder for results. Set to '' (empty word) if you want to skip copying [default = {default_net_db}].'}
 
 parser = argparse.ArgumentParser(description='Analyze Waters Raw Data with PLGS.')
-<<<<<<< HEAD
-parse = lambda x: dict(parse_arguments(x))
-_plgs = parse(plgs)
-_fastas = parse(fastas)
-_apex3d = parse(apex3d)
-_peptide3d = parse(peptide3d)
-_iadbs = parse(iadbs)
-_write_log = parse(write_log)
-_a = {**_fastas,**_apex3d,**_peptide3d,
-      **_iadbs,**_write_log}
-del _a['input_file'], _a['output_dir'], _a['to_log']
-del _a['fasta_file'], _a['parameters_file'], _a['--PLGS']
-del _a['--log_prefix']
-_a.update(_plgs)
-_a["--no_logs"] = dict(
-    dest="make_log",
-    action='store_false',
-    help="Don't make logs.")
-_a["--verbose"]['action']='store_true'
-for name, kwds in sorted(_a.items()):
-=======
+
 for name, kwds in sorted(A.items()):
->>>>>>> 9b02d03f1c067a722516bfbf5c81becb6a2250ab
     parser.add_argument(name, **kwds)
 args = parser.parse_args().__dict__
 
