@@ -4,82 +4,70 @@ import logging
 from pathlib import Path
 
 from vodkas import apex3d, peptide3d, iadbs, plgs, get_fastas
-from vodkas.fs import copy_folder
+from vodkas.fs import copy_folder, find_free_path
+from vodkas.header_txt import parse_header_txt
 
+
+DEBUG = True
 
 # if __name__ == '__main__':
 P = lambda x: dict(parse_arguments(x))
-A = {**P(get_fastas),**P(apex3d),**P(peptide3d),**P(iadbs)}
+A = {**P(get_fastas), **P(apex3d), **P(peptide3d), **P(iadbs)}
 A.update(P(plgs))
-del A['input_file'], A['output_dir']
+
+del A['input_file'], A['output_dir'], A['out_folder']
 del A['fasta_file'], A['--PLGS']
-A["--no_log"] = dict(dest="make_log", action='store_false', help="Do not log.")
+
+default_out = 'C:/SYMPHONY_VODKAS/temp'
 default_log = 'C:/SYMPHONY_VODKAS/temp_logs/plgs.log'
-A["--log_folder"] = dict(default=default_log,
-    help=f"Local folder for logs [default = {default_log}].")
 default_server = 'X:/SYMPHONY_VODKAS/temp_logs'
-A["--log_server_folder"] = dict(
-    default=default_server,
-    help=f"Network folder for logs [default = {default_server}].")
+default_net_db = 'J:/test_RES' if DEBUG else 'Y:/RES'
+
+A["--out_folder"] = {
+    'default': default_out,
+    'help': f"Local folder to save data to (we will append) [default = {default_out}]."}
+
+A["--log_folder"] = {
+    'default': default_log,
+    'help': f"Local folder for logs [default = {default_log}]."}
+
+A["--log_server_folder"] = {
+    'default': default_server,
+    'help': f"Network folder for logs [default = {default_server}]."}
+
+A["--network_db_folder"] = {
+    'default': default_net_db,
+    'help': f'Network folder for results. Set to '' (empty word) if you want to skip copying [default = {default_net_db}].'}
+
 parser = argparse.ArgumentParser(description='Analyze Waters Raw Data with PLGS.')
 for name, kwds in sorted(A.items()):
     parser.add_argument(name, **kwds)
 args = parser.parse_args().__dict__
 
-
-if args.make_log:
-    logging.basicConfig(filename=args.logs_folder,
-                        format='PLGS %(asctime)s:%(name)s:%(levelname)s:%(message)s:',
-                        level=logging.INFO)
-
-
-def get_paths(raw_folder, out_folder, network_out_folder):
-    """Get proper names for the folders.
-
-    Checks, if the folder already exists somewhere.
-    Maybe it's stupid. Maybe it should check if it existed before?
-    """
-    raw = Path(raw_folder)
-    out = Path(out_folder)
-    net_out = Path(network_out_folder)
-    proj_tag = raw.name[:5]
-    if proj_tag[0] in ('O','I'):
-        used = {p.name for x in (out, net_out)
-                        for p in x.glob(proj_tag+'*')}
-        if used:
-            used_No = {int(t.split('_')[1]) for t in used if "_" in t}
-            if (out/proj_tag).exists() or (net_out/proj_tag).exists():
-                used_No.add(0)
-            proj_tag = "{}_{}".format(proj_tag, max(used_No) + 1)
-        out /= proj_tag
-        if net_out:
-            net_out /= proj_tag
-    return raw, out, net_out
+logging.basicConfig(filename=args['logs_folder'],
+                    format='PLGS %(asctime)s:%(name)s:%(levelname)s:%(message)s:',
+                    level=logging.INFO)
+logger = logging.getLogger(__name__)
+del args['log_folder']
 
 
-raw_folder = ''
-
-
-try parse_header_txt()
-
+raw_folder = Path(args['raw_folder']) if not DEBUG else \
+             Path("C:/ms_soft/MasterOfPipelines/Data/O190302_01.raw")
+acquired_name = raw_folder.stem
+header_txt = parse_header_txt(raw_folder/'_HEADER.TXT')
+sample_set = header_txt['Sample Description'][:8]
+out_folder = Path(args['out_folder'])/sample_set/acquired_name
 
 try:
-    args['raw_folder'], args['out_folder']
     plgs(**args)
-    # copying to the server
-
-
+    if args['network_db_folder']:
+        net_folder = Path(args['network_db_folder'])/sample_set/acquired_name
+        net_folder = find_free_path(net_folder) # avoid network folder overwriting
+        copy_folder(out_folder, network_db_folder)
+        for f in out_folder.glob('*'):
+            f.unlink() # cleaning temp after use
+        out_folder.rmdir()
+        logger.info("Copied results to the server.")
+    logger.info("PLGS finished successfully.")
 except Exception as e:
     logger.critical(repr(e))
-
-# for algo, d in xml_params.items():
-#     for k,v in d.items():
-#         args["{}:{}".format(algo, k)] = v
-# write_log(args, 'plgs_', **args)
-# network_out_folder="J:/test_RES",
-# network_out_folder (str): Path to where to place the output on the server.
-if net_out:
-    copy_folder(out, net_out)
-    for f in out.glob('*'):
-        f.unlink() # cleaning temp after use
-    out.rmdir()

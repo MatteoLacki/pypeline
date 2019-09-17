@@ -28,8 +28,8 @@ def test_cp():
 
 
 def copy_folder(source, target):
-    return subprocess.run(['robocopy', str(source), str(target)])
-
+    cmd = ['robocopy', str(source), str(target), "/E"]
+    return subprocess.run(cmd)
 
 
 def random_folder_name(k=20):
@@ -50,3 +50,21 @@ def check_algo(path_to_algorithm):
     algo = Path(path_to_algorithm)
     assert algo.exists(), f"No '{algo}' found!"
     return str(algo)
+
+
+def find_free_path(p):
+    """Find the first free path for storing data by modifying the sample_set_no.
+
+    Starting from: path/sample_set_no/acquired_name
+    The procedure checks recursively if that path exists.
+    If it does, append a free version number to sample_set_no.
+
+    Args:
+        p (str): Path to check and modify.
+    """
+    i = 0
+    q = Path(p)
+    while q.is_dir():
+        i += 1
+        q = Path(f"{p.parent}__v{i}")/p.name
+    return q
