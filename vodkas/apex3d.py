@@ -1,3 +1,5 @@
+import json
+import logging 
 from pathlib import Path
 
 from vodkas.fs import check_algo
@@ -49,6 +51,10 @@ def apex3d(raw_folder,
     Returns:
         tuple: the path to the outcome (no extension: choose it yourself and believe more in capitalism) and the completed process.
     """
+    args = locals() # parameters to log
+    del args['kwds'] # contains shit from wrappers
+    logging.info(args)
+
     algo = check_algo(path_to_apex3d, verbose)
     raw_folder = Path(raw_folder)
     output_dir = Path(output_dir)
@@ -78,9 +84,12 @@ def apex3d(raw_folder,
     out_xml = out_bin.with_suffix('.xml')
 
     if not out_bin.exists() and not out_xml.exists():
-        raise RuntimeError("Apex3D's output missing.")
+        msg = "Apex3D's output missing."
+        logging.error(msg)
+        raise RuntimeError(msg)
 
     if verbose:
+        logging.info(runtime)
         print(f'Apex3 finished in {runtime} minutes.')
 
     return out_bin.with_suffix(''), pr, runtime

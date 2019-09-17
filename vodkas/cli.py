@@ -33,6 +33,8 @@ def make_cli(script, custom_args={}, custom_delete=[]):
         default=24,
         type=lambda h: float(h)/3600,
         help="Timeout (in hours). [default = 24]")
+    K["--verbose"]['action'] = "store_true"
+    K["--verbose"]['dest'] = "verbose"
     K.update(parse_arguments(FuncState.json))
     K["--show_less_output"] = dict(
         dest="capture_output",

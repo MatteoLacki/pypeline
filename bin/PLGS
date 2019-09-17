@@ -25,7 +25,7 @@ _a["--no_logs"] = dict(
     dest="make_log",
     action='store_false',
     help="Don't make logs.")
-
+_a["--verbose"]['action']='store_true'
 for name, kwds in sorted(_a.items()):
     parser.add_argument(name, **kwds)
 args = parser.parse_args().__dict__

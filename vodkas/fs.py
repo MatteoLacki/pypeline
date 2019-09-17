@@ -28,7 +28,8 @@ def test_cp():
 
 
 def copy_folder(source, target):
-    return subprocess.run(['robocopy', str(source), str(target)])
+    cmd = ['robocopy', str(source), str(target),"/E"]
+    return subprocess.run(cmd)
 
 
 
