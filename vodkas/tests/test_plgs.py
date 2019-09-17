@@ -6,8 +6,8 @@ from pathlib import Path
 PLGS("C:/ms_soft/MasterOfPipelines/Data/O190302_01.raw", "human")
 
 xml_params, params = parse_xmls("C:/SYMPHONY_VODKAS/temp/O1903/O190302_01_Apex3D.xml",
-           "C:/SYMPHONY_VODKAS/temp/O1903/O190302_01_Pep3D_Spectrum.xml",
-           "C:/SYMPHONY_VODKAS/temp/O1903/O190302_01_IA_workflow.xml")
+        "C:/SYMPHONY_VODKAS/temp/O1903/O190302_01_Pep3D_Spectrum.xml",
+        "C:/SYMPHONY_VODKAS/temp/O1903/O190302_01_IA_workflow.xml")
 
 pprint(xml_params['apex3d'])
 pprint(xml_params['apex3d'])

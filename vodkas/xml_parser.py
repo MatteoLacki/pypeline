@@ -1,5 +1,10 @@
 from itertools import chain
+import json
+import logging
 from pathlib import Path
+
+
+logger = logging.getLogger(__name__)
 
 
 def parse_xml_params(path, prefix=""):
@@ -44,3 +49,13 @@ def parse_xmls(apex_xml, pept_xml, work_xml):
              ('work:','iadbs')) for k,v in x[w].items()}
     return x, flat
     
+
+def create_params_file(apex_xml, pept_xml, work_xml):
+    params = {p+k:v for p,w in 
+              (('apex:','apex3d'),
+               ('spec:','peptide3d'),
+               ('work:','iadbs')) for k,v in x[w].items()}
+    p = Path(apex_xml).parent/"params.json"
+    with open(p, 'w') as f:
+        json.dump(params, indent=2)
+    logger.info(json.dumps(params))

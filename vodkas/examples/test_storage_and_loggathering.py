@@ -6,8 +6,6 @@ def foo1(a, b, c=10, **kwds):
     """abc"""
     return a+b+c
 
-
-
 def foo2(a, b, c=10, **kwds):
     """abc"""
     return a*b*c

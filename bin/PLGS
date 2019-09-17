@@ -1,13 +1,46 @@
 import argparse
-from pprint import pprint
 from docstr2argparse import parse_arguments
-import json
+import logging
 from pathlib import Path
 
-from vodkas import apex3d, peptide3d, iadbs, plgs, fastas
-from vodkas.misc import write_log
+from vodkas import apex3d, peptide3d, iadbs, plgs, get_fastas
+from vodkas.fs import copy_folder, find_free_path
+from vodkas.header_txt import parse_header_txt
+
+
+DEBUG = True
+
+# if __name__ == '__main__':
+P = lambda x: dict(parse_arguments(x))
+A = {**P(get_fastas), **P(apex3d), **P(peptide3d), **P(iadbs)}
+A.update(P(plgs))
+
+del A['input_file'], A['output_dir'], A['out_folder']
+del A['fasta_file'], A['--PLGS']
+
+default_out = 'C:/SYMPHONY_VODKAS/temp'
+default_log = 'C:/SYMPHONY_VODKAS/temp_logs/plgs.log'
+default_server = 'X:/SYMPHONY_VODKAS/temp_logs'
+default_net_db = 'J:/test_RES' if DEBUG else 'Y:/RES'
+
+A["--out_folder"] = {
+    'default': default_out,
+    'help': f"Local folder to save data to (there we will place the results) [default = {default_out}]."}
+
+A["--log_folder"] = {
+    'default': default_log,
+    'help': f"Local folder for logs [default = {default_log}]."}
+
+A["--log_server_folder"] = {
+    'default': default_server,
+    'help': f"Network folder for logs [default = {default_server}]."}
+
+A["--network_db_folder"] = {
+    'default': default_net_db,
+    'help': f'Network folder for results. Set to '' (empty word) if you want to skip copying [default = {default_net_db}].'}
 
 parser = argparse.ArgumentParser(description='Analyze Waters Raw Data with PLGS.')
+<<<<<<< HEAD
 parse = lambda x: dict(parse_arguments(x))
 _plgs = parse(plgs)
 _fastas = parse(fastas)
@@ -27,26 +60,36 @@ _a["--no_logs"] = dict(
     help="Don't make logs.")
 _a["--verbose"]['action']='store_true'
 for name, kwds in sorted(_a.items()):
+=======
+for name, kwds in sorted(A.items()):
+>>>>>>> 9b02d03f1c067a722516bfbf5c81becb6a2250ab
     parser.add_argument(name, **kwds)
 args = parser.parse_args().__dict__
 
-xml_params = {}
-no_error = True
+logging.basicConfig(filename=args['logs_folder'],
+                    format='PLGS %(asctime)s:%(name)s:%(levelname)s:%(message)s:',
+                    level=logging.INFO)
+logger = logging.getLogger(__name__)
+del args['log_folder']
+
+
+raw_folder = Path(args['raw_folder']) if not DEBUG else \
+             Path("C:/ms_soft/MasterOfPipelines/Data/O190302_01.raw")
+acquired_name = raw_folder.stem
+header_txt = parse_header_txt(raw_folder/'_HEADER.TXT')
+sample_set = header_txt['Sample Description'][:8]
+out_folder = Path(args['out_folder'])/sample_set/acquired_name
 
 try:
-    xml_params, T = plgs(**args)
-    args['error'] = ''
+    plgs(**args)
+    if args['network_db_folder']:
+        net_folder = Path(args['network_db_folder'])/sample_set/acquired_name
+        net_folder = find_free_path(net_folder) # avoid network folder overwriting
+        copy_folder(out_folder, network_db_folder)
+        for f in out_folder.glob('*'):
+            f.unlink() # cleaning temp after use
+        out_folder.rmdir()
+        logger.info("Copied results to the server.")
+    logger.info("PLGS finished successfully.")
 except Exception as e:
-    args['error'] = repr(e)
-    no_error = False
-    print(e)
-
-for algo, d in xml_params.items():
-    for k,v in d.items():
-        args["{}:{}".format(algo, k)] = v
-write_log(args, 'plgs_', **args)
-
-if no_error:
-    print("PLGS finished correctly.")
-else:
-    print("PLGS had errors.")
+    logger.critical(repr(e))
