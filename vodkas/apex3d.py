@@ -56,6 +56,7 @@ def apex3d(raw_folder,
 
     raw_folder = Path(raw_folder)
     output_dir = Path(output_dir)
+    apex_stdout = output_dir/'apex3d.log'
 
     cmd = ["powershell.exe", algo,
         f"-pRawDirName {raw_folder}",
@@ -73,7 +74,7 @@ def apex3d(raw_folder,
         f"-bEnableCuda {int(cuda)}",
         f"-bEnableUnsupportedGPUs {int(unsupported_gpu)}"]
 
-    pr, runtime = run_win_proc(cmd, timeout_apex3d)
+    pr, runtime = run_win_proc(cmd, timeout_apex3d, apex_stdout)
 
     out_bin = output_dir/(raw_folder.stem + "_Apex3D.bin")
     out_xml = out_bin.with_suffix('.xml')
@@ -81,7 +82,7 @@ def apex3d(raw_folder,
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("Apex3D's output missing.")
     
-    logger.info(f'Apex3 took {runtime} minutes.')
+    logger.info(f'Apex3d took {runtime} minutes.')
     
     return out_bin.with_suffix(''), pr
 

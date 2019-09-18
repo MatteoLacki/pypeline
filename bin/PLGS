@@ -8,7 +8,6 @@ from vodkas import apex3d, peptide3d, iadbs, plgs, get_fastas
 from vodkas.fs import copy_folder, find_free_path
 from vodkas.header_txt import parse_header_txt
 
-
 DEBUG = True
 
 # if __name__ == '__main__':
@@ -46,33 +45,34 @@ for name, kwds in sorted(A.items()):
     parser.add_argument(name, **kwds)
 args = parser.parse_args().__dict__
 
-if DEBUG:
-    pprint(args)
 logging.basicConfig(filename=args['logs_folder'],
                     format='PLGS %(asctime)s:%(name)s:%(levelname)s:%(message)s:',
                     level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('PLGS')
 del args['logs_folder']
 
+raw_folder = Path(args['raw_folder'])
+if not raw_folder.is_dir():
+    logger.critical(f"Raw folder missing: {raw_folder}")
+    raise FileNotFoundError(f"Did not find {raw_folder}")
 
-raw_folder = Path(args['raw_folder']) if not DEBUG else \
-             Path("C:/ms_soft/MasterOfPipelines/Data/O190302_01.raw")
 acquired_name = raw_folder.stem
 header_txt = parse_header_txt(raw_folder/'_HEADER.TXT')
 sample_set = header_txt['Sample Description'][:8]
-out_folder = Path(args['out_folder'])/sample_set/acquired_name
+out_folder = args['out_folder'] = Path(args['out_folder'])/sample_set/acquired_name
 
-# try:
-plgs(**args)
-if args['network_db_folder']:
-    net_folder = Path(args['network_db_folder'])/sample_set/acquired_name
-    net_folder = find_free_path(net_folder)
-    copy_folder(out_folder, network_db_folder)
-    for f in out_folder.glob('*'):
-        f.unlink() # del
-    out_folder.rmdir()
-    logger.info("Moved results to the server.")
-logger.info("PLGS finished successfully.")
-# except Exception as e:
-logger.critical(repr(e))
-#     print(e)
+try:
+    plgs(**args)
+    if args['network_db_folder']:
+        net_folder = Path(args['network_db_folder'])/sample_set/acquired_name
+        net_folder = find_free_path(net_folder)
+        copy_folder(out_folder, net_folder)
+        for f in out_folder.glob('*'):
+            f.unlink() # del
+        out_folder.rmdir()
+        out_folder.parent.rmdir()
+        logger.info("Moved results to the server.")
+    logger.info("PLGS finished successfully.")
+except Exception as e:
+    logger.critical(repr(e))
+    print(e)

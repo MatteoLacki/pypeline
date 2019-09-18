@@ -44,6 +44,7 @@ def iadbs(input_file,
     output_dir = Path(output_dir)
     fasta_file = Path(fasta_file)
     parameters_file = Path(parameters_file)
+    iadbs_stdout = output_dir/'iadbs.log'
 
     cmd = [ "powershell.exe", algo,
             f"-paraXMLFileName {parameters_file}",
@@ -54,7 +55,7 @@ def iadbs(input_file,
             f"-WriteBinary {int(write_binary)}",
             f"-bDeveloperCSVOutput {int(write_csv)}" ]
 
-    pr, runtime = run_win_proc(cmd, timeout_iadbs)
+    pr, runtime = run_win_proc(cmd, timeout_iadbs, iadbs_stdout)
 
     if '_Pep3D_Spectrum' in input_file.stem:
         out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')

@@ -40,22 +40,38 @@ def iter_xmls(apex_xml, pept_xml, work_xml):
 
 
 def parse_xmls(apex_xml, pept_xml, work_xml):
-    x = {'apex3d':dict(parse_xml_params(apex_xml)),
-         'peptide3d':dict(parse_xml_params(pept_xml)),
-         'iadbs':dict(parse_xml_params(work_xml))}
+    d_parse = lambda p: dict(parse_xml_params(p))
+    x = {'apex3d':    d_parse(apex_xml),
+         'peptide3d': d_parse(pept_xml),
+         'iadbs':     d_parse(work_xml)}
+
     flat = {p+k:v for p,w in 
             (('apex:','apex3d'),
              ('spec:','peptide3d'),
              ('work:','iadbs')) for k,v in x[w].items()}
+
     return x, flat
     
 
 def create_params_file(apex_xml, pept_xml, work_xml):
+    """Create a params.json file for Projectizer2.0.
+
+    This facilitates the creation of proper input for the IsoQuant (and PysoQuant).
+    """
+    logger.info('Parsing xml files for Projectizer2.0.')
+    
+    d_parse = lambda p: dict(parse_xml_params(p))
+    x = {'apex3d':    d_parse(apex_xml),
+         'peptide3d': d_parse(pept_xml),
+         'iadbs':     d_parse(work_xml)}
+
     params = {p+k:v for p,w in 
               (('apex:','apex3d'),
                ('spec:','peptide3d'),
                ('work:','iadbs')) for k,v in x[w].items()}
+    
     p = Path(apex_xml).parent/"params.json"
     with open(p, 'w') as f:
-        json.dump(params, indent=2)
+        json.dump(params, f, indent=2)
+    
     logger.info(json.dumps(params))

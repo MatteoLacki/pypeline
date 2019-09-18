@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 import multiprocessing
+from pathlib import Path
 
 
 def get_coresNo():
@@ -18,8 +19,16 @@ def isType(x, classes=(int,float)):
     return any(isinstance(x, t) for t in classes)
 
 
+def store_value(v):
+    if isType(v, (int,float)):
+        return v
+    if isinstance(v, Path):
+        return str(v)
+    return repr(v)
+
+
 def jsonDict(d):
-    return {k:v if isType(v) else repr(v) for k,v in d.items()}
+    return {k:store_value(v) for k,v in d.items()}
 
 
 def call_info(args):

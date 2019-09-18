@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 
 from .misc import get_coresNo, call_info
-
+from .fs import cp
 
 logger = logging.getLogger(__name__)
 

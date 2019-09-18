@@ -26,8 +26,8 @@ def plgs(raw_folder, out_folder, **kwds):
     logger.info(call_info(locals()))
     fastas = get_fastas(**kwds)
     a, _ = apex3d(raw_folder, out_folder, **kwds)
-    p, _ = peptide3d(a.with_suffix('bin'), out_folder,**kwds)
-    i, _ = iadbs(p.with_suffix('xml'), out_folder, fastas, **kwds)
+    p, _ = peptide3d(a.with_suffix('.bin'), out_folder,**kwds)
+    i, _ = iadbs(p.with_suffix('.xml'), out_folder, fastas, **kwds)
     create_params_file(a, p, i)# for projectizer2.0
     
     logger.info('PLGS finished.')
