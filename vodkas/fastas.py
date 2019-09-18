@@ -7,11 +7,11 @@ from .fs import cp
 logger = logging.getLogger(__name__)
 
 
-def get_fastas(proteome, 
-               fasta_db_server=r'X:/SYMPHONY_VODKAS/fastas/latest',
-               fasta_db_local=r'C:/SYMPHONY_VODKAS/fastas',
-               **kwds):
-    """Get the path to file with protein fastas.
+def get_proteome(proteome, 
+                 fasta_db_server=r'X:/SYMPHONY_VODKAS/fastas/latest',
+                 fasta_db_local=r'C:/SYMPHONY_VODKAS/fastas',
+                 **kwds):
+    """Get the path to file with standard proteome fastas.
 
     Args:
         proteome (str): Organism name = prefix of the fasta file.
@@ -22,9 +22,6 @@ def get_fastas(proteome,
     Returns:
         Path to the local fasta file.
     """
-    logger.info('Running get_fastas.')
-    logger.info(call_info(locals()))
-
     f_loc = Path(fasta_db_local)
     f_ser = Path(fasta_db_server)
     try:
@@ -36,3 +33,31 @@ def get_fastas(proteome,
         return f_loc/f_ser.name
     except StopIteration:
         raise FileNotFoundError(f'There is no file starting with "{proteome}" on the server under "{f_ser}".')
+
+
+def get_fastas(fastas, 
+               fasta_db_server=r'X:/SYMPHONY_VODKAS/fastas/latest',
+               fasta_db_local=r'C:/SYMPHONY_VODKAS/fastas',
+               **kwds):
+    """Get the path to file with standard proteome fastas.
+
+    Args:
+        fastas (str): Fasta file to use, or a prefix to one of the standard proteomes used, e.g. 'human'.
+        fasta_db_server (str): Path to server fastas.
+        fasta_db_local (str): Path to local fastas.
+        kwds: further arguments to subprocess.run used for copying.
+
+    Returns:
+        Path to the local fasta file.
+    """
+    if Path(fastas).is_file():
+        logger.info('Custom fastas used.')
+        logger.info(str(fastas))
+        return Path(fastas)
+    else:
+        logger.info('Checking standard proteomes.')
+        logger.info(call_info(locals()))
+        return get_proteome(fastas,
+                            fasta_db_server, 
+                            fasta_db_local)
+

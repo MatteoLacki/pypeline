@@ -19,6 +19,7 @@ for P in big_folders:
                 pprint(l(p))
 
 from vodkas.header_txt import parse_header_txt
+
 p = Path("/mnt/ms/idefix_rawdata/ARCHIVIERT/I1903/I190301_01.raw/_HEADER.TXT")
 d = parse_header_txt(p)
 d['Acquired Name']
