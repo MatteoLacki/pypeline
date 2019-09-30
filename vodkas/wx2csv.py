@@ -1,12 +1,12 @@
-import logging
 import subprocess
 from pathlib import Path
 import pandas as pd
 
+from .logging import get_logger
 from .subproc import run_win_proc
 
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 def wx2csv(input_file,

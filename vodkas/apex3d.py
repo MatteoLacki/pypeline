@@ -1,12 +1,12 @@
-import logging
 from pathlib import Path
 
 from .fs import check_algo
 from .misc import get_coresNo, call_info
 from .subproc import run_win_proc
+from .logging import get_logger
 
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 def apex3d(raw_folder,

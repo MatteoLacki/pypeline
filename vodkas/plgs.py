@@ -3,12 +3,12 @@ from time import sleep
 
 from . import apex3d, peptide3d, iadbs
 from .fastas import get_fastas
+from .logging import get_logger
 from .misc import call_info
 from .xml_parser import create_params_file
 
-
-logger = logging.getLogger(__name__)
-
+# logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 def plgs(raw_folder, out_folder, **kwds):
     """Run PLGS.
