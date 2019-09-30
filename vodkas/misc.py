@@ -35,3 +35,19 @@ def call_info(args):
     """Remove kwds (that only simplify argument passing in the wrappers)."""
     del args['kwds']
     return json.dumps(jsonDict(args))
+
+
+def get_task_no(log_file):
+    """Parse the log file to get the task number."""
+    log_file = Path(log_file)
+    try:
+        with log_file.open('r') as f:
+            for l in f:
+                pass
+        return int(l.split(' ')[0]) + 1
+    except (ValueError, FileNotFoundError):
+        return 0
+
+
+
+
