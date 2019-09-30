@@ -33,11 +33,12 @@ def wx2csv(input_file,
 
     wx2csv_stdout = output_file.parent/'wx2csv.log'
 
-    cmd = ["powershell.exe",
-           "java -Xms{} -jar".format(java_minimal_heap_size),
-            algo,
-            "-b -o {}".format(output_file),
-            "-i {}".format(input_file)]
+    cmd = [f"powershell.exe",
+           "java",
+           f"-Xms{java_minimal_heap_size}",
+           f"-jar {algo}",
+           f"-b -o {output_file}",
+           f"-i {input_file}"]
 
     pr, runtime = run_win_proc(cmd, 60, wx2csv_stdout)
 
