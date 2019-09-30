@@ -51,8 +51,10 @@ for name, kwds in sorted(A.items()):
     parser.add_argument(name, **kwds)
 args = parser.parse_args().__dict__
 
+# get task number
+
 logging.basicConfig(filename=args['logs_folder'],
-                    format='PLGS %(asctime)s:%(name)s:%(levelname)s:%(message)s:',
+                    format=f'{TASK_NO} %(asctime)s:%(name)s:%(levelname)s:%(message)s:',
                     level=logging.INFO)
 logger = logging.getLogger('PLGS')
 del args['logs_folder']
