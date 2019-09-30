@@ -31,3 +31,4 @@ def plgs(raw_folder, out_folder, **kwds):
     create_params_file(a, p, i)# for projectizer2.0
     
     logger.info('PLGS finished.')
+    return True
