@@ -34,7 +34,7 @@ logging.basicConfig(filename=pool2/"pool2.log",
 logger = logging.getLogger('PLGS')
 timeout = 8 * 60 # 8 hours timeout [in minutes]
 
-
+    
 for rawdatapath, fastapath in missing_files:
     rawdatapath = Path(rawdatapath)
     fastapath = Path(fastapath)
@@ -50,9 +50,8 @@ for rawdatapath, fastapath in missing_files:
                       timeout_peptide3d=timeout,
                       timeout_iadbs=timeout)
 
-            workflow_xml = next(out_folder.glob('_IA_workflow.xml'))
+            workflow_xml = next(out_folder.glob('*_IA_workflow.xml'))
             df, _ = wx2csv(workflow_xml, out_folder/'report.csv')
             break
         except Exception as e:
             logger.warning(repr(e))
-        
