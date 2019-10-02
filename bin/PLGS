@@ -8,6 +8,7 @@ from vodkas import apex3d, peptide3d, iadbs, plgs
 from vodkas.fastas import get_fastas
 from vodkas.fs import copy_folder, find_free_path
 from vodkas.header_txt import parse_header_txt
+from vodkas.logging import get_logger
 
 DEBUG = True
 
@@ -26,8 +27,7 @@ default_net_db = 'J:/test_RES' if DEBUG else 'Y:/RES'
 
 A['raw_folders'] = {
     'help': 'Path(s) to the raw_folder(s) to be analysed.',
-    'nargs': "+"
-}
+    'nargs': "+"}
 
 A["--out_folder"] = {
     'default': default_out,
@@ -51,10 +51,10 @@ for name, kwds in sorted(A.items()):
     parser.add_argument(name, **kwds)
 args = parser.parse_args().__dict__
 
-logging.basicConfig(filename=args['logs_folder'],
-                    format='PLGS %(asctime)s:%(name)s:%(levelname)s:%(message)s:',
-                    level=logging.INFO)
-logger = logging.getLogger('PLGS')
+log_file = args['logs_folder']
+log_format = '%(asctime)s:%(name)s:%(levelname)s:%(message)s:'
+logging.basicConfig(filename=log_file, format=log_format, level=logging.INFO)
+logger = get_logger('PLGS', log_format)
 del args['logs_folder']
 
 out = Path(args['out_folder'])
@@ -90,5 +90,6 @@ for raw_folder in args['raw_folders']:
         logger.warning(repr(e))
     except Exception as e:
         logger.warning(repr(e))
+    task_no += 1
 
 logger.info("PLGS finished.")

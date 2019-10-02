@@ -1,12 +1,12 @@
-import logging
 from pathlib import Path
 
 from .fs import check_algo
+from .logging import get_logger
 from .misc import call_info
 from .subproc import run_win_proc
 
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 def peptide3d(input_file,

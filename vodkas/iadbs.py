@@ -1,13 +1,13 @@
-import logging
 from pathlib import Path
 from time import time
 
 from .fs import check_algo
+from .logging import get_logger
 from .misc import call_info
 from .subproc import run_win_proc
 
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 def iadbs(input_file,
@@ -36,7 +36,7 @@ def iadbs(input_file,
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
     """
-    logger.info('Running Peptide3D.')
+    logger.info('Running iadbs.')
     logger.info(call_info(locals()))
 
     algo = check_algo(path_to_iadbs)
