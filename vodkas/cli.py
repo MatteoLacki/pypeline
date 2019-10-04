@@ -1,7 +1,7 @@
 from docstr2argparse import foo2parser, parse_arguments
 from subprocess import TimeoutExpired
 
-from .misc import monitor, FuncState
+# from .misc import monitor, FuncState
 
 
 def make_cli(script, custom_args={}, custom_delete=[]):
@@ -11,7 +11,7 @@ def make_cli(script, custom_args={}, custom_delete=[]):
         script (function): the function to make the CLI for.
         custom_args (dict): custom modification to CLI.
     """
-    script, fun_monitor = monitor(script)
+    # script, fun_monitor = monitor(script)
     parser = foo2parser(script)
     K = dict(parse_arguments(script))
     del K['--write_xml'], K['--write_binary'], 
@@ -29,17 +29,15 @@ def make_cli(script, custom_args={}, custom_delete=[]):
         dest="make_log",
         action='store_false',
         help="Do not log.")
-    K["--timeout"] = dict(
-        default=24,
-        type=lambda h: float(h)/3600,
-        help="Timeout (in hours). [default = 24]")
-    K["--verbose"]['action'] = "store_true"
-    K["--verbose"]['dest'] = "verbose"
-    K.update(parse_arguments(FuncState.json))
-    K["--show_less_output"] = dict(
-        dest="capture_output",
-        action='store_true',
-        help="Don't show terminal output.")
+    # K["--timeout"] = dict(
+    #     default=24,
+    #     type=lambda h: float(h)/3600,
+    #     help="Timeout (in hours). [default = 24]")
+    # K.update(parse_arguments(FuncState.json))
+    # K["--show_less_output"] = dict(
+    #     dest="capture_output",
+    #     action='store_true',
+    #     help="Don't show terminal output.")
     K["--comment"] = dict(help="Your custom comment.", type=str, default="")
     K.update(custom_args)
     for name, kwds in K.items():
@@ -57,7 +55,7 @@ def make_cli(script, custom_args={}, custom_delete=[]):
         error = "RuntimeError."
         print(error)
         print(e)
-    fun_monitor[script.__name__][0]['__error__'] = error
-    fun_monitor[script.__name__][0]['__comment__'] = args.comment
-    fun_monitor.json(args.logs_folder, args.logs_server_folder, prefix='{}_'.format(script.__name__))
+    # fun_monitor[script.__name__][0]['__error__'] = error
+    # fun_monitor[script.__name__][0]['__comment__'] = args.comment
+    # fun_monitor.json(args.logs_folder, args.logs_server_folder, prefix='{}_'.format(script.__name__))
 

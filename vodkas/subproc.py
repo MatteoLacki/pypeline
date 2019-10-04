@@ -19,7 +19,7 @@ def run_win_proc(cmd,
         T0 = time()
         pr = Popen(cmd, stdout=PIPE)
         out, err = pr.communicate(timeout=timeout)
-        runtime = (time() - T0)*60
+        runtime = (time() - T0)/60 # back to minutes
     except TimeoutExpired:
         kill = Path(cmd[1]).name
         kill = "Taskkill /IM {} /F".format(kill)

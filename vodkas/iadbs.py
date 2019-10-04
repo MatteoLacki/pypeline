@@ -23,7 +23,7 @@ def iadbs(input_file,
     """Run iaDBs.
     
     Args:
-        input_file (str): a path to the pep3D spectrum file, xml or bin.
+        input_file (str): a path to the pep3D spectrum file, with an extesion like .xml or .bin. Warning, .bin might not produce an output.
         output_dir (str): Path to where to place the output.
         fasta_file (str): Path to the fasta file used for search.
         parameters_file (str): Path to the search xml.
