@@ -1,10 +1,11 @@
-import logging
 from pathlib import Path
 
-from .misc import get_coresNo, call_info
 from .fs import cp
+from .logging import get_logger
+from .misc import get_coresNo, call_info
 
-logger = logging.getLogger(__name__)
+
+logger = get_logger(__name__)
 
 
 def get_proteome(proteome, 

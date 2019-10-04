@@ -6,7 +6,7 @@ from pprint import pprint
 
 from vodkas import apex3d, peptide3d, iadbs, plgs
 from vodkas.fastas import get_fastas
-from vodkas.fs import copy_folder, find_free_path
+from vodkas.fs import copy_folder, find_free_path, rm_tree
 from vodkas.header_txt import parse_header_txt
 from vodkas.logging import get_logger
 
@@ -26,22 +26,27 @@ default_server = 'X:/SYMPHONY_VODKAS/temp_logs'
 default_net_db = 'J:/test_RES' if DEBUG else 'Y:/RES'
 
 A['raw_folders'] = {
+    'type': Path,
     'help': 'Path(s) to the raw_folder(s) to be analysed.',
     'nargs': "+"}
 
 A["--out_folder"] = {
+    'type': Path,
     'default': default_out,
     'help': f"Local folder to save data to (there we will place the results) [default = {default_out}]."}
 
 A["--logs_folder"] = {
+    'type': Path,
     'default': default_log,
     'help': f"Local folder for logs [default = {default_log}]."}
 
 A["--log_server_folder"] = {
+    'type': Path,
     'default': default_server,
     'help': f"Network folder for logs [default = {default_server}]."}
 
 A["--network_db_folder"] = {
+    'type': Path,
     'default': default_net_db,
     'help': f"Network folder for results. Set to '' (empty word) if you want to skip copying [default = {default_net_db}]."}
 
@@ -57,12 +62,11 @@ logging.basicConfig(filename=log_file, format=log_format, level=logging.INFO)
 logger = get_logger('PLGS', log_format)
 del args['logs_folder']
 
-out = Path(args['out_folder'])
+out = args['out_folder']
 del args['out_folder']
 
 for raw_folder in args['raw_folders']:
     logger.info(f"Starting analysis of '{raw_folder}'.")
-    raw_folder = Path(raw_folder)
     try:
         if not raw_folder.is_dir():
             logger.info(f"Raw folder missing: {raw_folder}")
@@ -73,16 +77,14 @@ for raw_folder in args['raw_folders']:
         sample_set = header_txt['Sample Description'][:8]
         out_folder = out/sample_set/acquired_name
 
-        plgs(raw_folder, out_folder, **args)
+        plgs_ok = plgs(raw_folder, out_folder, **args)
 
-        if args['network_db_folder']:
-            net_folder = Path(args['network_db_folder'])/sample_set/acquired_name
-            net_folder = find_free_path(net_folder)
+        if plgs_ok and args['network_db_folder']:
+            net_folder = find_free_path(args['network_db_folder']/sample_set/acquired_name)
             copy_folder(out_folder, net_folder)
-            for f in out_folder.glob('*'):
-                f.unlink() # del
-            out_folder.rmdir()
-            out_folder.parent.rmdir()
+            rm_tree(out_folder)
+            if not out_folder.parent.glob('*'):
+                out_folder.parent.rmdir()
             logger.info("Moved results to the server.")
 
         logger.info(f"Finished with '{raw_folder}'.")
@@ -90,6 +92,5 @@ for raw_folder in args['raw_folders']:
         logger.warning(repr(e))
     except Exception as e:
         logger.warning(repr(e))
-    task_no += 1
 
 logger.info("PLGS finished.")
