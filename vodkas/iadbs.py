@@ -41,6 +41,9 @@ def iadbs(input_file,
 
     algo = check_algo(path_to_iadbs)
     input_file = Path(input_file)
+    if input_file.suffix == '.bin':
+        logger.warning('Running the ".bin" outputs of Peptide3D might be problematic.')
+
     output_dir = Path(output_dir)
     fasta_file = Path(fasta_file)
     parameters_file = Path(parameters_file)
@@ -48,7 +51,7 @@ def iadbs(input_file,
 
     cmd = [ "powershell.exe", algo,
             f"-paraXMLFileName {parameters_file}",
-            f"-pep3DFilename {input_file}",
+            f"-pep3DFileName {input_file}",
             f"-proteinFASTAFileName {fasta_file}",
             f"-outputDirName {output_dir}",
             f"-WriteXML {int(write_xml)}",
