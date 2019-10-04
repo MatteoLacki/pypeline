@@ -1,10 +1,12 @@
 from pathlib import Path
 from pprint import pprint
+import json
+import logging
 
 from vodkas import iadbs
 from vodkas.fastas import get_fastas
+from vodkas.logging import get_logger
 
-ls = lambda p: pprint(list(p.glob("*")))
 
 symphony_local = Path(r"C:/SYMPHONY_VODKAS")
 logging.basicConfig(filename=symphony_local/"iadbs.log",
@@ -22,13 +24,14 @@ problems = []
 for f in folders[1:]:
 	try:
 		input = f/f"{f.stem}_Pep3D_Spectrum.xml"
-		output = f
 		outfile, _ = iadbs(input, f, fastas)
 	except Exception as e:
 		problems.append((str(f), repr(e)))
 
 if problems:
-	with open(Path('C:/SYMPHONY_VODKAS/problems'))
+	with open(Path('C:/SYMPHONY_VODKAS/problems')) as h:
+		json.dump(problems,h,indent=4)
+
 
 
 
