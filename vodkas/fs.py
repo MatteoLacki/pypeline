@@ -3,6 +3,9 @@ from pathlib import Path
 import platform
 
 
+ls = lambda p: list(p.glob('*'))
+
+
 def cp(source, target, **kwds):
     """Copy a file, or rather synchronize it.
 
