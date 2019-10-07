@@ -42,7 +42,7 @@ def iadbs(input_file,
     algo = check_algo(path_to_iadbs)
     input_file = Path(input_file)
     if input_file.suffix == '.bin':
-        logger.warning('Running the ".bin" outputs of Peptide3D might be problematic.')
+        logger.warning('Taking a ".bin" input from Peptide3D might not always work.')
 
     output_dir = Path(output_dir)
     fasta_file = Path(fasta_file)
