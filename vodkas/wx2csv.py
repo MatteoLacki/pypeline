@@ -12,7 +12,7 @@ logger = get_logger(__name__)
 def wx2csv(input_file,
            output_file,
            path_to_wx2csv="C:/SYMPHONY_VODKAS/bin/wx2csv.jar",
-           java_minimal_heap_size='512m',
+           java_minimal_heap_size='2048m',
            **kwds):
     """A wrapper around wx2csv.
     
