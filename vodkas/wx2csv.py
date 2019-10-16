@@ -12,7 +12,7 @@ logger = get_logger(__name__)
 def wx2csv(input_file,
            output_file,
            path_to_wx2csv="C:/SYMPHONY_VODKAS/bin/wx2csv.jar",
-           java_minimal_heap_size='2048m',
+           java_minimal_heap_size='1G',
            **kwds):
     """A wrapper around wx2csv.
     
@@ -35,11 +35,12 @@ def wx2csv(input_file,
 
     cmd = [f"powershell.exe",
            "java",
-           f"-Xms{java_minimal_heap_size}",
+           f"-Xmx{java_minimal_heap_size}",
            f"-jar {algo}",
            f"-b -o {output_file}",
            f"-i {input_file}"]
 
+    print(cmd)
     pr, runtime = run_win_proc(cmd, 60, wx2csv_stdout)
 
     if not output_file.exists():
