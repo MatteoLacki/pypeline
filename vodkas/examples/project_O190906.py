@@ -6,6 +6,8 @@ File names O190906_02 to _26
 C:\SYMPHONY_VODKAS\temp\2019-080
 
 X:\SYMPHONY_VODKAS\fastas\custom\horny_mouse\20180515_up_mouse_reviewed_16970entries_and_171contaminants+hNECAB1+2_reverese.fasta
+
+python PLGS X:\SYMPHONY_VODKAS\fastas\custom\horny_mouse\20180515_up_mouse_reviewed_16970entries_and_171contaminants+hNECAB1+2_reverese.fasta O:\RAW\O1909\O190906_06.raw
 """
 import logging
 from pathlib import Path

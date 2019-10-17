@@ -23,7 +23,7 @@ def iadbs(input_file,
     """Run iaDBs.
     
     Args:
-        input_file (str): a path to the pep3D spectrum file, xml or bin.
+        input_file (str): a path to the pep3D spectrum file, with an extesion like .xml or .bin. Warning, .bin might not produce an output.
         output_dir (str): Path to where to place the output.
         fasta_file (str): Path to the fasta file used for search.
         parameters_file (str): Path to the search xml.
@@ -41,6 +41,9 @@ def iadbs(input_file,
 
     algo = check_algo(path_to_iadbs)
     input_file = Path(input_file)
+    if input_file.suffix == '.bin':
+        logger.warning('Taking a ".bin" input from Peptide3D might not always work.')
+
     output_dir = Path(output_dir)
     fasta_file = Path(fasta_file)
     parameters_file = Path(parameters_file)
@@ -48,7 +51,7 @@ def iadbs(input_file,
 
     cmd = [ "powershell.exe", algo,
             f"-paraXMLFileName {parameters_file}",
-            f"-pep3DFilename {input_file}",
+            f"-pep3DFileName {input_file}",
             f"-proteinFASTAFileName {fasta_file}",
             f"-outputDirName {output_dir}",
             f"-WriteXML {int(write_xml)}",

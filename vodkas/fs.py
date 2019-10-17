@@ -3,6 +3,9 @@ from pathlib import Path
 import platform
 
 
+ls = lambda p: list(p.glob('*'))
+
+
 def cp(source, target, **kwds):
     """Copy a file, or rather synchronize it.
 
@@ -68,3 +71,14 @@ def find_free_path(p):
         i += 1
         q = Path(f"{p.parent}__v{i}")/p.name
     return q
+
+
+def rm_tree(pth):
+    """Removes recursively the folder and everything below in the file tree."""
+    pth = Path(pth)
+    for child in pth.glob('*'):
+        if child.is_file():
+            child.unlink()
+        else:
+            rm_tree(child)
+    pth.rmdir()

@@ -1,9 +1,10 @@
-import logging
 import json
 from pathlib import Path
 
+from .logging import get_logger
 
-logger = logging.getLogger(__name__)
+
+logger = get_logger(__name__)
 
 
 # TODO this should be mostly used by a script for Folder Synchronization.

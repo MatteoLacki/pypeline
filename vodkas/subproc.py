@@ -14,12 +14,12 @@ def run_win_proc(cmd,
         out_path (str): Path to where to write stdout.
     """
     timeout_expired = False
-    timeout *= 60 # seconds to minute
+    timeout *= 60 # minutes to seconds
     try:
         T0 = time()
         pr = Popen(cmd, stdout=PIPE)
         out, err = pr.communicate(timeout=timeout)
-        runtime = (time() - T0)*60
+        runtime = (time() - T0)/60 # seconds to minutes
     except TimeoutExpired:
         kill = Path(cmd[1]).name
         kill = "Taskkill /IM {} /F".format(kill)
