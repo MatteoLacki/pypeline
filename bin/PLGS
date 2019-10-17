@@ -47,7 +47,7 @@ args = parser.parse_args().__dict__
 logging.basicConfig(filename=args['logs_folder'],
                     format='PLGS %(asctime)s:%(name)s:%(levelname)s:%(message)s:',
                     level=logging.INFO)
-logger = logging.getLogger('PLGS')
+logger = logging.getLogger('__name__')
 del args['log_folder']
 
 

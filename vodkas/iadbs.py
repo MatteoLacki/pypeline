@@ -1,13 +1,13 @@
-import logging
 from pathlib import Path
 from time import time
 
 from .fs import check_algo
+from .logging import get_logger
 from .misc import call_info
 from .subproc import run_win_proc
 
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 def iadbs(input_file,
@@ -36,7 +36,7 @@ def iadbs(input_file,
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
     """
-    logger.info('Running Peptide3D.')
+    logger.info('Running iadbs.')
     logger.info(call_info(locals()))
 
     algo = check_algo(path_to_iadbs)
@@ -44,6 +44,7 @@ def iadbs(input_file,
     output_dir = Path(output_dir)
     fasta_file = Path(fasta_file)
     parameters_file = Path(parameters_file)
+    iadbs_stdout = output_dir/'iadbs.log'
 
     cmd = [ "powershell.exe", algo,
             f"-paraXMLFileName {parameters_file}",
@@ -54,7 +55,7 @@ def iadbs(input_file,
             f"-WriteBinary {int(write_binary)}",
             f"-bDeveloperCSVOutput {int(write_csv)}" ]
 
-    pr, runtime = run_win_proc(cmd, timeout_iadbs)
+    pr, runtime = run_win_proc(cmd, timeout_iadbs, iadbs_stdout)
 
     if '_Pep3D_Spectrum' in input_file.stem:
         out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')

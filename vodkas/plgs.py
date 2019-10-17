@@ -3,12 +3,12 @@ from time import sleep
 
 from . import apex3d, peptide3d, iadbs
 from .fastas import get_fastas
+from .logging import get_logger
 from .misc import call_info
 from .xml_parser import create_params_file
 
-
-logger = logging.getLogger(__name__)
-
+# logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 def plgs(raw_folder, out_folder, **kwds):
     """Run PLGS.
@@ -26,8 +26,9 @@ def plgs(raw_folder, out_folder, **kwds):
     logger.info(call_info(locals()))
     fastas = get_fastas(**kwds)
     a, _ = apex3d(raw_folder, out_folder, **kwds)
-    p, _ = peptide3d(a.with_suffix('bin'), out_folder,**kwds)
-    i, _ = iadbs(p.with_suffix('xml'), out_folder, fastas, **kwds)
+    p, _ = peptide3d(a.with_suffix('.bin'), out_folder,**kwds)
+    i, _ = iadbs(p.with_suffix('.xml'), out_folder, fastas, **kwds)
     create_params_file(a, p, i)# for projectizer2.0
     
     logger.info('PLGS finished.')
+    return True

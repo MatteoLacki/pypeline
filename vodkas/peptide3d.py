@@ -1,12 +1,12 @@
-import logging
 from pathlib import Path
 
 from .fs import check_algo
+from .logging import get_logger
 from .misc import call_info
 from .subproc import run_win_proc
 
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 def peptide3d(input_file,
@@ -41,6 +41,8 @@ def peptide3d(input_file,
     algo = check_algo(path_to_peptide3d)
     input_file = Path(input_file)
     output_dir = Path(output_dir)
+    pep3d_stdout = output_dir/'pep3d.log'
+
     if input_file.suffix != '.bin':
         raise RuntimeError("Peptide3D failed: it accepts 'bin' input files only.")
 
@@ -53,7 +55,7 @@ def peptide3d(input_file,
             f"-WriteBinningFile {int(write_binning)}",
             f"-minLEMHPlus {min_LEMHPlus}"]
 
-    pr, runtime = run_win_proc(cmd, timeout_peptide3d)
+    pr, runtime = run_win_proc(cmd, timeout_peptide3d, pep3d_stdout)
 
     if '_Apex3D' in input_file.stem:
         out = input_file.parent/input_file.stem.replace('_Apex3D','_Pep3D_Spectrum')
