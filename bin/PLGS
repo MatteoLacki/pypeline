@@ -23,7 +23,7 @@ if __name__ == '__main__':
     default_out = 'C:/SYMPHONY_VODKAS/temp'
     default_log = 'C:/SYMPHONY_VODKAS/temp_logs/plgs.log'
     default_server = 'X:/SYMPHONY_VODKAS/temp_logs'
-    default_net_db = 'J:/test_RES' if DEBUG else 'Y:/RES'
+    default_net_db = 'Y:/TESTRES' if DEBUG else 'Y:/RES'
 
     A['raw_folders'] = {
         'type': Path,
