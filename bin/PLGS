@@ -35,10 +35,10 @@ if __name__ == '__main__':
         'default': default_out,
         'help': f"Local folder to save data to (there we will place the results) [default = {default_out}]."}
 
-    A["--logs_folder"] = {
+    A["--log_file"] = {
         'type': Path,
         'default': default_log,
-        'help': f"Local folder for logs [default = {default_log}]."}
+        'help': f"Local log file [default = {default_log}]."}
 
     A["--log_server_folder"] = {
         'type': Path,
@@ -56,14 +56,19 @@ if __name__ == '__main__':
         parser.add_argument(name, **kwds)
     args = parser.parse_args().__dict__
 
-    log_file = args['logs_folder']
+    log_file = args['log_file']
     log_format = '%(asctime)s:%(name)s:%(levelname)s:%(message)s:'
+
     logging.basicConfig(filename=log_file, format=log_format, level=logging.INFO)
     logger = get_logger('PLGS', log_format)
-    del args['logs_folder']
+    del args['log_file']
 
     out = args['out_folder']
     del args['out_folder']
+
+    network_db_folder = args['network_db_folder']
+    if not network_db_folder.parents[0].exists():
+        raise FileNotFoundError(f"Network drive missing: mount '{network_db_folder.parents[0]}'.")
 
     for raw_folder in args['raw_folders']:
         logger.info(f"Starting analysis of '{raw_folder}'.")
@@ -79,17 +84,20 @@ if __name__ == '__main__':
 
             plgs_ok = plgs(raw_folder, out_folder, **args)
 
-            if plgs_ok and args['network_db_folder']:
-                net_folder = find_free_path(args['network_db_folder']/sample_set/acquired_name)
-                copy_folder(out_folder, net_folder)
-                rm_tree(out_folder)
-                if not out_folder.parent.glob('*'):
-                    out_folder.parent.rmdir()
-                logger.info("Moved results to the server.")
+            if plgs_ok and network_db_folder:
+                net_folder = find_free_path(network_db_folder/sample_set/acquired_name)
+                try:
+                    copy_folder(out_folder, net_folder)
+                    rm_tree(out_folder)
+                    if not out_folder.parent.glob('*'):
+                        out_folder.parent.rmdir()
+                    logger.info("Moved results to the server.")
+                except RuntimeError as e:
+                    logger.warning(f"Could not copy '{raw_folder}'.")
+                    logger.warning(repr(e))
 
             logger.info(f"Finished with '{raw_folder}'.")
-        except FileNotFoundError as e:
-            logger.warning(repr(e))
+
         except Exception as e:
             logger.warning(repr(e))
 

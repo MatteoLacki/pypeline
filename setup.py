@@ -28,7 +28,6 @@ setup(
     # include_package_data=True,
     # package_data={'data': ['data/contaminants_uniprot_format.fasta']},
     scripts = ["bin/APEX3D",
-               "bin/IADBS",
                "bin/PEPTIDE3D",
                "bin/PLGS"
                ]
