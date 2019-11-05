@@ -70,6 +70,9 @@ if __name__ == '__main__':
     if not network_db_folder.parents[0].exists():
         raise FileNotFoundError(f"Network drive missing: mount '{network_db_folder.parents[0]}'.")
 
+    print(f"Running analysis on folders:")
+    pprint(args['raw_folders'])
+
     for raw_folder in args['raw_folders']:
         logger.info(f"Starting analysis of '{raw_folder}'.")
         try:
@@ -85,7 +88,10 @@ if __name__ == '__main__':
             plgs_ok = plgs(raw_folder, out_folder, **args)
 
             if plgs_ok and network_db_folder:
-                net_folder = find_free_path(network_db_folder/sample_set/acquired_name)
+                ##                              Y:\RES\         2019-008\   O191017-04
+                # net_folder = find_free_path(network_db_folder/sample_set/acquired_name)
+                ##                              Y:\RES\         O191017-04
+                net_folder = find_free_path(network_db_folder/acquired_name)
                 try:
                     copy_folder(out_folder, net_folder)
                     rm_tree(out_folder)
