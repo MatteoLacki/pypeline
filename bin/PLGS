@@ -70,8 +70,10 @@ if __name__ == '__main__':
     if not network_db_folder.parents[0].exists():
         raise FileNotFoundError(f"Network drive missing: mount '{network_db_folder.parents[0]}'.")
 
+    print()
     print(f"Running analysis on folders:")
     pprint(args['raw_folders'])
+    print()
 
     for raw_folder in args['raw_folders']:
         logger.info(f"Starting analysis of '{raw_folder}'.")

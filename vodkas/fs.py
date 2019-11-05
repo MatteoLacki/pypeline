@@ -21,8 +21,8 @@ def __cp(source, target, fcmd):
         raise FileNotFoundError(f"Network drive missing: mount '{t.parents[0]}'.")
     cmd = fcmd(s,t)
     completed_proc = subprocess.run(cmd.split())
-    if completed_proc.returncode != 0:
-        raise RuntimeError("The copy process did not succeed. Consult your local handsomely paid coder.")
+    # if completed_proc.returncode != 0:
+    #     raise RuntimeError("The copy process did not succeed. Consult your local handsomely paid coder.")
     return completed_proc
 
 def cp(source, target):
@@ -82,7 +82,8 @@ def find_free_path(p):
     q = Path(p)
     while q.is_dir():
         i += 1
-        q = Path(f"{p.parent}__v{i}")/p.name
+        q = p.parent/f"{p.name}__v{i}"
+        # q = Path(f"{p.parent}__v{i}")/p.name
     return q
 
 
