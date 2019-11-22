@@ -93,7 +93,9 @@ if __name__ == '__main__':
                 ##                              Y:\RES\         2019-008\   O191017-04
                 # net_folder = find_free_path(network_db_folder/sample_set/acquired_name)
                 ##                              Y:\RES\         O191017-04
-                net_folder = find_free_path(network_db_folder/acquired_name)
+                net_set_folder = network_db_folder/sample_set
+                net_set_folder.mkdir(parents=True, exist_ok=True)
+                net_folder = find_free_path(network_db_folder/sample_set/acquired_name)
                 try:
                     copy_folder(out_folder, net_folder)
                     rm_tree(out_folder)
