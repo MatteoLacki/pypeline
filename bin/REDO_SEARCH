@@ -1,12 +1,3 @@
-"""
-Script for redoing the search.
-By default, it will replace the results of the previous analysis.
-
-No need to run xml parser here: 'params.json' will just stay the same.
-
-Matteo Lacki
-"""
-
 import argparse
 from docstr2argparse import parse_arguments
 import logging
@@ -26,9 +17,8 @@ get_args = lambda x: dict(parse_arguments(x))
 A = {**get_args(iadbs), **get_args(get_fastas)}
 
 default_log = 'C:/SYMPHONY_VODKAS/temp_logs/plgs.log'
-default_server = 'X:/SYMPHONY_VODKAS/temp_logs'
 
-parser = argparse.ArgumentParser(description='Rerun search with iaDBs: outcomes will be dumped in the same folders as the provided files are in.')
+parser = argparse.ArgumentParser(description='Rerun search with iaDBs: outcomes will be dumped in the same folders as the provided files are in. WARNING: it replaces the results of the previous analysis.')
 A['peptide3d_results'] = {'type': Path, 'nargs': "+",
     'help': 'Path(s) to the peptide3d result files.'}
 A["--log_file"] = {'type': Path, 'default': default_log,
@@ -40,9 +30,8 @@ for name, kwds in sorted(A.items()):
 
 args = parser.parse_args().__dict__
 
-log_file = args['log_file']
 log_format = '%(asctime)s:%(name)s:%(levelname)s:%(message)s:'
-logging.basicConfig(filename=log_file, format=log_format, level=logging.INFO)
+logging.basicConfig(filename=args['log_file'], format=log_format, level=logging.INFO)
 logger = get_logger('RERUN_IADBS', log_format)
 del args['log_file']
 
