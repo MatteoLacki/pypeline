@@ -5,8 +5,27 @@ import platform
 
 ls = lambda p: list(p.glob('*'))
 
+def __cp(source, target, fcmd):
+    """robocopy wrapper
 
-def cp(source, target, **kwds):
+    Args:
+        source (Path or str): Path to the source.
+        target (Path or str): Path to the target.
+        fcmd (lambda): function returning a string with command for the subprocess.
+    """
+    s, t = Path(source), Path(target)
+    assert platform.system() == 'Windows', "This command works only on Windows, as Symphony does."
+    if not s:
+        raise FileNotFoundError("Source folder missing.")
+    if not t.parents[0].exists():
+        raise FileNotFoundError(f"Network drive missing: mount '{t.parents[0]}'.")
+    cmd = fcmd(s,t)
+    completed_proc = subprocess.run(cmd.split())
+    # if completed_proc.returncode != 0:
+    #     raise RuntimeError("The copy process did not succeed. Consult your local handsomely paid coder.")
+    return completed_proc
+
+def cp(source, target):
     """Copy a file, or rather synchronize it.
 
     On Windows, use robocopy.
@@ -15,13 +34,8 @@ def cp(source, target, **kwds):
     Args:
         source (Path or str): Path to the source.
         target (Path or str): Path to the target.
-        kwds: named arguments for subprocess.run
     """
-    s, t = Path(source), Path(target)
-    assert platform.system() == 'Windows', "This command works only on Windows, as Symphony does."
-    cmd = ['robocopy', str(s.parent), str(t), str(s.name)]
-    return subprocess.run(cmd, **kwds)
-
+    return __cp(source, target, lambda s,t: f"robocopy {str(s.parent)} {str(t)} {str(s.name)}")
 
 def test_cp():
     if platform.system() == 'Windows':
@@ -31,8 +45,7 @@ def test_cp():
 
 
 def copy_folder(source, target):
-    cmd = ['robocopy', str(source), str(target), "/E"]
-    return subprocess.run(cmd)
+    return __cp(source, target, lambda s,t: f"robocopy {str(s)} {str(t)} /E")
 
 
 def random_folder_name(k=20):
@@ -69,7 +82,8 @@ def find_free_path(p):
     q = Path(p)
     while q.is_dir():
         i += 1
-        q = Path(f"{p.parent}__v{i}")/p.name
+        q = p.parent/f"{p.name}__v{i}"
+        # q = Path(f"{p.parent}__v{i}")/p.name
     return q
 
 

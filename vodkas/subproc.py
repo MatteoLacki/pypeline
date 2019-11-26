@@ -2,6 +2,12 @@ from pathlib import Path
 from subprocess import Popen, TimeoutExpired, run, PIPE
 from time import time
 
+from .logging import get_logger
+
+
+logger = get_logger(__name__)
+
+
 
 def run_win_proc(cmd,
                  timeout=10,
@@ -24,7 +30,9 @@ def run_win_proc(cmd,
         kill = Path(cmd[1]).name
         kill = "Taskkill /IM {} /F".format(kill)
         _ = run(kill, capture_output=True)
-        timeout_expired = True    
+        timeout_expired = True
+        out = str.encode('Timeout Achieved.')
+        logger.warning(f"Timeout achieved for P{kill}")
 
     if out_path:
         with open(out_path, 'wb') as f:
