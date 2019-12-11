@@ -1,4 +1,4 @@
-r"""Quick test project.
+"""Quick test project.
 """
 import logging
 from pathlib import Path

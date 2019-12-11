@@ -13,3 +13,6 @@ fastas = get_fastas('human')
 i, _ = iadbs(o.with_suffix('.xml'), p, fastas)
 
 create_params_file(a, o, i)
+
+
+U:\Matteo\20191211_2019-015_reprocessing_with_Matteos_pipeline

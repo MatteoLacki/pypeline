@@ -2,12 +2,13 @@ import argparse
 from docstr2argparse import parse_arguments
 import logging
 from pathlib import Path
+from pprint import pprint
 
 from vodkas import apex3d, peptide3d, iadbs, plgs
 from vodkas.fastas import get_fastas
 from vodkas.fs import copy_folder, find_free_path, rm_tree
 from vodkas.header_txt import parse_header_txt
-
+from vodkas.logging import get_logger
 
 DEBUG = True
 
