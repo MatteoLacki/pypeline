@@ -6,7 +6,7 @@ from pprint import pprint
 
 from vodkas import apex3d, peptide3d, iadbs, plgs
 from vodkas.fastas import get_fastas
-from vodkas.fs import copy_folder, find_free_path, rm_tree
+from vodkas.fs import find_free_path, move_folder
 from vodkas.header_txt import parse_header_txt
 from vodkas.logging import get_logger
 
@@ -70,26 +70,21 @@ if __name__ == '__main__':
     network_db_folder = args['network_db_folder']
     if not network_db_folder.parents[0].exists():
         raise FileNotFoundError(f"Network drive missing: mount '{network_db_folder.parents[0]}'.")
-
     print()
     print(f"Running analysis on folders:")
     pprint(args['raw_folders'])
     print()
-
     for raw_folder in args['raw_folders']:
         logger.info(f"Starting analysis of '{raw_folder}'.")
         try:
             if not raw_folder.is_dir():
                 logger.info(f"Raw folder missing: {raw_folder}")
                 raise FileNotFoundError(f"Did not find {raw_folder}")
-
             acquired_name = raw_folder.stem
             header_txt = parse_header_txt(raw_folder/'_HEADER.TXT')
             sample_set = header_txt['Sample Description'][:8]
             out_folder = out/sample_set/acquired_name
-
             plgs_ok = plgs(raw_folder, out_folder, **args)
-
             if plgs_ok and network_db_folder:
                 ##                              Y:\RES\         2019-008\   O191017-04
                 # net_folder = find_free_path(network_db_folder/sample_set/acquired_name)
@@ -98,19 +93,17 @@ if __name__ == '__main__':
                 net_set_folder.mkdir(parents=True, exist_ok=True)
                 net_folder = find_free_path(network_db_folder/sample_set/acquired_name)
                 try:
-                    copy_folder(out_folder, net_folder)
-                    rm_tree(out_folder)
+                    move_folder(out_folder, net_folder)
                     if not out_folder.parent.glob('*'):
                         out_folder.parent.rmdir()
                     logger.info("Moved results to the server.")
                 except RuntimeError as e:
                     logger.warning(f"Could not copy '{raw_folder}'.")
                     logger.warning(repr(e))
-
+                else:
+                    print("PLGS unsuccessful.")
             logger.info(f"Finished with '{raw_folder}'.")
-
         except Exception as e:
             logger.warning(repr(e))
-
     logger.info("PLGS finished.")
 

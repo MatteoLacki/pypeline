@@ -1,6 +1,7 @@
 import subprocess
 from pathlib import Path
 import platform
+from filecmp import dircmp
 
 
 ls = lambda p: list(p.glob('*'))
@@ -96,3 +97,10 @@ def rm_tree(pth):
         else:
             rm_tree(child)
     pth.rmdir()
+
+
+def move_folder(source, target):
+    copying_finished = copy_folder(source, target)
+    comp = dircmp(source, target)
+    if copying_finished and not comp.diff_files: # no differences: delete!
+        rm_tree(source)
