@@ -9,9 +9,9 @@ iaDBs_xml = list(out_folder.glob('*_IA_workflow.xml'))[0]
 
 import subprocess
 
-C:\Symphony\Utils\wxStat.jar
-stats.csv
-target = iaDBs_xml
+# C:\Symphony\Utils\wxStat.jar
+# stats.csv
+# target = iaDBs_xml
 
 def wxStats(iaDBs_xml,
             path_to_wxStat="C:/SYMPHONY_VODKAS/plgs/wxStat.jar",

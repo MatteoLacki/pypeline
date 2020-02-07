@@ -70,7 +70,7 @@ def wxStats(iaDBs_xml,
         path_to_wxStat (Path or str): Path to the "wxStat.jar" executable.
         java_minimal_heap_size (str): Minimal heap size for fucking useless java.
     """
-        path_to_wxStat, iaDBs_xml = Path(path_to_wxStat), Path(iaDBs_xml)
-        cmd = f"java -Xmx{java_minimal_heap_size} -jar {path_to_wxStat} {iaDBs_xml} > {iaDBs_xml.parent/'stats.csv'}"
-        return subprocess.run(cmd.split())
+    path_to_wxStat, iaDBs_xml = Path(path_to_wxStat), Path(iaDBs_xml)
+    cmd = f"java -Xmx{java_minimal_heap_size} -jar {path_to_wxStat} {iaDBs_xml} > {iaDBs_xml.parent/'stats.csv'}"
+    return subprocess.run(cmd.split())
     
