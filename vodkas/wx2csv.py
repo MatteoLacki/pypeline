@@ -51,26 +51,3 @@ def wx2csv(input_file,
 
     return out, pr
 
-# def test_wx2csv():
-#     pd.set_option('display.max_rows', 4)
-#     pd.set_option('display.max_columns', 100)
-#     pd.set_option('display.max_colwidth', -1)
-#     report, proc = wx2csv("C:/Symphony/Temp/proteome_tools/T1707/T170722_03/215/T170722_03_IA_workflow.xml",
-#         "C:/Symphony/Temp/proteome_tools/T1707/T170722_03/215/T170722_03.csv")
-
-def wxStats(iaDBs_xml,
-            path_to_wxStat=r"C:/SYMPHONY_VODKAS/plgs/wxStat.jar",
-            java_minimal_heap_size='1G'):
-    """A wrapper around wxStats.
-
-    Counts found peptides.
-        
-    Args:
-        iaDBs_xml (Path or str): a path to *_IA_workflow.xml file containing outputs from the iaDBs search.
-        path_to_wxStat (Path or str): Path to the "wxStat.jar" executable.
-        java_minimal_heap_size (str): Minimal heap size for fucking useless java.
-    """
-    path_to_wxStat, iaDBs_xml = Path(path_to_wxStat), Path(iaDBs_xml)
-    cmd = f"java -Xmx{java_minimal_heap_size} -jar {path_to_wxStat} {iaDBs_xml} > {iaDBs_xml.parent/'stats.csv'}"
-    return subprocess.run(cmd.split())
-    
