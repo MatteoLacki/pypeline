@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 from pprint import pprint
 
-from vodkas import iadbs, plgs
+from vodkas import iadbs
 from vodkas.fastas import get_fastas
 from vodkas.fs import copy_folder, find_free_path, rm_tree
 from vodkas.header_txt import parse_header_txt

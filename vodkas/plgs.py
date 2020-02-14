@@ -1,15 +1,12 @@
 import logging
 from time import sleep
 
-from . import apex3d, peptide3d, iadbs, wxStats
+from fs_ops.csv import rows2csv
+from waters.parsers import iaDBsXMLparser
+
+from . import apex3d, peptide3d, iadbs
 from .fastas import get_fastas
-from .logging import get_logger
-from .misc import call_info
 from .xml_parser import create_params_file
-
-
-# logger = logging.getLogger(__name__)
-logger = get_logger(__name__)
 
 def plgs(raw_folder, out_folder, **kwds):
     """Run PLGS.
@@ -23,14 +20,11 @@ def plgs(raw_folder, out_folder, **kwds):
     Returns:
         dict: parsed parameters from the xml files.
     """
-    logger.info("Running plgs.")
-    logger.info(call_info(locals()))
     fastas = get_fastas(**kwds)
     a, _ = apex3d(raw_folder, out_folder, **kwds) # this will make .bin only
     p, _ = peptide3d(a.with_suffix('.bin'), out_folder,**kwds) # this will make .xml only
     i, _ = iadbs(p.with_suffix('.xml'), out_folder, fastas, **kwds)
-    create_params_file(a, p, i)# for projectizer2.0
-    wxStats(i)# stats on the project.
-
-    logger.info('PLGS finished.')
+    create_params_file(a, p, i) # for projectizer2.0
+    search_stats = iaDBsXMLparser(i).info()
+    rows2csv(i.parent/'stats.csv', [list(search_stats), list(search_stats.values())])
     return True

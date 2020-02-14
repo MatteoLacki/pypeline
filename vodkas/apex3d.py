@@ -3,10 +3,6 @@ from pathlib import Path
 from .fs import check_algo
 from .misc import get_coresNo, call_info
 from .subproc import run_win_proc
-from .logging import get_logger
-
-
-logger = get_logger(__name__)
 
 
 def apex3d(raw_folder,
@@ -49,11 +45,7 @@ def apex3d(raw_folder,
     Returns:
         tuple: the path to the outcome (no extension: choose it yourself and believe more in capitalism) and the completed process.
     """
-    logger.info('Running Apex3D.')
-    logger.info(call_info(locals()))
-
     algo = check_algo(path_to_apex3d)
-
     raw_folder = Path(raw_folder)
     output_dir = Path(output_dir)
     apex_stdout = output_dir/'apex3d.log'
@@ -81,9 +73,7 @@ def apex3d(raw_folder,
 
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("Apex3D's output missing.")
-    
-    logger.info(f'Apex3d took {runtime} minutes.')
-    
+
     return out_bin.with_suffix(''), pr
 
 # def test_apex3d():
