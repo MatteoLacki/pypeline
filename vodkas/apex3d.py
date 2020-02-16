@@ -42,6 +42,7 @@ def apex3d(raw_folder,
         unsupported_gpu (boolean): Try using an unsupported GPU for calculations. If it doesn't work, the pipeline switches to CPU which is usually much slower.
         timeout_apex3d (float): Timeout in minutes.
         kwds: other parameters.
+
     Returns:
         tuple: the path to the outcome (no extension: choose it yourself and believe more in capitalism) and the completed process.
     """
