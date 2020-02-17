@@ -5,8 +5,10 @@ from fs_ops.csv import rows2csv
 from waters.parsers import iaDBsXMLparser
 
 from . import apex3d, peptide3d, iadbs
-# from .fastas import get_fastas
+from .fastas import get_fastas
 from .xml_parser import create_params_file
+
+
 
 def plgs(raw_folder, out_folder, **kwds):
     """Run PLGS.

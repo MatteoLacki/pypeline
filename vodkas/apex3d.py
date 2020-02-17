@@ -20,8 +20,7 @@ def apex3d(raw_folder,
            PLGS=True,
            cuda=True,
            unsupported_gpu=True,
-           timeout_apex3d=60,
-           **kwds):
+           timeout_apex3d=60):
     """Analyze a Waters Raw Folder with Apex3D.
     
     Args:
@@ -41,7 +40,6 @@ def apex3d(raw_folder,
         cuda (boolean): Use CUDA.
         unsupported_gpu (boolean): Try using an unsupported GPU for calculations. If it doesn't work, the pipeline switches to CPU which is usually much slower.
         timeout_apex3d (float): Timeout in minutes.
-        kwds: other parameters.
 
     Returns:
         tuple: the path to the outcome (no extension: choose it yourself and believe more in capitalism) and the completed process.

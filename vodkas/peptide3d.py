@@ -17,8 +17,7 @@ def peptide3d(input_file,
               write_csv=False,
               write_binning=False,
               path_to_peptide3d="C:/SYMPHONY_VODKAS/plgs/Peptide3D.exe",
-              timeout_peptide3d=60,
-              **kwds):
+              timeout_peptide3d=60):
     """Run Peptide3D.
     
     Args:
@@ -31,7 +30,7 @@ def peptide3d(input_file,
         min_LEMHPlus (int): The minimal (M)ass of the (L)ow (E)nergy precursor with a single charge (H+).
         path_to_peptide3d (str): Path to the "Peptide3D.exe" executable.
         timeout_peptide3d (float): Timeout in minutes.
-        kwds: other parameters.
+
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
     """

@@ -18,8 +18,7 @@ def iadbs(input_file,
           write_binary=True,
           write_csv=False,
           path_to_iadbs="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
-          timeout_iadbs=60,
-          **kwds):
+          timeout_iadbs=60):
     """Run iaDBs.
     
     Args:
@@ -32,7 +31,7 @@ def iadbs(input_file,
         write_csv (boolean): Write the ions to csv file.
         path_to_iadbs (str): Path to the "iaDBs.exe" executable.
         timeout_iadbs (float): Timeout in minutes.
-        kwds: other parameters.
+
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
     """
