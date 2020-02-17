@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 setup(
     name='vodkas',
     packages=find_packages(),
-    version='0.0.1',
+    version='0.0.2',
     description='Syntactic sugar around Waters LC/IMS/MS pypeline.',
     long_description='A simple, once for all pythonic middle finger in face of Waters. Works under Windows only for now.',
     author='Mateusz Krzysztof Łącki',

@@ -10,18 +10,16 @@ logger = get_logger(__name__)
 
 def get_proteome(proteome, 
                  fasta_db_server=r'X:/SYMPHONY_VODKAS/fastas/latest',
-                 fasta_db_local=r'C:/SYMPHONY_VODKAS/fastas',
-                 **kwds):
+                 fasta_db_local=r'C:/SYMPHONY_VODKAS/fastas'):
     """Get the path to file with standard proteome fastas.
 
     Args:
         proteome (str): Organism name = prefix of the fasta file.
         fasta_db_server (str): Path to server fastas.
         fasta_db_local (str): Path to local fastas.
-        kwds: further arguments to subprocess.run used for copying.
-
+    
     Returns:
-        Path to the local fasta file.
+        Path: Local fasta file.
     """
     f_loc = Path(fasta_db_local)
     f_ser = Path(fasta_db_server)
@@ -38,23 +36,22 @@ def get_proteome(proteome,
 
 def get_fastas(fastas, 
                fasta_db_server=r'X:/SYMPHONY_VODKAS/fastas/latest',
-               fasta_db_local=r'C:/SYMPHONY_VODKAS/fastas',
-               **kwds):
+               fasta_db_local=r'C:/SYMPHONY_VODKAS/fastas'):
     """Get the path to file with standard proteome fastas.
 
     Args:
         fastas (str): Fasta file to use, or a prefix to one of the standard proteomes used, e.g. 'human'.
         fasta_db_server (str): Path to server fastas.
         fasta_db_local (str): Path to local fastas.
-        kwds: further arguments to subprocess.run used for copying.
 
     Returns:
-        Path to the local fasta file.
+        Path: Local fasta file.
     """
-    if Path(fastas).is_file():
+    fastas = Path(fastas)
+    if fastas.is_file():
         logger.info('Custom fastas used.')
         logger.info(str(fastas))
-        return Path(fastas)
+        return fastas
     else:
         logger.info('Checking standard proteomes.')
         logger.info(call_info(locals()))
