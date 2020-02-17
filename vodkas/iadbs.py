@@ -17,8 +17,8 @@ def iadbs(input_file,
           write_xml=True,
           write_binary=True,
           write_csv=False,
-          path_to_iadbs="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
-          timeout_iadbs=60):
+          path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
+          timeout=60):
     """Run iaDBs.
     
     Args:
@@ -29,8 +29,8 @@ def iadbs(input_file,
         write_xml (boolean): Write the output in an xml in the output folder.
         write_binary (boolean): Write the binary output in an xml in the output folder.
         write_csv (boolean): Write the ions to csv file.
-        path_to_iadbs (str): Path to the "iaDBs.exe" executable.
-        timeout_iadbs (float): Timeout in minutes.
+        path (str): Path to the "iaDBs.exe" executable.
+        timeout (float): Timeout in minutes.
 
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
@@ -38,7 +38,7 @@ def iadbs(input_file,
     logger.info('Running iadbs.')
     logger.info(call_info(locals()))
 
-    algo = check_algo(path_to_iadbs)
+    algo = check_algo(path)
     input_file = Path(input_file)
     if input_file.suffix == '.bin':
         logger.warning('Taking a ".bin" input from Peptide3D might not always work.')
@@ -57,7 +57,7 @@ def iadbs(input_file,
             f"-WriteBinary {int(write_binary)}",
             f"-bDeveloperCSVOutput {int(write_csv)}" ]
 
-    pr, runtime = run_win_proc(cmd, timeout_iadbs, iadbs_stdout)
+    pr, runtime = run_win_proc(cmd, timeout, iadbs_stdout)
 
     if '_Pep3D_Spectrum' in input_file.stem:
         out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')

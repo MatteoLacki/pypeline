@@ -1,14 +1,13 @@
-from time import sleep
+# from time import sleep
 from collections import defaultdict
 
-from docstr2argparse.parse import foo2argparse
+from docstr2argparse.parse import ParserDisambuigationEasy
 from fs_ops.csv import rows2csv
 from waters.parsers import iaDBsXMLparser
 
 from . import apex3d, peptide3d, iadbs
 from .fastas import get_fastas
 from .xml_parser import create_params_file
-
 
 
 def plgs(raw_folder,
@@ -41,32 +40,4 @@ def plgs(raw_folder,
     rows2csv(i.parent/'stats.csv', [list(search_stats), list(search_stats.values())])
     return True
 
-
-def parse_optional_plgs_args():
-    """Parse plgs' documentation.
-    
-    Returns:
-        tuple: arg_parser with filled documents and dictionary with arguments desambuigation.
-    """
-    foos = [get_fastas, apex3d, peptide3d, iadbs]
-    plgs_desc, plgs_args = foo2argparse(plgs)
-    plgs_args = {n:h for n,o,h in plgs_args}
-    out = []
-    arg2foo = defaultdict(list)
-    for f in foos:
-        for n,o,h in foo2argparse(f)[1]:
-            if n[0:2] == '--':
-                arg2foo[o].append((f.__name__, o))
-    repeating_args = {a for a, f_l in arg2foo.items() if len(f_l) > 1}
-    for arg in repeating_args:
-        del arg2foo[arg]
-    for f in foos:
-        for n,o,h in foo2argparse(f)[1]:
-            if n[0:2] == '--':
-                if o in repeating_args:
-                    m = f"{f.__name__}_{o}"
-                    n = "--" + m
-                    arg2foo[m].append((f.__name__, o))
-                out.append((n,h))
-    arg2foo = {k: v[0] for k,v in arg2foo.items()}
-    return plgs_desc, out, dict(arg2foo)
+plgs.parsed = ParserDisambuigationEasy([get_fastas, apex3d, peptide3d, iadbs])

@@ -16,8 +16,8 @@ def peptide3d(input_file,
               write_binary=False,
               write_csv=False,
               write_binning=False,
-              path_to_peptide3d="C:/SYMPHONY_VODKAS/plgs/Peptide3D.exe",
-              timeout_peptide3d=60):
+              path="C:/SYMPHONY_VODKAS/plgs/Peptide3D.exe",
+              timeout=60):
     """Run Peptide3D.
     
     Args:
@@ -28,8 +28,8 @@ def peptide3d(input_file,
         write_csv (boolean): Write the ions to csv file.
         write_binning (boolean): Write binning file.
         min_LEMHPlus (int): The minimal (M)ass of the (L)ow (E)nergy precursor with a single charge (H+).
-        path_to_peptide3d (str): Path to the "Peptide3D.exe" executable.
-        timeout_peptide3d (float): Timeout in minutes.
+        path (str): Path to the "Peptide3D.exe" executable.
+        timeout (float): Timeout in minutes.
 
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
@@ -37,7 +37,7 @@ def peptide3d(input_file,
     logger.info('Running Peptide3D.')
     logger.info(call_info(locals()))
 
-    algo = check_algo(path_to_peptide3d)
+    algo = check_algo(path)
     input_file = Path(input_file)
     output_dir = Path(output_dir)
     pep3d_stdout = output_dir/'pep3d.log'
@@ -54,7 +54,7 @@ def peptide3d(input_file,
             f"-WriteBinningFile {int(write_binning)}",
             f"-minLEMHPlus {min_LEMHPlus}"]
 
-    pr, runtime = run_win_proc(cmd, timeout_peptide3d, pep3d_stdout)
+    pr, runtime = run_win_proc(cmd, timeout, pep3d_stdout)
 
     if '_Apex3D' in input_file.stem:
         out = input_file.parent/input_file.stem.replace('_Apex3D','_Pep3D_Spectrum')

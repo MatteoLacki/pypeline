@@ -16,11 +16,11 @@ def apex3d(raw_folder,
            write_binary=True,
            write_csv=False,
            max_used_cores=get_coresNo(),
-           path_to_apex3d="C:/SYMPHONY_VODKAS/plgs/Apex3D64.exe",
+           path="C:/SYMPHONY_VODKAS/plgs/Apex3D64.exe",
            PLGS=True,
            cuda=True,
            unsupported_gpu=True,
-           timeout_apex3d=60):
+           timeout=60):
     """Analyze a Waters Raw Folder with Apex3D.
     
     Args:
@@ -35,11 +35,11 @@ def apex3d(raw_folder,
         write_binary (boolean): Write the binary output in an xml in the output folder.
         write_csv (boolean): Write the output in a csv in the output folder (doesn't work).
         max_used_cores (int): The maximal number of cores to use.
-        path_to_apex3d (str): Path to the "Apex3D.exe" executable.
+        path (str): Path to the "Apex3D.exe" executable.
         PLGS (boolean): No idea what it is.
         cuda (boolean): Use CUDA.
         unsupported_gpu (boolean): Try using an unsupported GPU for calculations. If it doesn't work, the pipeline switches to CPU which is usually much slower.
-        timeout_apex3d (float): Timeout in minutes.
+        timeout (float): Timeout in minutes.
 
     Returns:
         tuple: the path to the outcome (no extension: choose it yourself and believe more in capitalism) and the completed process.
@@ -65,7 +65,7 @@ def apex3d(raw_folder,
         f"-bEnableCuda {int(cuda)}",
         f"-bEnableUnsupportedGPUs {int(unsupported_gpu)}"]
 
-    pr, runtime = run_win_proc(cmd, timeout_apex3d, apex_stdout)
+    pr, runtime = run_win_proc(cmd, timeout, apex_stdout)
 
     out_bin = output_dir/(raw_folder.stem + "_Apex3D.bin")
     out_xml = out_bin.with_suffix('.xml')
