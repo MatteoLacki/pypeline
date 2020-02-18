@@ -99,8 +99,11 @@ def rm_tree(pth):
     pth.rmdir()
 
 
+# def move_folder(source, target):
+#     copying_finished = copy_folder(source, target)
+#     comp = dircmp(source, target)
+#     if copying_finished and not comp.diff_files: # no differences: delete!
+#         rm_tree(source)
+
 def move_folder(source, target):
-    copying_finished = copy_folder(source, target)
-    comp = dircmp(source, target)
-    if copying_finished and not comp.diff_files: # no differences: delete!
-        rm_tree(source)
+    return __cp(source, target, lambda s,t: f"robocopy {str(s)} {str(t)} /e /move")

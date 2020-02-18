@@ -1,12 +1,20 @@
 import argparse
+import logging
 from pprint import pprint
 from pathlib import Path
+import platform
 
 from vodkas import plgs
 from vodkas.fs import find_free_path, move_folder
+from vodkas.logging import get_logger
 
 DEBUG = True
 net_folder = 'Y:/TESTRES' if DEBUG else 'Y:/RES'
+log_folder = {
+    "Windows": Path('C:/SYMPHONY_VODKAS/temp_logs/plgs.log'),
+    "Linux":   Path('~/plgs.log').expanduser(),
+    "Darwin":  Path('~/plgs.log').expanduser(),
+}[platform.system()]
 
 ap = argparse.ArgumentParser(description='Analyze Waters Raw Data with PLGS.')
 ap.add_argument('raw_folders', type=Path, nargs='+',
@@ -16,11 +24,10 @@ ap.add_argument('--temp_folder', type=Path,
                 default='C:/SYMPHONY_VODKAS/temp')
 ap.add_argument('--log_file', type=Path,
                 help='Path to temporary outcome folder.',
-                default='C:/SYMPHONY_VODKAS/temp_logs/plgs.log')
+                default=log_folder)
 ap.add_argument('--net_folder', type=Path,
                 help=f"Network folder for results. Set to '' (empty word) if you want to skip copying [default = {net_folder}].",
                 default=net_folder)
-
 for arg_name, arg_desc in plgs.parsed.a2d:
     ap.add_argument(arg_name,**arg_desc)
 args = ap.parse_args()
@@ -30,24 +37,47 @@ if DEBUG:
     print(args.temp_folder)
     pprint(foo_args)
 
+# setting up loggers
 log_format = '%(asctime)s:%(name)s:%(levelname)s:%(message)s:'
 logging.basicConfig(filename=args.log_file,
                     format=log_format,
                     level=logging.INFO)
 log = get_logger('PLGS', log_format)
 
-net_drive = args.net_folder.parents[0] 
-if not net_drive.exists():
-    log.error(f"no network drive {net_drive}")
-    exit()
+# check network drives
+net_drive = args.net_folder.parents[0]
+
+if not net_drive.exists() and not str(net_drive) == '':
+    log.warning(f"no network drive (proceeding locally): {net_drive}")
 
 log.info("Analyzing folders:")
 pprint(args.raw_folders)
-
 for raw_folder in args.raw_folders:
     log.info(f"analyzing: {raw_folder}")
+    if not raw_folder.is_dir():
+        log.error(f"missing: {raw_folder}")
+        continue
+    acquired_name = raw_folder.stem
     try:
-
+        header_txt = parse_header_txt(raw_folder/'_HEADER.TXT')
+        sample_set = header_txt['Sample Description'][:8]
+        out_folder = out/sample_set/acquired_name
+        plgs_ok = plgs(raw_folder, out_folder, **args)
+        if plgs_ok and network_db_folder:
+            net_set_folder = network_db_folder/sample_set
+            net_set_folder.mkdir(parents=True, exist_ok=True)
+            net_folder = find_free_path(network_db_folder/sample_set/acquired_name)
+            try:
+                move_folder(out_folder, net_folder)
+                if not out_folder.parent.glob('*'):
+                    out_folder.parent.rmdir()
+                log.info("Moved results to the server.")
+            except RuntimeError as e:
+                log.warning(f"Could not copy '{raw_folder}'.")
+                log.warning(repr(e))
+            else:
+                print("PLGS unsuccessful.")
+        log.info(f"Finished with '{raw_folder}'.")
     except Exception as e:
         log.error(repr(e))
 
