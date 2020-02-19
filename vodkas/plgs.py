@@ -9,7 +9,7 @@ from . import apex3d, peptide3d, iadbs
 from .xml_parser import create_params_file
 
 DEBUG = True
-
+# DEBUG = False
 
 def plgs(fastas,
          raw_folder,
@@ -32,10 +32,10 @@ def plgs(fastas,
     Returns:
         dict: parsed parameters from the xml files.
     """
-    if DEBUG:
-        from vodkas.apex3d import apex3d_mock as apex3d
-        from vodkas.peptide3d import peptide3d_mock as peptide3d
-        from vodkas.iadbs import iadbs_mock as iadbs
+    # if DEBUG:
+    #     from vodkas.apex3d import apex3d_mock as apex3d
+    #     from vodkas.peptide3d import peptide3d_mock as peptide3d
+    #     from vodkas.iadbs import iadbs_mock as iadbs
    
     a, _, time_a = apex3d(raw_folder, out_folder, **apex3d_kwds) # this will make .bin only
     p, _, time_p = peptide3d(a.with_suffix('.bin'), out_folder,**peptide3d_kwds) # this will make .xml only

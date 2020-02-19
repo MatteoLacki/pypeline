@@ -85,9 +85,7 @@ for raw_folder in args.raw_folders:
         sample_set = header_txt['Sample Description'][:8]
         #                   C:/SYMPHONY_PIPELINE/2019-008/O191017-04
         local_folder = args.local_output_folder/sample_set/acquired_name
-        print('Cipa')
         plgs_ok = plgs(fastas, raw_folder, local_folder, **kwds)
-        print('Dupa')
         if plgs_ok and args.net_folder:
             #                     Y:/TESTRES/2019-008
             net_set_folder = args.net_folder/sample_set
@@ -114,3 +112,5 @@ for raw_folder in args.raw_folders:
         log.error(f"error: {repr(e)}")
 log.info('PLGS finished.')
 input("Press Enter to continue...")
+
+
