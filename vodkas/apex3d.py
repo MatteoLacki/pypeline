@@ -12,7 +12,7 @@ def apex3d(raw_folder,
            low_energy_thr=300,
            high_energy_thr=30,
            lowest_intensity_thr=750,
-           write_xml=False,
+           write_xml=True,
            write_binary=True,
            write_csv=False,
            max_used_cores=get_coresNo(),
@@ -25,7 +25,7 @@ def apex3d(raw_folder,
     
     Args:
         raw_folder (str): a path to the input folder with raw Waters data.
-        output_dir (str): Path to where to place the output.
+        output_dir (str): Path to where to place the output (bin & xml).
         lock_mass_z2 (float): The lock mass for doubly charged ion.
         lock_mass_tol_amu (float): Tolerance around lock mass (in atomic mass units, amu).
         low_energy_thr (int): The minimal intensity of a precursor ion so that it ain't a noise peak.
@@ -42,7 +42,7 @@ def apex3d(raw_folder,
         timeout (float): Timeout in minutes.
 
     Returns:
-        tuple: path to the outcome, the completed process, and runtime.
+        tuple: path to the outcome xml, the completed process, and runtime.
     """
     algo = check_algo(path)
     raw_folder = Path(raw_folder)
@@ -73,7 +73,30 @@ def apex3d(raw_folder,
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("Apex3D's output missing.")
 
-    return out_bin.with_suffix(''), pr, runtime
+    return out_xml, pr, runtime
+
+
+def apex3d_mock(raw_folder,
+           output_dir,
+           lock_mass_z2=785.8426,
+           lock_mass_tol_amu=.25,
+           low_energy_thr=300,
+           high_energy_thr=30,
+           lowest_intensity_thr=750,
+           write_xml=False,
+           write_binary=True,
+           write_csv=False,
+           max_used_cores=get_coresNo(),
+           path="C:/SYMPHONY_VODKAS/plgs/Apex3D64.exe",
+           PLGS=True,
+           cuda=True,
+           unsupported_gpu=True,
+           timeout=60):
+    raw_folder = Path(raw_folder)
+    output_dir = Path(output_dir)
+    out_bin = output_dir/(raw_folder.stem + "_Apex3D.bin")
+    out_xml = out_bin.with_suffix('.xml')
+    return out_xml, True, 0.0
 
 # def test_apex3d():
 #     """test Apex3D."""

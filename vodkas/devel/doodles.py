@@ -19,5 +19,3 @@ from pathlib import Path
 fastas = 'human'
 fastas_db = Path(r'X:/SYMPHONY_VODKAS/fastas/latest')
 
-
-

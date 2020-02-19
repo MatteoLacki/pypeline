@@ -59,8 +59,29 @@ def peptide3d(input_file,
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("Peptide3D's output missing.")
     
-    return out_bin.with_suffix(''), pr, runtime
+    return out_xml, pr, runtime
 
+
+def peptide3d_mock(input_file,
+                   output_dir,
+                   min_LEMHPlus=0,
+                   write_xml=True,
+                   write_binary=False,
+                   write_csv=False,
+                   write_binning=False,
+                   path="C:/SYMPHONY_VODKAS/plgs/Peptide3D.exe",
+                   timeout=60):
+    input_file = Path(input_file)
+    output_dir = Path(output_dir)
+    pep3d_stdout = output_dir/'pep3d.log'
+    if '_Apex3D' in input_file.stem:
+        out = input_file.parent/input_file.stem.replace('_Apex3D','_Pep3D_Spectrum')
+    else:
+        out = input_file.stem + "_Pep3D_Spectrum"
+        out = input_file.parent/out
+    out_bin = out.with_suffix('.bin')
+    out_xml = out.with_suffix('.xml')
+    return out_xml, True, 0.0
 
 # def test_peptide3d():
 #     """Test the stupid Peptide3D."""

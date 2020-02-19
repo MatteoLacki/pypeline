@@ -58,8 +58,31 @@ def iadbs(input_file,
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("iaDBs' output missing.")
 
-    return out_bin.with_suffix(''), pr, runtime
+    return out_xml, pr, runtime
 
+
+
+def iadbs_mock(input_file,
+               output_dir,
+               fasta_file,
+               parameters_file="X:/SYMPHONY_VODKAS/search/215.xml",
+               write_xml=True,
+               write_binary=True,
+               write_csv=False,
+               path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
+               timeout=60):
+    input_file = Path(input_file)
+    output_dir = Path(output_dir)
+    fasta_file = Path(fasta_file)
+    parameters_file = Path(parameters_file)
+    iadbs_stdout = output_dir/'iadbs.log'
+    if '_Pep3D_Spectrum' in input_file.stem:
+        out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
+    else:
+        out = output_dir/(input_file.stem+"_IA_workflow")
+    out_bin = out.with_suffix('.bin')
+    out_xml = out.with_suffix('.xml')
+    return out_xml, True, 0.0
 
 # def test_iadbs():
 #     """Test the stupid iaDBs on Windows."""

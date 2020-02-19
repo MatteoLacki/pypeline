@@ -40,6 +40,7 @@ if DEBUG:
     print(args.local_output_folder)
     pprint(kwds)
 
+
 # setting up logger
 log_format = '%(asctime)s:%(name)s:%(levelname)s:%(message)s:'
 logging.basicConfig(filename=args.log_file,
@@ -65,6 +66,10 @@ else:
     if not fastas.exists():
         log.error(f"Fastas unreachable: {fastas}")
 
+# add automatic translation of fastas to proper format.
+# can do it every time: super fast it is.
+# then, dump locally?
+# no, better aumatically add them to custom fastas.
 
  
 log.info("analyzing folders:")
@@ -80,7 +85,9 @@ for raw_folder in args.raw_folders:
         sample_set = header_txt['Sample Description'][:8]
         #                   C:/SYMPHONY_PIPELINE/2019-008/O191017-04
         local_folder = args.local_output_folder/sample_set/acquired_name
+        print('Cipa')
         plgs_ok = plgs(fastas, raw_folder, local_folder, **kwds)
+        print('Dupa')
         if plgs_ok and args.net_folder:
             #                     Y:/TESTRES/2019-008
             net_set_folder = args.net_folder/sample_set
