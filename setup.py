@@ -6,7 +6,7 @@ setup(
     packages=find_packages(),
     version='0.0.2',
     description='Syntactic sugar around Waters LC/IMS/MS pypeline.',
-    long_description='A simple, once for all pythonic middle finger in face of Waters. Works under Windows only for now.',
+    long_description='A simple, once for all pythonic middle finger in face of Waters. Works under fucking Windows only.',
     author='Mateusz Krzysztof Łącki',
     author_email='matteo.lacki@gmail.com',
     url='https://github.com/MatteoLacki/vodkas',
@@ -31,5 +31,6 @@ setup(
     scripts = ["bin/APEX3D.py",
                "bin/PEPTIDE3D.py",
                "bin/PLGS.py",
-               "bin/REDO_SEARCH.py"]
+               "bin/REDO_SEARCH.py",
+               "bin/PLGS_2.py",]
 )

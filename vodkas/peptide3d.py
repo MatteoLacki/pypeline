@@ -1,12 +1,7 @@
 from pathlib import Path
 
 from .fs import check_algo
-from .logging import get_logger
-from .misc import call_info
 from .subproc import run_win_proc
-
-
-logger = get_logger(__name__)
 
 
 def peptide3d(input_file,
@@ -34,9 +29,6 @@ def peptide3d(input_file,
     Returns:
         tuple: the completed process and the path to the outcome (preference of xml over bin).
     """
-    logger.info('Running Peptide3D.')
-    logger.info(call_info(locals()))
-
     algo = check_algo(path)
     input_file = Path(input_file)
     output_dir = Path(output_dir)
@@ -67,9 +59,7 @@ def peptide3d(input_file,
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("Peptide3D's output missing.")
     
-    logger.info(f'Peptide3D took {runtime} minutes.')
-
-    return out_bin.with_suffix(''), pr
+    return out_bin.with_suffix(''), pr, runtime
 
 
 # def test_peptide3d():

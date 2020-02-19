@@ -5,50 +5,68 @@ from pathlib import Path
 import platform
 
 from vodkas import plgs
-from vodkas.fs import find_free_path, move_folder
+from vodkas.fs import find_free_path, move_folder, network_drive_exists
+from vodkas.header_txt import parse_header_txt
 from vodkas.logging import get_logger
 
 DEBUG = True
-net_folder = 'Y:/TESTRES' if DEBUG else 'Y:/RES'
-log_folder = {
-    "Windows": Path('C:/SYMPHONY_VODKAS/temp_logs/plgs.log'),
-    "Linux":   Path('~/plgs.log').expanduser(),
-    "Darwin":  Path('~/plgs.log').expanduser(),
-}[platform.system()]
 
-ap = argparse.ArgumentParser(description='Analyze Waters Raw Data with PLGS.')
+ap = argparse.ArgumentParser(description='Analyze Waters Raw Data with PLGS.',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+ap.add_argument('fastas', type=str,
+                help="fastas (str): Fasta file to use, or a prefix to one of the standard proteomes used, e.g. 'human'.")
 ap.add_argument('raw_folders', type=Path, nargs='+',
                 help='Path(s) to raw folder(s).')
 ap.add_argument('--local_output_folder', type=Path,
                 help='Path to temporary outcome folder.',
-                default='C:/SYMPHONY_VODKAS/temp')
+                default=r'C:/SYMPHONY_VODKAS/temp')
+ap.add_argument('--fastas_db', type=Path,
+                help="Path to fastas DB: used when supplying reduced fasta names, e.g. 'human'",
+                default=r'X:/SYMPHONY_VODKAS/fastas/latest')
 ap.add_argument('--log_file', type=Path,
                 help='Path to temporary outcome folder.',
-                default=log_folder)
+                default={"Windows": 'C:/SYMPHONY_VODKAS/temp_logs/plgs.log',
+                          "Linux":  Path('~/plgs.log').expanduser(),
+                          "Darwin": Path('~/plgs.log').expanduser(),}[platform.system()])
 ap.add_argument('--net_folder', type=Path,
-                help=f"Network folder for results. Set to '' (empty word) if you want to skip copying [default = {net_folder}].",
-                default=net_folder)
+                help=f"Network folder for results. Set to '' (empty word) if you want to skip copying.",
+                default='Y:/TESTRES2' if DEBUG else 'Y:/RES')
 for arg_name, arg_desc in plgs.parsed.a2d:
     ap.add_argument(arg_name,**arg_desc)
 args = ap.parse_args()
-foo_args = plgs.parsed.parsed2kwds(args.__dict__)
+kwds = {k+"_kwds":v for k,v in plgs.parsed.parsed2kwds(args.__dict__).items()}
 if DEBUG:
     print(args.raw_folders)
     print(args.local_output_folder)
-    pprint(foo_args)
+    pprint(kwds)
 
-# setting up loggers
+# setting up logger
 log_format = '%(asctime)s:%(name)s:%(levelname)s:%(message)s:'
 logging.basicConfig(filename=args.log_file,
                     format=log_format,
                     level=logging.INFO)
 log = get_logger('PLGS', log_format)
 
-# check network drives
-net_drive = args.net_folder.parents[0]
-if not net_drive.exists() and not str(net_drive) == '':
-    log.warning(f"no network drive (proceeding locally): {net_drive}")
 
+# check network drive
+if not args.net_folder == '' and not network_drive_exists(args.net_folder):
+    log.warning(f"no network drive for {args.net_folder}: saving locally")
+if not network_drive_exists(args.fastas_db):
+    log.warning(f"network drive absent: {args.fastas_db}")
+
+
+
+# check fastas: assumed to be kept only on the server, not locally
+standard_fastas = {p.stem.split('_')[0]:p for p in args.fastas_db.glob(f"*/PLGS/*.fasta")}
+if args.fastas in standard_fastas:
+    fastas = standard_fastas[args.fastas]
+else:
+    fastas = Path(args.fastas)
+    if not fastas.exists():
+        log.error(f"Fastas unreachable: {fastas}")
+
+
+ 
 log.info("analyzing folders:")
 pprint(args.raw_folders)
 for raw_folder in args.raw_folders:
@@ -62,15 +80,15 @@ for raw_folder in args.raw_folders:
         sample_set = header_txt['Sample Description'][:8]
         #                   C:/SYMPHONY_PIPELINE/2019-008/O191017-04
         local_folder = args.local_output_folder/sample_set/acquired_name
-        plgs_ok = plgs(raw_folder, local_folder, **args)
+        plgs_ok = plgs(fastas, raw_folder, local_folder, **kwds)
         if plgs_ok and args.net_folder:
             #                     Y:/TESTRES/2019-008
             net_set_folder = args.net_folder/sample_set
             net_set_folder.mkdir(parents=True, exist_ok=True)
-            # if the project is reanalyzed, the old one will not be replaced
-            # but a version number will be appended to the acuired name
-            # e.g. if we already have:          Y:/TESTRES/2019-008/O191017-04
-            # then results will be copied to:   Y:/TESTRES/2019-008/O191017-04__v1
+            # if reanalysing, the old folder is preserved, 
+            # and a version number appended to the new one
+            # e.g.              Y:/TESTRES/2019-008/O191017-04
+            # replaced with:    Y:/TESTRES/2019-008/O191017-04__v1
             net_folder = find_free_path(args.net_folder/sample_set/acquired_name)
             try:
                 move_folder(local_folder, net_folder)
@@ -88,6 +106,4 @@ for raw_folder in args.raw_folders:
     except Exception as e:
         log.error(f"error: {repr(e)}")
 log.info('PLGS finished.')
-
-
-
+input("Press Enter to continue...")

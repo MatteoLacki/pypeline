@@ -42,9 +42,9 @@ def apex3d(raw_folder,
         timeout (float): Timeout in minutes.
 
     Returns:
-        tuple: the path to the outcome (no extension: choose it yourself and believe more in capitalism) and the completed process.
+        tuple: path to the outcome, the completed process, and runtime.
     """
-    algo = check_algo(path_to_apex3d)
+    algo = check_algo(path)
     raw_folder = Path(raw_folder)
     output_dir = Path(output_dir)
     apex_stdout = output_dir/'apex3d.log'
@@ -73,7 +73,7 @@ def apex3d(raw_folder,
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("Apex3D's output missing.")
 
-    return out_bin.with_suffix(''), pr
+    return out_bin.with_suffix(''), pr, runtime
 
 # def test_apex3d():
 #     """test Apex3D."""

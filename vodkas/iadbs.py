@@ -2,12 +2,7 @@ from pathlib import Path
 from time import time
 
 from .fs import check_algo
-from .logging import get_logger
-from .misc import call_info
 from .subproc import run_win_proc
-
-
-logger = get_logger(__name__)
 
 
 def iadbs(input_file,
@@ -33,16 +28,10 @@ def iadbs(input_file,
         timeout (float): Timeout in minutes.
 
     Returns:
-        tuple: the completed process and the path to the outcome (preference of xml over bin).
+        tuple: path to the outcome, the completed process, and runtime.
     """
-    logger.info('Running iadbs.')
-    logger.info(call_info(locals()))
-
     algo = check_algo(path)
     input_file = Path(input_file)
-    if input_file.suffix == '.bin':
-        logger.warning('Taking a ".bin" input from Peptide3D might not always work.')
-
     output_dir = Path(output_dir)
     fasta_file = Path(fasta_file)
     parameters_file = Path(parameters_file)
@@ -65,13 +54,11 @@ def iadbs(input_file,
         out = output_dir/(input_file.stem+"_IA_workflow")
     out_bin = out.with_suffix('.bin')
     out_xml = out.with_suffix('.xml')
-    
+
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("iaDBs' output missing.")
 
-    logger.info(f'iaDBs took {runtime} minutes.')
-
-    return out_bin.with_suffix(''), pr
+    return out_bin.with_suffix(''), pr, runtime
 
 
 # def test_iadbs():

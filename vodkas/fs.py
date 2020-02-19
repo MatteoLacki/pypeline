@@ -107,3 +107,8 @@ def rm_tree(pth):
 
 def move_folder(source, target):
     return __cp(source, target, lambda s,t: f"robocopy {str(s)} {str(t)} /e /move")
+
+
+def network_drive_exists(path):
+    """Check if network folder exists."""
+    return Path(Path(path).parts[0]).exists()
