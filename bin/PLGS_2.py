@@ -3,6 +3,7 @@ import logging
 from pprint import pprint
 from pathlib import Path
 import platform
+import json
 
 from vodkas import plgs
 from vodkas.fs import find_free_path, move_folder, network_drive_exists
@@ -71,6 +72,7 @@ else:
 # then, dump locally?
 # no, better aumatically add them to custom fastas.
 
+
  
 log.info("analyzing folders:")
 pprint(args.raw_folders)
@@ -85,6 +87,12 @@ for raw_folder in args.raw_folders:
         sample_set = header_txt['Sample Description'][:8]
         #                   C:/SYMPHONY_PIPELINE/2019-008/O191017-04
         local_folder = args.local_output_folder/sample_set/acquired_name
+        # print(kwds)
+        # print(json.dumps(kwds))
+        # print(type(json.dumps(kwds)))
+        # Send: fastas, raw_folder, local_folder, **kwds
+        # json.dumps([fastas, raw_folder, local_folder, kwds])
+        
         times = plgs(fastas, raw_folder, local_folder, **kwds)
         if args.net_folder:
             #                     Y:/TESTRES/2019-008
