@@ -25,11 +25,13 @@ pip install ipython
 REM installing pipeline
 cd C:\\SYMPHONY_VODKAS\
 git clone https://github.com/MatteoLacki/fs_ops
+git clone https://github.com/MatteoLacki/furious_fastas
 git clone https://github.com/MatteoLacki/docstr2argparse
 git clone https://github.com/MatteoLacki/waters
 git clone https://github.com/MatteoLacki/vodkas
 
 pip install -e fs_ops
+pip install -e furious_fastas
 pip install -e docstr2argparse
 pip install -e waters
 pip install -e vodkas
