@@ -85,8 +85,8 @@ for raw_folder in args.raw_folders:
         sample_set = header_txt['Sample Description'][:8]
         #                   C:/SYMPHONY_PIPELINE/2019-008/O191017-04
         local_folder = args.local_output_folder/sample_set/acquired_name
-        plgs_ok = plgs(fastas, raw_folder, local_folder, **kwds)
-        if plgs_ok and args.net_folder:
+        times = plgs(fastas, raw_folder, local_folder, **kwds)
+        if args.net_folder:
             #                     Y:/TESTRES/2019-008
             net_set_folder = args.net_folder/sample_set
             net_set_folder.mkdir(parents=True, exist_ok=True)
@@ -103,10 +103,7 @@ for raw_folder in args.raw_folders:
             except RuntimeError as e:
                 log.warning(f"not copied '{raw_folder}': {repr(e)}")
         else:
-            if not plgs_ok:
-                log.error(f"plgs_ok == False")
-            if not args.net_folder:
-                log.warning(f"saved '{raw_folder}' locally") 
+            log.warning(f"saved '{raw_folder}' locally") 
         log.info(f"Finished: '{raw_folder}'")
     except Exception as e:
         log.error(f"error: {repr(e)}")
