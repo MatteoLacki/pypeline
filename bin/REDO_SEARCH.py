@@ -15,7 +15,6 @@ DEBUG = True
 # if __name__ == '__main__':
 get_args = lambda x: dict(parse_arguments(x))
 A = {**get_args(iadbs), **get_args(get_fastas)}
-
 default_log = 'C:/SYMPHONY_VODKAS/temp_logs/plgs.log'
 
 parser = argparse.ArgumentParser(description='Rerun search with iaDBs: outcomes will be dumped in the same folders as the provided files are in. WARNING: it replaces the results of the previous analysis.')
@@ -52,3 +51,4 @@ for pep3d in args['peptide3d_results']:
         logger.warning(repr(e))
 
 logger.info("Search redone.")
+
