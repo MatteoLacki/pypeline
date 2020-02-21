@@ -24,13 +24,16 @@ setup(
     license="GPL-3.0-or-later",
     install_requires=['pandas',
                       'docstr2argparse',
+                      'furious_fastas',
                       'fs_ops',
-                      'waters'],
+                      'waters',
+                      'flask'],
     # include_package_data=True,
     # package_data={'data': ['data/contaminants_uniprot_format.fasta']},
     scripts = ["bin/APEX3D.py",
                "bin/PEPTIDE3D.py",
                "bin/PLGS.py",
                "bin/REDO_SEARCH.py",
-               "bin/PLGS_2.py",]
+               "bin/PLGS_2.py",
+               "bin/RESEARCH.py",]
 )

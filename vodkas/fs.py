@@ -38,6 +38,24 @@ def cp(source, target):
     """
     return __cp(source, target, lambda s,t: f"robocopy {str(s.parent)} {str(t)} {str(s.name)}")
 
+
+def move(source, target):
+    """Move a file, or rather synchronize it.
+
+    On Windows, use robocopy.
+    One would have to wrap the executables and use Wine on Linux.
+
+    Args:
+        source (Path or str): Path to the source.
+        target (Path or str): Path to the target.
+    """
+    if platform.system() == 'Windows':
+        return __cp(source, target, lambda s,t: f"robocopy {str(s.parent)} {str(t)} {str(s.name)} /move")
+    else:
+        import shutil
+        shutil.move(str(source), str(target))
+
+
 def test_cp():
     if platform.system() == 'Windows':
         cp('C:/test_s/test.ref', 'C:/test_t')

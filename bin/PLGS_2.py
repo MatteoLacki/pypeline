@@ -5,7 +5,10 @@ from pathlib import Path
 import platform
 import json
 
+from docstr2argparse.parse import foo2argparse
+
 from vodkas import plgs
+from vodkas.fastas import get_fastas
 from vodkas.fs import find_free_path, move_folder, network_drive_exists
 from vodkas.header_txt import parse_header_txt
 from vodkas.logging import get_logger
@@ -17,16 +20,13 @@ DEBUG = True
 
 ap = argparse.ArgumentParser(description='Analyze Waters Raw Data with PLGS.',
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-ap.add_argument('fastas', type=str,
-                help="fastas (str): Fasta file to use, or a prefix to one of the standard proteomes used, e.g. 'human'.")
+for n,_,h in foo2argparse(get_fastas)[1]:
+    ap.add_argument(n, **h)
 ap.add_argument('raw_folders', type=Path, nargs='+',
                 help='Path(s) to raw folder(s).')
 ap.add_argument('--local_output_folder', type=Path,
                 help='Path to temporary outcome folder.',
                 default=r'C:/SYMPHONY_VODKAS/temp')
-ap.add_argument('--fastas_db', type=Path,
-                help="Path to fastas DB: used when supplying reduced fasta names, e.g. 'human'",
-                default=r'X:/SYMPHONY_VODKAS/fastas/latest')
 ap.add_argument('--log_file', type=Path,
                 help='Path to temporary outcome folder.',
                 default={"Windows": 'C:/SYMPHONY_VODKAS/temp_logs/plgs.log',
@@ -53,7 +53,7 @@ logging.basicConfig(filename=args.log_file,
 log = get_logger('PLGS', log_format)
 
 
-# check network drive
+
 if not args.net_folder == '' and not network_drive_exists(args.net_folder):
     log.warning(f"no network drive for {args.net_folder}: saving locally")
 if not network_drive_exists(args.fastas_db):
@@ -61,7 +61,6 @@ if not network_drive_exists(args.fastas_db):
 
 
 
-# check fastas: assumed to be kept only on the server, not locally
 standard_fastas = {p.stem.split('_')[0]:p for p in args.fastas_db.glob(f"*/PLGS/*.fasta")}
 if args.fastas in standard_fastas:
     fastas = standard_fastas[args.fastas]
