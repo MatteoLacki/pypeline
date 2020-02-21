@@ -38,8 +38,8 @@ def peptide3d(input_file,
         raise RuntimeError("Peptide3D failed: it accepts 'bin' input files only.")
 
     cmd = ["powershell.exe", algo,
-            f"-inputFileName {input_file}",
-            f"-outputDirName {output_dir}",
+            f"-inputFileName '{input_file}'",
+            f"-outputDirName '{output_dir}'",
             f"-WriteXML {int(write_xml)}",
             f"-WriteBinary {int(write_binary)}",
             f"-WriteAllIonsToCSV {int(write_csv)}",

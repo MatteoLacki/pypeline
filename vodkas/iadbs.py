@@ -5,14 +5,14 @@ from .fs import check_algo
 from .subproc import run_win_proc
 
 
-PRINT2STDOUT = True
+PRINT2STDOUT = False
 
 def iadbs(input_file,
           output_dir,
           fasta_file,
           parameters_file="X:/SYMPHONY_VODKAS/search/215.xml",
           write_xml=True,
-          write_binary=True,
+          write_binary=False,
           write_csv=False,
           path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
           timeout=60):
@@ -40,15 +40,16 @@ def iadbs(input_file,
     iadbs_stdout = output_dir/'iadbs.log'
 
     cmd = [ "powershell.exe", algo,
-            f"-paraXMLFileName {parameters_file}",
-            f"-pep3DFileName {input_file}",
-            f"-proteinFASTAFileName {fasta_file}",
-            f"-outputDirName {output_dir}",
+            f"-paraXMLFileName '{parameters_file}'",
+            f"-pep3DFileName '{input_file}'",
+            f"-proteinFASTAFileName '{fasta_file}'",
+            f"-outputDirName '{output_dir}'",
             f"-WriteXML {int(write_xml)}",
             f"-WriteBinary {int(write_binary)}",
             f"-bDeveloperCSVOutput {int(write_csv)}" ]
 
     if PRINT2STDOUT:
+        print(" ".join(cmd))
         pr, runtime = run_win_proc(cmd, timeout, '')
     else:
         pr, runtime = run_win_proc(cmd, timeout, iadbs_stdout)
@@ -73,7 +74,7 @@ def iadbs_mock(input_file,
                fasta_file,
                parameters_file="X:/SYMPHONY_VODKAS/search/215.xml",
                write_xml=True,
-               write_binary=True,
+               write_binary=False,
                write_csv=False,
                path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
                timeout=60):

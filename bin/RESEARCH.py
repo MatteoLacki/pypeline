@@ -6,6 +6,8 @@ import platform
 from pprint import pprint
 
 from fs_ops.paths import find_suffixed_files
+from fs_ops.csv import rows2csv
+from waters.parsers import iaDBsXMLparser
 
 from vodkas import iadbs
 from vodkas.fastas import get_fastas
@@ -63,6 +65,9 @@ for xml in xmls:
     log.info(f"researching: {str(xml)}")
     try:
         iadbs_out, _, runtime = iadbs(xml, xml.parent, fastas,**iadbs_kwds)
+        create_params_file(apex_out, xml, iadbs_out) # for projectizer2.0
+        search_stats = iaDBsXMLparser(iadbs_out).info()
+        rows2csv(iadbs_out.parent/'stats.csv', [list(search_stats), list(search_stats.values())])
     except Exception as e:
         log.warning(repr(e))
 log.info("Search redone.")

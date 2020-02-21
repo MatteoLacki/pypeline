@@ -50,8 +50,8 @@ def apex3d(raw_folder,
     apex_stdout = output_dir/'apex3d.log'
 
     cmd = ["powershell.exe", algo,
-        f"-pRawDirName {raw_folder}",
-        f"-outputDirName {output_dir}",
+        f"-pRawDirName '{raw_folder}'",
+        f"-outputDirName '{output_dir}'",
         f"-lockMassZ2 {lock_mass_z2}",
         f"-lockmassToleranceAMU {lock_mass_tol_amu}",
         f"-leThresholdCounts {low_energy_thr}",
