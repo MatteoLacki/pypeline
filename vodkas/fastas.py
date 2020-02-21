@@ -21,7 +21,7 @@ def get_fastas(fastas_path,
     """
     standard_fastas = {p.stem.split('_')[0]:p for p in Path(fastas_db).glob(f"*/PLGS/*.fasta")}
     if str(fastas_path) in standard_fastas:
-        fastas_path = standard_fastas[fastas_path]
+        outpath = standard_fastas[fastas_path]
     else:
         fastas_path = Path(fastas_path)
         if not fastas_path.exists():
@@ -45,4 +45,4 @@ def get_fastas(fastas_path,
                 fs_gnl.reverse()
             outpath = fastas_path.parent/(fastas_path.stem + '_contaminated_reversed_pipelineFriendly.fasta')
             fs_gnl.write(outpath)
-        return outpath
+    return outpath

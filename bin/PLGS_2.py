@@ -53,28 +53,20 @@ logging.basicConfig(filename=args.log_file,
 log = get_logger('PLGS', log_format)
 
 
-
 if not args.net_folder == '' and not network_drive_exists(args.net_folder):
     log.warning(f"no network drive for {args.net_folder}: saving locally")
 if not network_drive_exists(args.fastas_db):
     log.warning(f"network drive absent: {args.fastas_db}")
 
 
+try: # translate fastas to NCBIgeneralFastas and store it on the server.
+    fastas = get_fastas(args.fastas_path)
+except FileNotFoundError:
+    log.error(f"Fastas unreachable: {fastas}")
+    exit()
 
-standard_fastas = {p.stem.split('_')[0]:p for p in args.fastas_db.glob(f"*/PLGS/*.fasta")}
-if args.fastas in standard_fastas:
-    fastas = standard_fastas[args.fastas]
-else:
-    fastas = Path(args.fastas)
-    if not fastas.exists():
-        log.error(f"Fastas unreachable: {fastas}")
-
-# add automatic translation of fastas to proper format.
-# can do it every time: super fast it is.
-# then, dump locally?
-# no, better aumatically add them to custom fastas.
-
-
+# setting up connection with the server DB.
+# server = Sender()
  
 log.info("analyzing folders:")
 pprint(args.raw_folders)
@@ -89,18 +81,8 @@ for raw_folder in args.raw_folders:
         sample_set = header_txt['Sample Description'][:8]
         #                   C:/SYMPHONY_PIPELINE/2019-008/O191017-04
         local_folder = args.local_output_folder/sample_set/acquired_name
-        # print(kwds)
-        # print(json.dumps(kwds))
-        # print(type(json.dumps(kwds)))
-        # Send: fastas, raw_folder, local_folder, **kwds
-        # json.dumps([fastas, raw_folder, local_folder, kwds])
-
-
-        s = Sender()
-
-        message = [str(fastas), str(raw_folder), str(local_folder), kwds]
-
-        s.send(message)
+        # message = [str(fastas), str(raw_folder), str(local_folder), kwds]
+        # server.send(message)
 
         times = plgs(fastas, raw_folder, local_folder, **kwds)
         if args.net_folder:

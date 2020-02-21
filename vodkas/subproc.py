@@ -23,8 +23,12 @@ def run_win_proc(cmd,
     timeout *= 60 # minutes to seconds
     try:
         T0 = time()
-        pr = Popen(cmd, stdout=PIPE)
+        if out_path:
+            pr = Popen(cmd, stdout=PIPE)
+        else:
+            pr = Popen(cmd)
         out, err = pr.communicate(timeout=timeout)
+        # pr = ''
         runtime = (time() - T0)/60 # seconds to minutes
     except TimeoutExpired:
         kill = Path(cmd[1]).name

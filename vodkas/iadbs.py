@@ -5,6 +5,8 @@ from .fs import check_algo
 from .subproc import run_win_proc
 
 
+PRINT2STDOUT = True
+
 def iadbs(input_file,
           output_dir,
           fasta_file,
@@ -46,7 +48,11 @@ def iadbs(input_file,
             f"-WriteBinary {int(write_binary)}",
             f"-bDeveloperCSVOutput {int(write_csv)}" ]
 
-    pr, runtime = run_win_proc(cmd, timeout, iadbs_stdout)
+    if PRINT2STDOUT:
+        pr, runtime = run_win_proc(cmd, timeout, '')
+    else:
+        pr, runtime = run_win_proc(cmd, timeout, iadbs_stdout)
+
 
     if '_Pep3D_Spectrum' in input_file.stem:
         out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')

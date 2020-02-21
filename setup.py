@@ -35,5 +35,7 @@ setup(
                "bin/PLGS.py",
                "bin/REDO_SEARCH.py",
                "bin/PLGS_2.py",
-               "bin/RESEARCH.py",]
+               "bin/RESEARCH.py",
+               "bin/_RESEARCH.py",
+               "bin/PROJECTIZE.py"]
 )
