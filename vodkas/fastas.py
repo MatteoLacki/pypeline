@@ -59,6 +59,6 @@ def get_fastas(fastas,
         logger.info('Checking standard proteomes.')
         logger.info(call_info(locals()))
         return get_proteome(fastas,
-                            fasta_db_server, 
-                            fasta_db_local)
+                            Path(fasta_db_server), 
+                            Path(fasta_db_local))
 

@@ -20,10 +20,10 @@ A.update(P(plgs))
 del A['input_file'], A['output_dir'], A['out_folder']
 del A['fasta_file'], A['--PLGS'], A['raw_folder']
 
-default_out = 'C:/SYMPHONY_VODKAS/temp'
-default_log = 'C:/SYMPHONY_VODKAS/temp_logs/plgs.log'
-default_server = 'X:/SYMPHONY_VODKAS/temp_logs'
-default_net_db = 'Y:/TESTRES' if DEBUG else 'Y:/RES'
+default_out = Path(r'C:/SYMPHONY_VODKAS/temp')
+default_log = Path(r'C:/SYMPHONY_VODKAS/temp_logs/plgs.log')
+default_server = Path(r'X:/SYMPHONY_VODKAS/temp_logs')
+default_net_db = Path(r'Y:/TESTRES') if DEBUG else Path(r'Y:/RES')
 
 A['raw_folders'] = {
     'type': Path,
@@ -78,25 +78,25 @@ for raw_folder in args['raw_folders']:
         header_txt = parse_header_txt(raw_folder/'_HEADER.TXT')
         sample_set = header_txt['Sample Description'][:8]
         out_folder = out/sample_set/acquired_name
-        # plgs_ok = plgs(raw_folder, out_folder, **args)
-        # if plgs_ok and network_db_folder:
-        #     ##                              Y:\RES\         2019-008\   O191017-04
-        #     # net_folder = find_free_path(network_db_folder/sample_set/acquired_name)
-        #     ##                              Y:\RES\         O191017-04
-        #     net_set_folder = network_db_folder/sample_set
-        #     net_set_folder.mkdir(parents=True, exist_ok=True)
-        #     net_folder = find_free_path(network_db_folder/sample_set/acquired_name)
-        #     try:
-        #         move_folder(out_folder, net_folder)
-        #         if not out_folder.parent.glob('*'):
-        #             out_folder.parent.rmdir()
-        #         log.info("Moved results to the server.")
-        #     except RuntimeError as e:
-        #         log.warning(f"Could not copy '{raw_folder}'.")
-        #         log.warning(repr(e))
-        #     else:
-        #         print("PLGS unsuccessful.")
-        # log.info(f"Finished with '{raw_folder}'.")
+        plgs_ok = plgs(raw_folder, out_folder, **args)
+        if plgs_ok and network_db_folder:
+            ##                              Y:\RES\         2019-008\   O191017-04
+            # net_folder = find_free_path(network_db_folder/sample_set/acquired_name)
+            ##                              Y:\RES\         O191017-04
+            net_set_folder = network_db_folder/sample_set
+            net_set_folder.mkdir(parents=True, exist_ok=True)
+            net_folder = find_free_path(network_db_folder/sample_set/acquired_name)
+            try:
+                move_folder(out_folder, net_folder)
+                if not out_folder.parent.glob('*'):
+                    out_folder.parent.rmdir()
+                log.info("Moved results to the server.")
+            except RuntimeError as e:
+                log.warning(f"Could not copy '{raw_folder}'.")
+                log.warning(repr(e))
+            else:
+                print("PLGS unsuccessful.")
+        log.info(f"Finished with '{raw_folder}'.")
     except Exception as e:
         log.warning(repr(e))
 log.info("PLGS finished.")
