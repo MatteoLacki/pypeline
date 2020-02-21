@@ -10,15 +10,21 @@ from fs_ops.paths import find_suffixed_files
 from vodkas import iadbs
 from vodkas.fastas import get_fastas
 from vodkas.logging import get_logger
+from vodkas.xml_parser import parse_parameters_file
 
 paths = [Path(p).resolve().expanduser() for p in sys.argv[1:]]
+xmls = list(find_suffixed_files(paths,
+                                ['**/*_Pep3D_Spectrum.xml'],
+                                ['.xml']))
 print("Re-analyzing folders:")
-pprint(paths)
+pprint(xmls)
+
 fastas_path = input('fastas to use: ')
 
 parameters_file = Path(r"X:/SYMPHONY_VODKAS/search/215.xml")
-print(f'If parameters from {parameters_file} are ok, press ENTER.')
-parameters_file = input('Otherwise, provide better path: ') or parameters_file
+print(f'Default search parameters (parameters_file):')
+parse_parameters_file(parameters_file)
+parameters_file = input(f'If OK hit ENTER, or provide better path: ') or parameters_file
 print(parameters_file)
 
 
@@ -36,12 +42,6 @@ except FileNotFoundError:
     log.error(f"Fastas unreachable: {fastas}")
     exit()
 
-xmls = list(find_suffixed_files(paths,
-                                ['**/*_Pep3D_Spectrum.xml'],
-                                ['.xml']))
-print("analyzing folders:")
-pprint(xmls)
-print(fastas)
 
 for xml in xmls:
     log.info(f"researching: {str(xml)}")
@@ -50,3 +50,7 @@ for xml in xmls:
     except Exception as e:
         log.warning(repr(e))
 log.info("Search redone.")
+
+parameters_file = Path(r"X:/SYMPHONY_VODKAS/search/215.xml")
+input('press ENTER')
+

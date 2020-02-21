@@ -1,3 +1,4 @@
+import xml.etree.cElementTree as ET
 from itertools import chain
 import json
 import logging
@@ -76,4 +77,24 @@ def create_params_file(apex_xml, pept_xml, work_xml):
     
     logger.info(json.dumps(params))
 
+
+def parse_parameters_file(parameters_file):
+    tree = ET.parse(parameters_file)
+    root = tree.getroot()
+    for h in root.iter('*'):
+        if h.attrib:
+            if 'VALUE' in h.attrib:
+                print(h.tag, h.attrib['VALUE'])
+    for digest in root.iter('DIGESTS'):
+        for analysis_digestor in digest: 
+            print(analysis_digestor.tag, analysis_digestor.attrib)
+            for aa_seq_dig in analysis_digestor:
+                print(aa_seq_dig.attrib['NAME'])
+                for c in aa_seq_dig:
+                    print(c.tag, c.attrib['AMINO_ACID'], c.attrib['POSITION'])        
+    for modifier in root.iter('MODIFICATIONS'):
+        for mod in modifier:
+            print(mod.tag, mod.attrib['STATUS'])
+            for l in mod:
+                print(l.tag, l.attrib)
 
