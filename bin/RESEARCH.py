@@ -22,14 +22,14 @@ for n,o,h in params:
 args = ap.parse_args()
 print(args.__dict__)
 
+try:
+    fastas = get_fastas(args.fastas_path)
+except FileNotFoundError:
+    log.error(f"Fastas unreachable: {fastas}")
+    exit()
 
-standard_fastas = {p.stem.split('_')[0]:p for p in args.fastas_db.glob(f"*/PLGS/*.fasta")}
-if args.fastas in standard_fastas:
-    fastas = standard_fastas[args.fastas]
-else:
-    fastas = Path(args.fastas)
-    if not fastas.exists():
-        log.error(f"Fastas unreachable: {fastas}")
+
+
 
 
 
