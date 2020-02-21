@@ -1,64 +1,48 @@
 from pathlib import Path
+from furious_fastas import fastas, Fastas
 
-from .fs import cp
-from .logging import get_logger
-from .misc import get_coresNo, call_info
-
-
-logger = get_logger(__name__)
+from .fs import move
 
 
-def get_proteome(proteome, 
-                 fasta_db_server=r'X:/SYMPHONY_VODKAS/fastas/latest',
-                 fasta_db_local=r'C:/SYMPHONY_VODKAS/fastas',
-                 **kwds):
-    """Get the path to file with standard proteome fastas.
+def get_fastas(fastas_path,
+               fastas_db=r'X:/SYMPHONY_VODKAS/fastas/latest',
+               add_contaminants=True,
+               reverse_fastas=True):
+    """Get proper fastas.
 
     Args:
-        proteome (str): Organism name = prefix of the fasta file.
-        fasta_db_server (str): Path to server fastas.
-        fasta_db_local (str): Path to local fastas.
-        kwds: further arguments to subprocess.run used for copying.
+        fastas_path (str): path to fasta file or one of the standard proteomes used, e.g. 'human'.
+        fastas_db (str): Path to fastas DB: used when supplying reduced fasta names, e.g. 'human'.
+        add_contaminants (boolean): Should we add in contaminants.
+        reverse_fastas (boolean):Should we reverse the fastas.
 
     Returns:
-        Path to the local fasta file.
+        Path: path to the fastas.
     """
-    f_loc = Path(fasta_db_local)
-    f_ser = Path(fasta_db_server)
-    try:
-        f_ser = next(f_ser.glob(f"*/PLGS/{proteome}*.fasta"))
-        if not (f_loc/f_ser.name).exists():# remove old
-            for f in f_loc.glob(f"{proteome}*.fasta"):
-                f.unlink()
-            proc = cp(f_ser, f_loc)# copy newest
-        return f_loc/f_ser.name
-    except StopIteration:
-        raise FileNotFoundError(f'There is no file starting with "{proteome}" on the server under "{f_ser}".')
-
-
-def get_fastas(fastas, 
-               fasta_db_server=r'X:/SYMPHONY_VODKAS/fastas/latest',
-               fasta_db_local=r'C:/SYMPHONY_VODKAS/fastas',
-               **kwds):
-    """Get the path to file with standard proteome fastas.
-
-    Args:
-        fastas (str): Fasta file to use, or a prefix to one of the standard proteomes used, e.g. 'human'.
-        fasta_db_server (str): Path to server fastas.
-        fasta_db_local (str): Path to local fastas.
-        kwds: further arguments to subprocess.run used for copying.
-
-    Returns:
-        Path to the local fasta file.
-    """
-    if Path(fastas).is_file():
-        logger.info('Custom fastas used.')
-        logger.info(str(fastas))
-        return Path(fastas)
+    standard_fastas = {p.stem.split('_')[0]:p for p in Path(fastas_db).glob(f"*/PLGS/*.fasta")}
+    if str(fastas_path) in standard_fastas:
+        outpath = standard_fastas[fastas_path]
     else:
-        logger.info('Checking standard proteomes.')
-        logger.info(call_info(locals()))
-        return get_proteome(fastas,
-                            Path(fasta_db_server), 
-                            Path(fasta_db_local))
-
+        fastas_path = Path(fastas_path)
+        if not fastas_path.exists():
+            raise FileNotFoundError
+        # TODO: if path is there, don't do all that!
+        final_name = fastas_path.stem
+        if add_contaminants:
+            final_name += "_contaminated"
+        if reverse_fastas:
+            final_name += "_reversed"
+        final_name += "_pipelineFriendly.fasta"
+        outpath = fastas_path.parent/final_name
+        if not outpath.exists():
+            fs = fastas(fastas_path)
+            if add_contaminants:
+                from furious_fastas.contaminants import contaminants
+                fs.extend(contaminants)
+            fs_gnl = Fastas(f.to_ncbi_general() for f in fs)
+            assert fs_gnl.same_fasta_types(), "Fastas are not in the same format."
+            if reverse_fastas:
+                fs_gnl.reverse()
+            outpath = fastas_path.parent/(fastas_path.stem + '_contaminated_reversed_pipelineFriendly.fasta')
+            fs_gnl.write(outpath)
+    return outpath

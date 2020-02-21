@@ -2,13 +2,10 @@ from pathlib import Path
 from time import time
 
 from .fs import check_algo
-from .logging import get_logger
-from .misc import call_info
 from .subproc import run_win_proc
 
 
-logger = get_logger(__name__)
-
+PRINT2STDOUT = True
 
 def iadbs(input_file,
           output_dir,
@@ -17,9 +14,8 @@ def iadbs(input_file,
           write_xml=True,
           write_binary=True,
           write_csv=False,
-          path_to_iadbs="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
-          timeout_iadbs=60,
-          **kwds):
+          path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
+          timeout=60):
     """Run iaDBs.
     
     Args:
@@ -30,20 +26,14 @@ def iadbs(input_file,
         write_xml (boolean): Write the output in an xml in the output folder.
         write_binary (boolean): Write the binary output in an xml in the output folder.
         write_csv (boolean): Write the ions to csv file.
-        path_to_iadbs (str): Path to the "iaDBs.exe" executable.
-        timeout_iadbs (float): Timeout in minutes.
-        kwds: other parameters.
+        path (str): Path to the "iaDBs.exe" executable.
+        timeout (float): Timeout in minutes.
+
     Returns:
-        tuple: the completed process and the path to the outcome (preference of xml over bin).
+        tuple: path to the outcome, the completed process, and runtime.
     """
-    logger.info('Running iadbs.')
-    logger.info(call_info(locals()))
-
-    algo = check_algo(path_to_iadbs)
+    algo = check_algo(path)
     input_file = Path(input_file)
-    if input_file.suffix == '.bin':
-        logger.warning('Taking a ".bin" input from Peptide3D might not always work.')
-
     output_dir = Path(output_dir)
     fasta_file = Path(fasta_file)
     parameters_file = Path(parameters_file)
@@ -58,7 +48,11 @@ def iadbs(input_file,
             f"-WriteBinary {int(write_binary)}",
             f"-bDeveloperCSVOutput {int(write_csv)}" ]
 
-    pr, runtime = run_win_proc(cmd, timeout_iadbs, iadbs_stdout)
+    if PRINT2STDOUT:
+        pr, runtime = run_win_proc(cmd, timeout, '')
+    else:
+        pr, runtime = run_win_proc(cmd, timeout, iadbs_stdout)
+
 
     if '_Pep3D_Spectrum' in input_file.stem:
         out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
@@ -66,14 +60,35 @@ def iadbs(input_file,
         out = output_dir/(input_file.stem+"_IA_workflow")
     out_bin = out.with_suffix('.bin')
     out_xml = out.with_suffix('.xml')
-    
+
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("iaDBs' output missing.")
 
-    logger.info(f'iaDBs took {runtime} minutes.')
+    return out_xml, pr, runtime
 
-    return out_bin.with_suffix(''), pr
 
+
+def iadbs_mock(input_file,
+               output_dir,
+               fasta_file,
+               parameters_file="X:/SYMPHONY_VODKAS/search/215.xml",
+               write_xml=True,
+               write_binary=True,
+               write_csv=False,
+               path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
+               timeout=60):
+    input_file = Path(input_file)
+    output_dir = Path(output_dir)
+    fasta_file = Path(fasta_file)
+    parameters_file = Path(parameters_file)
+    iadbs_stdout = output_dir/'iadbs.log'
+    if '_Pep3D_Spectrum' in input_file.stem:
+        out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
+    else:
+        out = output_dir/(input_file.stem+"_IA_workflow")
+    out_bin = out.with_suffix('.bin')
+    out_xml = out.with_suffix('.xml')
+    return out_xml, True, 0.0
 
 # def test_iadbs():
 #     """Test the stupid iaDBs on Windows."""
