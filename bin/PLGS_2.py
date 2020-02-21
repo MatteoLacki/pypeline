@@ -20,7 +20,7 @@ DEBUG = True
 
 ap = argparse.ArgumentParser(description='Analyze Waters Raw Data with PLGS.',
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-for n,_,h in foo2argparse(get_fastas)[1]:
+for n,_,h in foo2argparse(get_fastas, get_short=False):
     ap.add_argument(n, **h)
 ap.add_argument('raw_folders', type=Path, nargs='+',
                 help='Path(s) to raw folder(s).')

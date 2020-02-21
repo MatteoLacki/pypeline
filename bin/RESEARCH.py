@@ -48,13 +48,17 @@ except FileNotFoundError:
     log.error(f"Fastas unreachable: {fastas}")
     exit()
 
+
+# setting up connection with the server DB.
+# server = Sender()
+
+
+
 xmls = list(find_suffixed_files(args.Pep3D_Spectrum,
                                 ['**/*_Pep3D_Spectrum.xml'],
                                 ['.xml']))
 print("analyzing folders:")
 pprint(xmls)
-
-
 for xml in xmls:
     log.info(f"researching: {str(xml)}")
     try:
