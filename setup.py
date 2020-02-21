@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 setup(
     name='vodkas',
     packages=find_packages(),
-    version='0.0.2',
+    version='0.0.3',
     description='Syntactic sugar around Waters LC/IMS/MS pypeline.',
     long_description='A simple, once for all pythonic middle finger in face of Waters. Works under fucking Windows only.',
     author='Mateusz Krzysztof Łącki',
@@ -30,12 +30,7 @@ setup(
                       'flask'],
     # include_package_data=True,
     # package_data={'data': ['data/contaminants_uniprot_format.fasta']},
-    scripts = ["bin/APEX3D.py",
-               "bin/PEPTIDE3D.py",
-               "bin/PLGS.py",
-               "bin/REDO_SEARCH.py",
-               "bin/PLGS_2.py",
+    scripts = ["bin/PLGS.py",
                "bin/RESEARCH.py",
-               "bin/_RESEARCH.py",
-               "bin/PROJECTIZE.py"]
+               "bin/_RESEARCH.py"]
 )
