@@ -4,3 +4,5 @@ dist
 todo.md
 .DS_Store
 *.sublime-workspace
+vodka_env
+*.db
