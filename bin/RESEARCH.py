@@ -12,9 +12,11 @@ from fs_ops.csv import rows2csv
 from waters.parsers import iaDBsXMLparser
 
 from vodkas import iadbs
+from vodkas.iadbs import iadbs_mock as iadbs
 from vodkas.fastas import get_fastas
 from vodkas.logging import get_logger
 from vodkas.remote.sender import Sender
+from vodkas.xml_parser import create_params_file
 
 ap = argparse.ArgumentParser(description='Rerun search with iaDBs.',
                              epilog="WARNING: PREVIOUS '*_Pep3D_Spectrum.xml' SHALL BE DELETED ",
@@ -69,9 +71,10 @@ for xml in xmls:
         sender.send_dict({'key': 'iadbs_args',
                           'value': json.dumps([str(xml), str(fastas), iadbs_kwds])})
         iadbs_out, _, runtime = iadbs(xml, xml.parent, fastas,**iadbs_kwds)
+        apex_out = iadbs_out.parent/iadbs_out.name.replace('_IA_workflow.xml', '_Apex3D.xml')
         create_params_file(apex_out, xml, iadbs_out) # for projectizer2.0
         search_stats = iaDBsXMLparser(iadbs_out).info()
-        sender.send_dict(search_stats)
+        sender.send_dict({"key": "stats", "value":json.dumps(search_stats)})
         rows2csv(iadbs_out.parent/'stats.csv', [list(search_stats), list(search_stats.values())])
     except Exception as e:
         log.warning(repr(e))
