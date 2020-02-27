@@ -70,14 +70,14 @@ def iadbs(input_file,
 
 
 def iadbs_mock(input_file,
-               output_dir,
-               fasta_file,
-               parameters_file="X:/SYMPHONY_VODKAS/search/215.xml",
-               write_xml=True,
-               write_binary=False,
-               write_csv=False,
-               path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
-               timeout=60):
+          output_dir,
+          fasta_file,
+          parameters_file="X:/SYMPHONY_VODKAS/search/215.xml",
+          write_xml=True,
+          write_binary=False,
+          write_csv=False,
+          path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
+          timeout=60):
     input_file = Path(input_file)
     output_dir = Path(output_dir)
     fasta_file = Path(fasta_file)
@@ -90,6 +90,7 @@ def iadbs_mock(input_file,
     out_bin = out.with_suffix('.bin')
     out_xml = out.with_suffix('.xml')
     return out_xml, True, 0.0
+iadbs_mock.__doc__ = iadbs.__doc__
 
 # def test_iadbs():
 #     """Test the stupid iaDBs on Windows."""
