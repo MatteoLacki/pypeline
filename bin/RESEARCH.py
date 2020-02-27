@@ -74,7 +74,7 @@ for xml in xmls:
         apex_out = iadbs_out.parent/iadbs_out.name.replace('_IA_workflow.xml', '_Apex3D.xml')
         create_params_file(apex_out, xml, iadbs_out) # for projectizer2.0
         search_stats = iaDBsXMLparser(iadbs_out).info()
-        sender.send_dict(search_stats)
+        sender.send_dict({"key": "stats", "value":json.dumps(search_stats)})
         rows2csv(iadbs_out.parent/'stats.csv', [list(search_stats), list(search_stats.values())])
     except Exception as e:
         log.warning(repr(e))
