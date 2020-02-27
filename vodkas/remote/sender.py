@@ -35,7 +35,6 @@ class Sender(object):
     def send_df(self, df):
         df['__project_id__'] = self.id
         df['__name__'] = self.name
-        print(df)
         df_json = df.to_json(default_handler=str).encode(self._enc) 
         with self.__socket('updateDB', df_json) as s:
             return json.loads(s.read())
