@@ -5,41 +5,46 @@ import pandas as pd
 
 
 class Sender(object):
-    def __init__(self, host='192.168.1.176', port=8745):
+    def __init__(self,
+                 name,
+                 host='192.168.1.176',
+                 port=8745, 
+                 encoding="cp1251"):
         self.host = host
         self.port = port
+        self._enc = encoding
+        self.name = name
+        self.id = self.__greet(self.name)
 
-    def _establish_conn(self, where):
-        url = f"http://{self.host}:{self.port}/{where}"
+    def __socket(self, route, message):
+        url = f"http://{self.host}:{self.port}/{route}"
         request = Request(url)
         request.add_header('Content-Type', 'application/json; charset=utf-8')
-        return request
+        return urlopen(request, message)
 
-    def great(self, message):
-        """Great the server.
+    def __greet(self, greeting):
+        """Greet the receiver."""
+        greeting = json.dumps(greeting).encode(self._enc)
+        with self.__socket('greet', greeting) as s:
+            return json.loads(s.read())
 
-        Args:
-            message (str): The greating message.
+    def send_df(self, df):
+        df['__project_id__'] = self.id
+        df['__name__'] = self.name
+        print(df)
+        df_json = df.to_json().encode(self._enc) 
+        with self.__socket('updateDB', df_json) as s:
+            return json.loads(s.read())
 
-        Returns:
-            Projection index.
-        """
-        message = json.dumps(message).encode("cp1251")
-        with urlopen(self._establish_conn('great'), message) as r:
-            id_no = json.loads(r.read())
-        return id_no
+    def send_dict(self, d):
+        df = pd.DataFrame()
+        df = df.append(d, ignore_index=True)
+        self.send_df(df)
 
-    def log(self, message):
-        message = json.dumps(message).encode("cp1251") 
-        with urlopen(self._establish_conn('log'), message) as r:
-            ok = json.loads(r.read())
-        return ok
+    def get_df(self):
+        with self.__socket('df', '""'.encode(self._enc)) as s:
+            return pd.read_json(s.read())
 
-    def df(self):
-        message = json.dumps('').encode("cp1251") 
-        with urlopen(self._establish_conn('df'), message) as r:
-            df = pd.read_json(r.read())
-        return df
 
 
 if __name__ == '__main__':

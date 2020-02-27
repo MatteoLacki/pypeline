@@ -44,3 +44,5 @@ class SimpleDB(object):
     def __len__(self):
         return next(self.conn.execute(f"SELECT COUNT(*) FROM '{self.tbl}'"))[0]
 
+    def get_new_index(self):
+        return next(self.conn.execute(f"SELECT MAX(__project_id__) FROM '{self.tbl}'"))[0] + 1
