@@ -36,8 +36,11 @@ class SimpleDB(object):
             df (pd.DataFrame): DataFrame to append to the database's main table.
         """
         try:
-            df.to_sql(tbl, self.conn, if_exists='append')
+            df.to_sql(self.tbl, self.conn, if_exists='append')
         except sqlite3.OperationalError:
             db = pd.concat([self.df(), df.reset_index()], ignore_index=True)
             db.to_sql(self.tbl, self.conn, if_exists='replace', index=False)
+
+    def __len__(self):
+        return next(self.conn.execute(f"SELECT COUNT(*) FROM '{self.tbl}'"))[0]
 

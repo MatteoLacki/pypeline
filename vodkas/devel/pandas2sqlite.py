@@ -21,21 +21,28 @@ class SimpleDB(object):
             db = pd.concat([self.df(), df.reset_index()], ignore_index=True)
             db.to_sql(self.tbl, self.conn, if_exists='replace', index=False)
 
+    def __len__(self):
+        return next(conn.execute(f"SELECT COUNT(*) FROM '{self.tbl}'"))[0]
 
-# def test_db():
-#     X = pd.DataFrame({'a':[1,2,3], 'b':['1','2','3'], 'd':[1, 434, 34]}).set_index('a')
-#     X.to_sql('logs', conn, if_exists='replace')
-#     db = SimpleDB(sqlite_path)
-#     db.df()
-#     db.append(df)
-#     db.df()
-#     for _ in range(100):
-#         db.append(df)
-#     db.df()
-#     sqlite_path = Path('/home/matteo/Projects/vodkas/vodkas/devel/server_stuff/logs.db')
-#     conn = sqlite3.connect(str(sqlite_path))
-#     X = pd.DataFrame({'a':[1,2,3], 'b':['1','2','3'], 'd':[1, 434, 34]}).set_index('a')
-#     X.to_sql('logs', conn, if_exists='replace')
-#     df = pd.DataFrame({'a':[5,6,7], 'b':['1','2','3'], 'e':[1, 434, 34], 'c':['a','b','c']}).set_index('a')
-#     df = X.copy()
+sqlite_path = Path('/home/matteo/Projects/vodkas/vodkas/devel/server_stuff/logs.db')
+conn = sqlite3.connect(str(sqlite_path))
+
+
+
+X = pd.DataFrame({'a':[1,2,3], 'b':['1','2','3'], 'd':[1, 434, 34]}).set_index('a')
+X.to_sql('logs', conn, if_exists='replace')
+
+
+db = SimpleDB(sqlite_path)
+len(db)
+db.df()
+db.append(X)
+db.df()
+for _ in range(100):
+    db.append(df)
+db.df()
+X = pd.DataFrame({'a':[1,2,3], 'b':['1','2','3'], 'd':[1, 434, 34]}).set_index('a')
+X.to_sql('logs', conn, if_exists='replace')
+df = pd.DataFrame({'a':[5,6,7], 'b':['1','2','3'], 'e':[1, 434, 34], 'c':['a','b','c']}).set_index('a')
+df = X.copy()
 

@@ -12,7 +12,7 @@ from waters.parsers import iaDBsXMLparser
 from vodkas import iadbs
 from vodkas.fastas import get_fastas
 from vodkas.logging import get_logger
-
+from vodkas.remote.sender import Sender
 
 ap = argparse.ArgumentParser(description='Rerun search with iaDBs.',
                              epilog="WARNING: PREVIOUS '*_Pep3D_Spectrum.xml' SHALL BE DELETED ",
@@ -22,6 +22,9 @@ ap.add_argument('--log_file', type=Path,
                 default={"Windows": 'C:/SYMPHONY_VODKAS/temp_logs/research.log',
                           "Linux":  Path('~/research.log').expanduser(),
                           "Darwin": Path('~/research.log').expanduser(),}[platform.system()])
+ap.add_argument('--server_ip', type=str,
+                help='IP of the server',
+                default='0.0.0.0')
 for n,o,h in foo2argparse(get_fastas, get_short=False):
     ap.add_argument(n, **h)
 ap.add_argument('Pep3D_Spectrum',
@@ -38,8 +41,6 @@ args = ap.parse_args()
 iadbs_kwds = {o: args.__dict__[n.replace('--','')] for n,o,h in iadbs_kwds}
 
 
-
-
 log_format = '%(asctime)s:%(name)s:%(levelname)s:%(message)s:'
 logging.basicConfig(filename=args.log_file, format=log_format, level=logging.INFO)
 log = get_logger('RERUN_IADBS', log_format)
@@ -51,19 +52,24 @@ except FileNotFoundError:
     exit()
 
 
-# setting up connection with the server DB.
-# server = Sender()
-
-
+server = Sender(args.server_ip)
+project_idx = server.great('RESEARCH')
+common_info = {'project_idx':project_idx, 'fastas':str(fastas)}
+common_info.update(iadbs_kwds)
 
 xmls = list(find_suffixed_files(args.Pep3D_Spectrum,
                                 ['**/*_Pep3D_Spectrum.xml'],
                                 ['.xml']))
 print("analyzing folders:")
 pprint(xmls)
+
+
+
 for xml in xmls:
     log.info(f"researching: {str(xml)}")
     try:
+        print({**{"xml":str(xml)}, **common_info})
+        server.log({**{"xml":str(xml)}, **common_info})
         iadbs_out, _, runtime = iadbs(xml, xml.parent, fastas,**iadbs_kwds)
         create_params_file(apex_out, xml, iadbs_out) # for projectizer2.0
         search_stats = iaDBsXMLparser(iadbs_out).info()
