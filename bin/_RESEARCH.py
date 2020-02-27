@@ -54,7 +54,7 @@ for xml in xmls:
                                       output_dir=xml.parent,
                                       fasta_file=fastas,
                                       parameters_file=parameters_file)
-        apex_out = iadbs_out.parent/iadbs_out.name.replace('_Pep3D_Spectrum.xml', '_Apex3D.xml')
+        apex_out = iadbs_out.parent/iadbs_out.name.replace('_IA_workflow.xml', '_Apex3D.xml')
         create_params_file(apex_out, xml, iadbs_out) # for projectizer2.0
         search_stats = iaDBsXMLparser(iadbs_out).info()
         rows2csv(iadbs_out.parent/'stats.csv', [list(search_stats), list(search_stats.values())])
