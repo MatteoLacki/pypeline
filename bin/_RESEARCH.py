@@ -12,6 +12,7 @@ from waters.parsers import iaDBsXMLparser
 from vodkas import iadbs
 # from vodkas.iadbs import iadbs_mock as iadbs
 from vodkas.fastas import get_fastas
+from vodkas.json import PathlibFriendlyEncoder
 from vodkas.logging import get_logger
 from vodkas.xml_parser import parse_parameters_file, create_params_file
 
@@ -31,13 +32,14 @@ parse_parameters_file(parameters_file)
 parameters_file = input(f'If OK hit ENTER, or provide better path: ') or parameters_file
 print(parameters_file)
 
-
 log_file = {"Windows": 'C:/SYMPHONY_VODKAS/temp_logs/research.log',
                           "Linux":  Path('~/research.log').expanduser(),
                           "Darwin": Path('~/research.log').expanduser(),}[platform.system()]
 log_format = '%(asctime)s:%(name)s:%(levelname)s:%(message)s:'
 logging.basicConfig(filename=log_file, format=log_format, level=logging.INFO)
 log = get_logger('RERUN_IADBS', log_format)
+
+
 
 
 try: # translate fastas to NCBIgeneralFastas and store it on the server.
@@ -54,7 +56,7 @@ for xml in xmls:
                                       output_dir=xml.parent,
                                       fasta_file=fastas,
                                       parameters_file=parameters_file)
-        apex_out = iadbs_out.parent/iadbs_out.name.replace('_Pep3D_Spectrum.xml', '_Apex3D.xml')
+        apex_out = iadbs_out.parent/iadbs_out.name.replace('_IA_workflow.xml', '_Apex3D.xml')
         create_params_file(apex_out, xml, iadbs_out) # for projectizer2.0
         search_stats = iaDBsXMLparser(iadbs_out).info()
         rows2csv(iadbs_out.parent/'stats.csv', [list(search_stats), list(search_stats.values())])

@@ -1,4 +1,5 @@
 from urllib.request import Request, urlopen
+from urllib.error import URLError
 import json
 from pathlib import Path
 import pandas as pd
@@ -14,7 +15,10 @@ class Sender(object):
         self.port = port
         self._enc = encoding
         self.name = name
-        self.id = self.__greet(self.name)
+        try:
+            self.id = self.__greet(self.name)
+        except URLError:
+            raise URLError('IP not OK.')
 
     def __socket(self, route, message):
         url = f"http://{self.host}:{self.port}/{route}"
@@ -32,7 +36,7 @@ class Sender(object):
         df['__project_id__'] = self.id
         df['__name__'] = self.name
         print(df)
-        df_json = df.to_json().encode(self._enc) 
+        df_json = df.to_json(default_handler=str).encode(self._enc) 
         with self.__socket('updateDB', df_json) as s:
             return json.loads(s.read())
 
@@ -40,6 +44,9 @@ class Sender(object):
         df = pd.DataFrame()
         df = df.append(d, ignore_index=True)
         self.send_df(df)
+
+    def send_pair(self, key, value):
+        self.send_dict({'key':key, 'value': json.dumps(value)})
 
     def get_df(self):
         with self.__socket('df', '""'.encode(self._enc)) as s:
