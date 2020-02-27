@@ -17,11 +17,11 @@ from vodkas.research import research
 ap = argparse.ArgumentParser(description='Rerun search with iaDBs.',
                              epilog="WARNING: PREVIOUS '*_IA_Workflow.xml' SHALL BE DELETED ",
                              formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-ap.add_argument('--log_file', type=Path,
+ap.add_argument('--log_file', type=lambda p: Path(p).expanduser().resolve(),
                 help='Path to temporary outcome folder.',
                 default={"Windows": 'C:/SYMPHONY_VODKAS/temp_logs/research.log',
-                          "Linux":  Path('~/research.log').expanduser(),
-                          "Darwin": Path('~/research.log').expanduser(),}[platform.system()])
+                         "Linux":   '~/SYMPHONY_VODKAS/research.log',
+                         "Darwin":  '~/SYMPHONY_VODKAS/research.log'}[platform.system()])
 ap.add_argument('--server_ip', type=str, help='IP of the server', default='0.0.0.0')
 for n,o,h in foo2argparse(get_fastas, get_short=False):
     ap.add_argument(n, **h)
