@@ -8,13 +8,7 @@ from .json import dump2json
 from .remote.sender import Sender
 from .xml_parser import create_params_file
 
-
 MOCK = True
-
-if MOCK:
-    from .iadbs import iadbs_mock as iadbs
-else:
-    from .iadbs import iadbs
 
 
 def research(xmls, fastas_path, iadbs_kwds, log, server_ip):
@@ -22,7 +16,6 @@ def research(xmls, fastas_path, iadbs_kwds, log, server_ip):
         iadbs_kwds['fasta_file'] = get_fastas(fastas_path)
     except FileNotFoundError:
         log.error(f"Fastas unreachable: {fastas_path}")
-        exit()
 
     server = Sender('RESEARCH', server_ip)
 

@@ -5,8 +5,6 @@ from .fs import check_algo
 from .subproc import run_win_proc
 
 
-PRINT2STDOUT = False
-
 def iadbs(input_file,
           output_dir,
           fasta_file,
@@ -15,7 +13,8 @@ def iadbs(input_file,
           write_binary=False,
           write_csv=False,
           path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
-          timeout=60):
+          timeout=60,
+          mock=False):
     """Run iaDBs.
     
     Args:
@@ -28,9 +27,10 @@ def iadbs(input_file,
         write_csv (boolean): Write the ions to csv file.
         path (str): Path to the "iaDBs.exe" executable.
         timeout (float): Timeout in minutes.
+        mock (bool): Run without calling iaDBs.
 
     Returns:
-        tuple: path to the outcome, the completed process, and runtime.
+        tuple: path to the outcome xml file and the completed process (or None if mocking).
     """
     algo = check_algo(path)
     input_file = Path(input_file)
@@ -48,12 +48,10 @@ def iadbs(input_file,
             f"-WriteBinary {int(write_binary)}",
             f"-bDeveloperCSVOutput {int(write_csv)}" ]
 
-    if PRINT2STDOUT:
-        print(" ".join(cmd))
-        pr, runtime = run_win_proc(cmd, timeout, '')
+    if mock:
+        pr = None 
     else:
-        pr, runtime = run_win_proc(cmd, timeout, iadbs_stdout)
-
+        pr, _ = run_win_proc(cmd, timeout, iadbs_stdout)
 
     if '_Pep3D_Spectrum' in input_file.stem:
         out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
@@ -65,32 +63,10 @@ def iadbs(input_file,
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("iaDBs' output missing.")
 
-    return out_xml, pr, runtime
+    return out_xml, pr
 
 
 
-def iadbs_mock(input_file,
-          output_dir,
-          fasta_file,
-          parameters_file="X:/SYMPHONY_VODKAS/search/215.xml",
-          write_xml=True,
-          write_binary=False,
-          write_csv=False,
-          path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
-          timeout=60):
-    input_file = Path(input_file)
-    output_dir = Path(output_dir)
-    fasta_file = Path(fasta_file)
-    parameters_file = Path(parameters_file)
-    iadbs_stdout = output_dir/'iadbs.log'
-    if '_Pep3D_Spectrum' in input_file.stem:
-        out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
-    else:
-        out = output_dir/(input_file.stem+"_IA_workflow")
-    out_bin = out.with_suffix('.bin')
-    out_xml = out.with_suffix('.xml')
-    return out_xml, True, 0.0
-iadbs_mock.__doc__ = iadbs.__doc__
 
 # def test_iadbs():
 #     """Test the stupid iaDBs on Windows."""

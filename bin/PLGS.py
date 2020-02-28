@@ -39,10 +39,11 @@ for arg_name, arg_desc in plgs.parsed.a2d:
     ap.add_argument(arg_name,**arg_desc)
 args = ap.parse_args()
 kwds = {k+"_kwds":v for k,v in plgs.parsed.parsed2kwds(args.__dict__).items()}
-if DEBUG:
-    print(args.raw_folders)
-    print(args.local_output_folder)
-    pprint(kwds)
+
+
+print(args.raw_folders)
+print(args.local_output_folder)
+pprint(kwds)
 
 
 # setting up logger
@@ -83,8 +84,8 @@ for raw_folder in args.raw_folders:
         local_folder = args.local_output_folder/sample_set/acquired_name
         # message = [str(fastas), str(raw_folder), str(local_folder), kwds]
         # server.send(message)
-
-        times = plgs(fastas, raw_folder, local_folder, **kwds)
+        
+        plgs(fastas, raw_folder, local_folder, **kwds)
         if args.net_folder:
             #                     Y:/TESTRES/2019-008
             net_set_folder = args.net_folder/sample_set

@@ -66,11 +66,8 @@ human.download(uniprot_url['human'])
 # human.reverse()
 human.write('~/SYMPHONY_VODKAS/fastas/human.fasta')
 
-
-import inspect
-
-def f(a, b=2, c=3):
-    # print(locals())
+@print_out_params
+def f(a, b=2, c=3, *args, **kwds):
     return a,b,c
 
 f(10)
@@ -80,17 +77,8 @@ a = 2
 dict(sig.bind(a).arguments)
 
 sig.parameters
-from docstr2argparse.parse import defaults
-
-
-def foobar(f):
-    sig = inspect.signature(f)
-    def wrapped(*args, **kwds):
-        all_args = defaults(f)
-        all_args.update(sig.bind(*args, **kwds).arguments)
-        print(all_args)
-        return f(*args, **kwds)
-    return wrapped
-
 g = foobar(f)
-g(10)
+g(10, 20, 30, 40, 60, m=10)
+
+
+
