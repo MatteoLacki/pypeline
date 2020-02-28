@@ -30,7 +30,6 @@ def updateDB():
     Returns:
         boolean: success
     """
-    # pprint(request.__dict__)
     if request.data:
         try:
             df = pd.read_json(request.data)
@@ -50,7 +49,7 @@ def df():
 
 
 if __name__ == '__main__':
-    app.run(debug=False,
+    app.run(debug=True,
             host=HOST,
             port=PORT,
             threaded=False)

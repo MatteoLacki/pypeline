@@ -12,9 +12,7 @@ from vodkas.fastas import get_fastas
 from vodkas.fs import find_free_path, move_folder, network_drive_exists
 from vodkas.header_txt import parse_header_txt
 from vodkas.logging import get_logger
-#######
 from vodkas.remote.sender import Sender
-#######
 
 DEBUG = True
 
@@ -108,6 +106,3 @@ for raw_folder in args.raw_folders:
     except Exception as e:
         log.error(f"error: {repr(e)}")
 log.info('PLGS finished.')
-input("Press Enter to continue...")
-
-

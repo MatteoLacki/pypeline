@@ -14,9 +14,9 @@ MOCK = True
 def plgs(fastas,
          raw_folder,
          out_folder,
-         apex3d_kwds,
-         peptide3d_kwds,
-         iadbs_kwds):
+         apex3d_kwds={},
+         peptide3d_kwds={},
+         iadbs_kwds={}):
     """Run PLGS.
 
     Run complete PLGS analysis.

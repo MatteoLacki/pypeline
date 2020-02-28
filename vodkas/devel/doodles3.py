@@ -20,10 +20,19 @@ def test(a, b=10, c=20, *args, **kwds):
     """hahah"""
     return a,b,c,args,kwds
 
-
-
 test_logging = log_parameters(log)(test)
 x = test_logging(10, Path('.'))
 test.__name__
+
+
+from vodkas.remote.sender import Sender
+from urllib.request import Request, urlopen
+
+Sender('test','0.0.0.0')
+request = Request(f"http://0.0.0.0:8745/greet")
+request.add_header('Content-Type', 'application/json; charset=utf-8')
+
+with urlopen(request, '""'.encode()) as s:
+    print(s.read)
 
 
