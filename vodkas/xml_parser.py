@@ -78,7 +78,7 @@ def create_params_file(apex_xml, pept_xml, work_xml):
     logger.info(json.dumps(params))
 
 
-def parse_parameters_file(parameters_file):
+def print_parameters_file(parameters_file):
     tree = ET.parse(parameters_file)
     root = tree.getroot()
     for h in root.iter('*'):

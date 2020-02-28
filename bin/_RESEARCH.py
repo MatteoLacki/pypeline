@@ -10,11 +10,8 @@ from fs_ops.csv import rows2csv
 from waters.parsers import iaDBsXMLparser
 
 from vodkas import iadbs
-# from vodkas.iadbs import iadbs_mock as iadbs
 from vodkas.fastas import get_fastas
-from vodkas.json import PathlibFriendlyEncoder
-from vodkas.logging import get_logger
-from vodkas.xml_parser import parse_parameters_file, create_params_file
+from vodkas.xml_parser import print_parameters_file, create_params_file
 
 print("Collecting folders.")
 paths = [Path(p).resolve().expanduser() for p in sys.argv[1:]]
@@ -25,19 +22,22 @@ print("Re-analyzing folders:")
 pprint(xmls)
 
 fastas_path = input('fastas to use (human|wheat|..|custom path): ')
+# TODO: ask for reversal/contaminants.
 
 parameters_file = Path(r"X:/SYMPHONY_VODKAS/search/215.xml")
 print(f'Default search parameters (parameters_file):')
-parse_parameters_file(parameters_file)
+print_parameters_file(parameters_file)
 parameters_file = input(f'If OK hit ENTER, or provide better path: ') or parameters_file
 print(parameters_file)
 
-log_file = {"Windows": 'C:/SYMPHONY_VODKAS/temp_logs/research.log',
-                          "Linux":  Path('~/research.log').expanduser(),
-                          "Darwin": Path('~/research.log').expanduser(),}[platform.system()]
-log_format = '%(asctime)s:%(name)s:%(levelname)s:%(message)s:'
-logging.basicConfig(filename=log_file, format=log_format, level=logging.INFO)
-log = get_logger('RERUN_IADBS', log_format)
+if platform.system() == 'Windows':
+    log_file = Path('C:/SYMPHONY_VODKAS/temp_logs/research.log')
+else:
+    log_file = Path('~/SYMPHONY_VODKAS/research.log').expanduser()
+logging.basicConfig(filename=log_file, 
+                    format='%(asctime)s:%(name)s:%(levelname)s:%(message)s:',
+                    level=logging.INFO)
+log = logging.getLogger('RESEARCH')
 
 
 

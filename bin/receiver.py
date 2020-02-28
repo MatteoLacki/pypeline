@@ -2,13 +2,19 @@ import pandas as pd
 from flask import Flask, jsonify, make_response, request, abort
 import pandas as pd
 from pprint import pprint
+import platform
 
 from vodkas.simple_db import SimpleDB
 
-DEFAULT_APP_PORT = 8745
-DB = SimpleDB('/home/matteo/Projects/vodkas/vodkas/devel/server_stuff/simple.db')
-app = Flask(__name__)
 
+HOST = '0.0.0.0'
+PORT = 8745
+app  = Flask(__name__)
+
+if platform.system() == 'Windows':
+    DB = SimpleDB('C:/SYMPHONY_VODKAS/simple.db')
+else:
+    DB = SimpleDB('/home/matteo/SYMPHONY_VODKAS/simple.db')
 
 @app.route('/greet', methods=['POST'])
 def receive_greeting():
@@ -22,7 +28,7 @@ def updateDB():
     """Receive a pd.DataFrame and append it to existing data base.
     
     Returns:
-        boolean: was all successfull.
+        boolean: success
     """
     # pprint(request.__dict__)
     if request.data:
@@ -43,10 +49,8 @@ def df():
     return DB.df().to_json()
 
 
-
 if __name__ == '__main__':
-    port = DEFAULT_APP_PORT
     app.run(debug=False,
-            host='0.0.0.0',
-            port=port,
+            host=HOST,
+            port=PORT,
             threaded=False)

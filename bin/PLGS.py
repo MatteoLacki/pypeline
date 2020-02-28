@@ -63,7 +63,7 @@ if not network_drive_exists(args.fastas_db):
 try: # translate fastas to NCBIgeneralFastas and store it on the server.
     fastas = get_fastas(args.fastas_path)
 except FileNotFoundError:
-    log.error(f"Fastas unreachable: {fastas}")
+    log.error(f"Fastas unreachable: {args.fastas_path}")
     exit()
 
 # setting up connection with the server DB.

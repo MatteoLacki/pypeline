@@ -1,7 +1,7 @@
 # from time import sleep
 from collections import defaultdict
 
-from docstr2argparse.parse import ParserDisambuigationEasy, defaults
+from docstr2argparse.parse import ParserDisambuigationEasy
 from fs_ops.csv import rows2csv
 from waters.parsers import iaDBsXMLparser
 
@@ -14,9 +14,9 @@ MOCK = True
 def plgs(fastas,
          raw_folder,
          out_folder,
-         apex3d_kwds=defaults(apex3d),
-         peptide3d_kwds=defaults(peptide3d),
-         iadbs_kwds=defaults(iadbs)):
+         apex3d_kwds,
+         peptide3d_kwds,
+         iadbs_kwds):
     """Run PLGS.
 
     Run complete PLGS analysis.
