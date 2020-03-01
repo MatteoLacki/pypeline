@@ -34,5 +34,6 @@ setup(
     scripts = ["bin/PLGS.py",
                "bin/RESEARCH.py",
                "bin/_RESEARCH.py",
-               "bin/receiver.py"]
+               "bin/receiver.py",
+               "bin/barman.py"]
 )

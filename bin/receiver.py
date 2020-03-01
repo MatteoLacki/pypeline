@@ -1,5 +1,5 @@
 import pandas as pd
-from flask import Flask, jsonify, make_response, request, abort
+from flask import Flask, jsonify, request
 import pandas as pd
 from pprint import pprint
 import platform
@@ -16,12 +16,14 @@ if platform.system() == 'Windows':
 else:
     DB = SimpleDB('/home/matteo/SYMPHONY_VODKAS/simple.db')
 
+
 @app.route('/greet', methods=['POST'])
 def receive_greeting():
     """Receive greeting from the sender."""
     if request.data:
         greeting = request.get_json()
         return jsonify(DB.get_new_index())
+
 
 @app.route('/updateDB', methods=['POST'])
 def updateDB():

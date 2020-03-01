@@ -27,12 +27,16 @@ test.__name__
 
 from vodkas.remote.sender import Sender
 from urllib.request import Request, urlopen
+import json
 
 Sender('test','0.0.0.0')
-request = Request(f"http://0.0.0.0:8745/greet")
+
+request = Request(f"http://0.0.0.0:8745/test")
 request.add_header('Content-Type', 'application/json; charset=utf-8')
-
 with urlopen(request, '""'.encode()) as s:
-    print(s.read)
+    print(json.loads(s.read()))
 
-
+request = Request(f"http://0.0.0.0:8745/getnumber")
+request.add_header('Content-Type', 'application/json; charset=utf-8')
+with urlopen(request) as s:
+    print(json.loads(s.read()))
