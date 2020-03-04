@@ -24,7 +24,6 @@ test_logging = log_parameters(log)(test)
 x = test_logging(10, Path('.'))
 test.__name__
 
-
 from vodkas.remote.sender import Sender
 from urllib.request import Request, urlopen
 import json
@@ -40,3 +39,12 @@ request = Request(f"http://0.0.0.0:8745/getnumber")
 request.add_header('Content-Type', 'application/json; charset=utf-8')
 with urlopen(request) as s:
     print(json.loads(s.read()))
+
+%load_ext autoreload
+%autoreload 2
+from vodkas.remote.sender import Sender, currentIP
+
+s = Sender('Test')
+s = Sender('Test', '0.0.0.0')
+
+

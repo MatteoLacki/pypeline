@@ -8,7 +8,9 @@ import json
 from vodkas.simple_db import SimpleDB
 
 s = Sender('Test', '0.0.0.0')
- s = Sender('Test', '192.168.1.191')
+
+
+s = Sender('Test', '192.168.1.191')
 X = s.get_df()
 
 X.columns

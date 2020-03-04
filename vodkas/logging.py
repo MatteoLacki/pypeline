@@ -48,21 +48,35 @@ def __print_out_params(f):
     return wrapped
 
 
-def log_parameters(log):
-    """Log parameters of a function."""
-    def wrapping(foo):
-        sig = inspect.signature(foo)
-        default_args = defaults(foo)
-        default_args['__name__'] = foo.__name__
+class MockLog():
+    def info(self, *args, **kwds):
+        print(*args, **kwds)
+
+
+def store_parameters(log=MockLog()):
+    """Store parameters of a function."""
+    def wrapping(foo, 
+                 store_input=True, 
+                 store_runtime=True,
+                 store_output=True):
+        if store_input:
+            sig = inspect.signature(foo)
+            default_args = defaults(foo)
+            default_args['__name__'] = foo.__name__
         @wraps(foo)
         def wrapper(*args, **kwds):
-            all_args = default_args.copy()
-            all_args.update(sig.bind(*args,**kwds).arguments)
-            log.info(dump2json(all_args))
+            log.info(f"Logging {foo.__name__}. Input: {store_input}. Runtime: {store_runtime}. Output: {store_output}.")
+            if store_input:
+                all_args = default_args.copy()
+                all_args.update(sig.bind(*args,**kwds).arguments)
+                log.info(dump2json(all_args))
             T0 = time()
             res = foo(*args, **kwds)
             T1 = time()
-            log.info(f"{foo.__name__} took: {T1-T0}")
+            if store_runtime:
+                log.info(f"{foo.__name__} took: {T1-T0}")
+            if store_output:
+                log.info(dump2json(res))
             return res
         return wrapper
     return wrapping

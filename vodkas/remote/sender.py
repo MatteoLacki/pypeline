@@ -3,22 +3,27 @@ from urllib.error import URLError
 import json
 from pathlib import Path
 import pandas as pd
+import socket
+
+
+currentIP = socket.gethostbyname(socket.gethostname())
 
 
 class Sender(object):
     def __init__(self,
                  name,
-                 host='192.168.1.176',
+                 host=currentIP,
                  port=8745, 
                  encoding="cp1251"):
         self.host = host
         self.port = port
         self._enc = encoding
         self.name = name
-        try:
-            self.id = self.__greet(self.name)
-        except URLError:
-            raise URLError('IP not OK.')
+        self.id = self.__getnumber(self.name)
+        # try:
+        #     self.id = self.__greet(self.name)
+        # except URLError:
+        #     raise URLError('IP not OK.')
 
     def __socket(self, route, message):
         url = f"http://{self.host}:{self.port}/{route}"
@@ -26,10 +31,10 @@ class Sender(object):
         request.add_header('Content-Type', 'application/json; charset=utf-8')
         return urlopen(request, message)
 
-    def __greet(self, greeting):
+    def __getnumber(self, greeting):
         """Greet the receiver."""
         greeting = json.dumps(greeting).encode(self._enc)
-        with self.__socket('greet', greeting) as s:
+        with self.__socket('getnumber', greeting) as s:
             return json.loads(s.read())
 
     def send_df(self, df):
@@ -54,7 +59,7 @@ class Sender(object):
 
 
 if __name__ == '__main__':
-    s = Sender(host='0.0.0.0')
+    s = Sender(host=currentIP)
     message = "Hello this is a test!"
     w = s.log(message)
     print(w)
