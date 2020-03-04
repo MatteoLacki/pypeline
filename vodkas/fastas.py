@@ -25,7 +25,7 @@ def get_fastas(path_or_tag='none',
     if prompt:
         path_or_tag = input('fastas to use (human|wheat|..|custom path): ')
         if str(path_or_tag) in standard_fastas:
-            print(f"Selected: {path_or_tag}, stored under {standard_fastas[path_or_tag]}")
+            print(f"Selected: {path_or_tag}: {standard_fastas[path_or_tag]}")
         else:
             print(f"Selected: {path_or_tag}")
             add_contaminants = input('Adding contaminants: to stop me write "no": ')
@@ -37,7 +37,6 @@ def get_fastas(path_or_tag='none',
     else:
         if path_or_tag == 'none':
             raise FileNotFoundError('You did not specify a path for fastas.')
-
     if str(path_or_tag) in standard_fastas:
         outpath = standard_fastas[path_or_tag]
     else:
