@@ -75,16 +75,16 @@ def store_parameters(log=MockLog(), sender=MockSender()):
                 all_args = default_args.copy()
                 all_args.update(sig.bind(*args,**kwds).arguments)
                 log.info(dump2json(all_args))
-                sender.log('args', all_args)
+                sender.log(f'{foo.__name__}:args', all_args)
             T0 = time()
             res = foo(*args, **kwds)
             T1 = time()
             if store_runtime:
                 log.info(f"{foo.__name__} took: {T1-T0}")
-                sender.log('runtime', T1-T0)
+                sender.log(f'{foo.__name__}:runtime', T1-T0)
             if store_output:
                 log.info(dump2json(res))
-                sender.log('output', res)
+                sender.log(f'{foo.__name__}:output', res)
             return res
         return wrapper
     return wrapping

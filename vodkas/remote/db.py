@@ -55,6 +55,7 @@ class DB(object):
     def get_free_project_id(self):
         with self.conn as cur:
             sql = "SELECT project_id FROM 'logs' WHERE oid = (SELECT max(oid) FROM 'logs')"
+            sql = "SELECT MAX(project_id) FROM 'logs'"
             try:
                 project_id = cur.execute(sql).fetchall()[0][0] 
                 return project_id + 1

@@ -59,17 +59,16 @@ logging.basicConfig(filename=args.log_file, level=logging.INFO,
                     format='%(asctime)s:%(name)s:%(levelname)s:%(message)s:')
 log = logging.getLogger('RESEARCH.py')
 sender = Sender('RESEARCH', args.server_ip) # what to do, if server is down???
+print(sender.project_id)
+# from vodkas.logging import MockSender
+# sender = MockSender()
 logFun = store_parameters(log, sender)
-
-# can this work???
-for foo in (iadbs, create_params_file, get_search_stats):
-    foo = logFun(foo)
-# iadbs = logFun(iadbs)
-# create_params_file = logFun(create_params_file)
-# iaDBsXMLparser = logFun(iaDBsXMLparser)
+iadbs = logFun(iadbs)
+create_params_file = logFun(create_params_file)
+get_search_stats = logFun(get_search_stats)
 
 
-######################################## PROTO GUI
+# ######################################## PROTO GUI
 parse_out_kwds = lambda p: {o: args.__dict__[n.replace('--','')] for n,o,h in p}
 iadbs_kwds = parse_out_kwds(iadbs_kwds)
 get_fastas_kwds = parse_out_kwds(get_fastas_kwds)
