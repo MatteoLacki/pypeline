@@ -13,12 +13,12 @@ ap.add_argument('--port', help='Port to listen to.', default=8745, type=int)
 args = ap.parse_args()
 
 def create_logs(conn):
-    sql_create_projects_table = """ CREATE TABLE IF NOT EXISTS logs (
+    sql_create_projects_table = """CREATE TABLE IF NOT EXISTS logs (
                                         id integer PRIMARY KEY,
                                         name text NOT NULL,
                                         begin_date text,
                                         end_date text
-                                    ); """
+                                    );"""
 
 if OS() == 'Windows':
     DBpath = Path(r'C:\SYMPHONY_VODKAS\simple.db')
@@ -27,17 +27,19 @@ else:
 
 app  = Flask(__name__)
 
+# maybe db should be closed.
 def DB():
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = sqlite3.connect(str(DBpath))
     return db
 
-def query(q, args=(), one=False):
+def queryDB(sql, args=(), one=False):
     with DB() as db:
-        cur = db.execute(q, args)
+        cur = db.execute(sql, args)
         rv = cur.fetchall()
         return (rv[0] if rv else None) if one else rv
+
 
 @app.route('/')
 def index():
@@ -45,8 +47,8 @@ def index():
 
 @app.route('/getnumber', methods=['POST'])
 def getnumber():
-    x = query('SELECT MAX(__project_id__) FROM logs')
-    print(x)
+    # x = query('SELECT MAX(__project_id__) FROM logs')
+    # print(x)
     return jsonify(1)
 
 @app.teardown_appcontext
@@ -54,6 +56,16 @@ def close_connection(exception):
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
+
+@app.route('/query', methods=['POST'])
+def query():
+    """Receive greeting from the sender."""
+    if request.data:
+        sql = request.get_json()
+        print(sql)
+        out = queryDB(sql)
+        print(out)
+        return jsonify(out)
 
 @app.route('/test', methods=['POST'])
 def receive_greeting():

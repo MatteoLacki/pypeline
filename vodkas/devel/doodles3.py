@@ -1,32 +1,14 @@
 %load_ext autoreload
 %autoreload 2
-import logging
-from vodkas.logging import log_parameters
-from pathlib import Path
-import sys
-
-log_format = '%(asctime)s:%(name)s:%(levelname)s:%(message)s:'
-logging.basicConfig(filename='/home/matteo/SYMPHONY_VODKAS/test.log',
-                    format=log_format,
-                    level=logging.INFO)
-log = logging.getLogger('TEST')
-# log.addHandler(logging.StreamHandler(sys.stdout))
-# log = get_logger('RERUN_IADBS', log_format)
-# log.info('hahaha')
-# add name of the function, and time it.
-
-
-def test(a, b=10, c=20, *args, **kwds):
-    """hahah"""
-    return a,b,c,args,kwds
-
-test_logging = log_parameters(log)(test)
-x = test_logging(10, Path('.'))
-test.__name__
-
 from vodkas.remote.sender import Sender
 from urllib.request import Request, urlopen
 import json
+from pathlib import Path
+import sqlite3
+import json
+
+from vodkas.remote.db import DB
+from vodkas.json import dump2json
 
 Sender('test','0.0.0.0')
 
@@ -45,6 +27,24 @@ with urlopen(request) as s:
 from vodkas.remote.sender import Sender, currentIP
 
 s = Sender('Test')
-s = Sender('Test', '0.0.0.0')
+s.getnumber('Test')
+s.query("SELECT name FROM sqlite_master WHERE type='table' AND name='{logs}';")
 
 
+
+
+db = DB(r'/home/matteo/SYMPHONY_VODKAS/simple.db')
+db.tables()
+db.table_exist('logs')
+list(db.iter_logs())
+db.drop_logs()
+db.tables()
+db.create_logs_if_aint_there()
+db.tables()
+for i in range(100):
+    db.log(i, 'test', 'input', dump2json({'haha':i, 'cipa':'tak'}))
+list(db.iter_logs())
+
+del db
+
+db.get_free_project_id()

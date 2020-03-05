@@ -17,9 +17,9 @@ class Sender(object):
                  encoding="cp1251"):
         self.host = host
         self.port = port
-        self._enc = encoding
+        self.encoding = encoding
         self.name = name
-        self.id = self.__getnumber(self.name)
+        self.id = self.getnumber(self.name)
         # try:
         #     self.id = self.__greet(self.name)
         # except URLError:
@@ -31,16 +31,21 @@ class Sender(object):
         request.add_header('Content-Type', 'application/json; charset=utf-8')
         return urlopen(request, message)
 
-    def __getnumber(self, greeting):
+    def getnumber(self, greeting):
         """Greet the receiver."""
-        greeting = json.dumps(greeting).encode(self._enc)
+        greeting = json.dumps(greeting).encode(self.encoding)
         with self.__socket('getnumber', greeting) as s:
             return json.loads(s.read())
+
+    def query(self, sql):
+        sql = json.dumps(sql).encode(self.encoding)
+        with self.__socket('query', sql) as s:
+            return json.loads(s.read())        
 
     def send_df(self, df):
         df['__project_id__'] = self.id
         df['__name__'] = self.name
-        df_json = df.to_json(default_handler=str).encode(self._enc) 
+        df_json = df.to_json(default_handler=str).encode(self.encoding) 
         with self.__socket('updateDB', df_json) as s:
             return json.loads(s.read())
 
@@ -53,7 +58,7 @@ class Sender(object):
         self.send_dict({'key':key, 'value': json.dumps(value)})
 
     def get_df(self):
-        with self.__socket('df', '""'.encode(self._enc)) as s:
+        with self.__socket('df', '""'.encode(self.encoding)) as s:
             return pd.read_json(s.read())
 
 
