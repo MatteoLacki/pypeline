@@ -46,30 +46,29 @@ def apex3d(raw_folder,
     Returns:
         tuple: path to the outcome xml and the completed process (or None if mocking).
     """
-    algo = check_algo(path)
     raw_folder = Path(raw_folder)
     output_dir = Path(output_dir)
     apex_stdout = output_dir/'apex3d.log'
 
-    cmd = ["powershell.exe", algo,
-          f"-pRawDirName '{raw_folder}'",
-          f"-outputDirName '{output_dir}'",
-          f"-lockMassZ2 {lock_mass_z2}",
-          f"-lockmassToleranceAMU {lock_mass_tol_amu}",
-          f"-leThresholdCounts {low_energy_thr}",
-          f"-heThresholdCounts {high_energy_thr}",
-          f"-binIntenThreshold {lowest_intensity_thr}",
-          f"-writeXML {int(write_xml)}",
-          f"-writeBinary {int(write_binary)}",
-          f"-bRawCSVOutput {int(write_csv)}",
-          f"-maxCPUs {int(max_used_cores)}",
-          f"-PLGS {int(PLGS)}",
-          f"-bEnableCuda {int(cuda)}",
-          f"-bEnableUnsupportedGPUs {int(unsupported_gpu)}"]
-
     if mock:
         pr = None
     else:
+        algo = check_algo(path)
+        cmd = ["powershell.exe", algo,
+              f"-pRawDirName '{raw_folder}'",
+              f"-outputDirName '{output_dir}'",
+              f"-lockMassZ2 {lock_mass_z2}",
+              f"-lockmassToleranceAMU {lock_mass_tol_amu}",
+              f"-leThresholdCounts {low_energy_thr}",
+              f"-heThresholdCounts {high_energy_thr}",
+              f"-binIntenThreshold {lowest_intensity_thr}",
+              f"-writeXML {int(write_xml)}",
+              f"-writeBinary {int(write_binary)}",
+              f"-bRawCSVOutput {int(write_csv)}",
+              f"-maxCPUs {int(max_used_cores)}",
+              f"-PLGS {int(PLGS)}",
+              f"-bEnableCuda {int(cuda)}",
+              f"-bEnableUnsupportedGPUs {int(unsupported_gpu)}"]
         pr,_ = run_win_proc(cmd, timeout, apex_stdout)
 
     out_bin = output_dir/(raw_folder.stem + "_Apex3D.bin")

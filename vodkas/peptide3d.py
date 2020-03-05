@@ -31,7 +31,6 @@ def peptide3d(input_file,
     Returns:
         tuple: path to the outcome xml file and the completed process (or None if mocking).
     """
-    algo = check_algo(path)
     input_file = Path(input_file)
     output_dir = Path(output_dir)
     pep3d_stdout = output_dir/'pep3d.log'
@@ -39,18 +38,19 @@ def peptide3d(input_file,
     if input_file.suffix != '.bin':
         raise RuntimeError("Peptide3D failed: it accepts 'bin' input files only.")
 
-    cmd = ["powershell.exe", algo,
-            f"-inputFileName '{input_file}'",
-            f"-outputDirName '{output_dir}'",
-            f"-WriteXML {int(write_xml)}",
-            f"-WriteBinary {int(write_binary)}",
-            f"-WriteAllIonsToCSV {int(write_csv)}",
-            f"-WriteBinningFile {int(write_binning)}",
-            f"-minLEMHPlus {min_LEMHPlus}"]
-
     if mock:
         pr = None
-    pr, runtime = run_win_proc(cmd, timeout, pep3d_stdout)
+    else:
+        algo = check_algo(path)
+        cmd = ["powershell.exe", algo,
+                f"-inputFileName '{input_file}'",
+                f"-outputDirName '{output_dir}'",
+                f"-WriteXML {int(write_xml)}",
+                f"-WriteBinary {int(write_binary)}",
+                f"-WriteAllIonsToCSV {int(write_csv)}",
+                f"-WriteBinningFile {int(write_binning)}",
+                f"-minLEMHPlus {min_LEMHPlus}"]
+        pr, runtime = run_win_proc(cmd, timeout, pep3d_stdout)
 
     if '_Apex3D' in input_file.stem:
         out = input_file.parent/input_file.stem.replace('_Apex3D','_Pep3D_Spectrum')

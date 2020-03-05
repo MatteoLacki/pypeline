@@ -32,25 +32,24 @@ def iadbs(input_file,
     Returns:
         tuple: path to the outcome xml file and the completed process (or None if mocking).
     """
-    algo = check_algo(path)
     input_file = Path(input_file)
     output_dir = Path(output_dir)
     fasta_file = Path(fasta_file)
     parameters_file = Path(parameters_file)
     iadbs_stdout = output_dir/'iadbs.log'
 
-    cmd = [ "powershell.exe", algo,
-            f"-paraXMLFileName '{parameters_file}'",
-            f"-pep3DFileName '{input_file}'",
-            f"-proteinFASTAFileName '{fasta_file}'",
-            f"-outputDirName '{output_dir}'",
-            f"-WriteXML {int(write_xml)}",
-            f"-WriteBinary {int(write_binary)}",
-            f"-bDeveloperCSVOutput {int(write_csv)}" ]
-
     if mock:
         pr = None 
     else:
+        algo = check_algo(path)
+        cmd = [ "powershell.exe", algo,
+                f"-paraXMLFileName '{parameters_file}'",
+                f"-pep3DFileName '{input_file}'",
+                f"-proteinFASTAFileName '{fasta_file}'",
+                f"-outputDirName '{output_dir}'",
+                f"-WriteXML {int(write_xml)}",
+                f"-WriteBinary {int(write_binary)}",
+                f"-bDeveloperCSVOutput {int(write_csv)}" ]
         pr, _ = run_win_proc(cmd, timeout, iadbs_stdout)
 
     if '_Pep3D_Spectrum' in input_file.stem:

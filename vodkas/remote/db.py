@@ -9,7 +9,9 @@ LOG = namedtuple('log', 'date ip project_id process_name key value')
 class DB(object):
     def __init__(self, path):
         self.path = Path(path).expanduser().resolve()
-        self.conn = sqlite3.connect(str(self.path)) 
+        self.path.parent.mkdir(parents=True, 
+                               exist_ok=True)
+        self.conn = sqlite3.connect(str(self.path))
         self.create_logs_if_aint_there()
 
     def iter_logs(self):

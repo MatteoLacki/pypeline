@@ -15,7 +15,7 @@ from vodkas.fastas import get_fastas
 from vodkas.iadbs import iadbs
 from vodkas.json import dump2json
 from vodkas.logging import store_parameters
-from vodkas.remote.sender import Sender
+from vodkas.remote.sender import Sender, currentIP
 from vodkas.xml_parser import print_parameters_file, create_params_file
 
 
@@ -46,10 +46,27 @@ ap.add_argument('--log_file',
     help='Path to temporary outcome folder.',
     default= 'C:/SYMPHONY_VODKAS/temp_logs/research.log' if system() == 'Windows' else '~/SYMPHONY_VODKAS/research.log')
 
-ap.add_argument('--server_ip', type=str, help='IP of the server', default='0.0.0.0')
+
+ap.add_argument('--server_ip', 
+                type=str, 
+                help='IP of the server',
+                default=currentIP)
 
 args = ap.parse_args()
 
+######################################## Logging
+logging.basicConfig(filename=args.log_file, level=logging.INFO,
+                    format='%(asctime)s:%(name)s:%(levelname)s:%(message)s:')
+log = logging.getLogger('RESEARCH.py')
+sender = Sender('RESEARCH', args.server_ip) # what to do, if server is down???
+logFun = store_parameters(log, sender)
+
+# can this work???
+for foo in (iadbs, create_params_file, get_search_stats):
+    foo = logFun(foo)
+# iadbs = logFun(iadbs)
+# create_params_file = logFun(create_params_file)
+# iaDBsXMLparser = logFun(iaDBsXMLparser)
 
 
 ######################################## PROTO GUI
@@ -68,23 +85,6 @@ if args.fastas_prompt: # search file.
     print(f'Default search parameters {search_params}:')
     print_parameters_file(search_params)
     iadbs_kwds['parameters_file'] = input(f'OK? ENTER. Not OK? Provide path here and hit ENTER: ') or search_params
-
-
-
-######################################## Logging
-logging.basicConfig(filename=args.log_file, level=logging.INFO,
-                    format='%(asctime)s:%(name)s:%(levelname)s:%(message)s:')
-log = logging.getLogger('RESEARCH.py')
-sender = Sender('RESEARCH', args.server_ip) # what to do, if server is down???
-logFun = store_parameters(log, sender)
-
-# can this work???
-for foo in (iadbs, create_params_file, get_search_stats):
-    foo = logFun(foo)
-# iadbs = logFun(iadbs)
-# create_params_file = logFun(create_params_file)
-# iaDBsXMLparser = logFun(iaDBsXMLparser)
-
 
 
 ######################################## RESEARCH 
