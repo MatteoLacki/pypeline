@@ -9,7 +9,7 @@ from vodkas.remote.db import DB
 from vodkas.json import dump2json
 from vodkas.remote.sender import Sender, currentIP
 
-s = Sender('Test')
+s = Sender('Test', currentIP)
 s.project_id
 for i in range(100):
     s.log('test', {'haha':i, 'path':Path(f'{i}'), 'str': 'asdaa'})

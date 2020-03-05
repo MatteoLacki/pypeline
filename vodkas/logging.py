@@ -52,8 +52,12 @@ class MockLog():
     def info(self, *args, **kwds):
         print(*args, **kwds)
 
+class MockSender():
+    def log(self, *args, **kwds):
+        print(*args, **kwds)
 
-def store_parameters(log=MockLog()):
+
+def store_parameters(log=MockLog(), sender=MockSender()):
     """Store parameters of a function."""
     def wrapping(foo, 
                  store_input=True, 

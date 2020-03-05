@@ -10,16 +10,18 @@ from vodkas.remote.db import LOG
 
 currentIP = socket.gethostbyname(socket.gethostname())
 
+
 class Sender(object):
     def __init__(self,
                  name,
-                 host=currentIP,
+                 host,
                  port=8745, 
                  encoding="cp1251"):
         self.host = host
         self.port = port
         self.encoding = encoding
         self.name = name
+        self.ip = socket.gethostbyname(socket.gethostname())
         self.project_id = self.__get_project_id()
 
     def __sock(self, route, message=None):
@@ -44,7 +46,7 @@ class Sender(object):
         Returns:
             boolean: success?
         """
-        _log = json.dumps((self.host, 
+        _log = json.dumps((self.ip, 
                            self.project_id,
                            self.name, 
                            key, 
@@ -70,7 +72,6 @@ class Sender(object):
 
 
 if __name__ == '__main__':
-    s = Sender(host=currentIP)
-    message = "Hello this is a test!"
-    w = s.log(message)
-    print(w)
+    s = Sender('Test', host=currentIP)
+    print(s.project_id)
+    print(s.all_logs_df())

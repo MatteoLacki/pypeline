@@ -9,14 +9,14 @@ from tqdm import tqdm
 
 from fs_ops.paths import find_suffixed_files
 from fs_ops.csv import rows2csv
-from waters.parsers import iaDBsXMLparser
+from waters.parsers import get_search_stats
 
 from vodkas.fastas import get_fastas
 from vodkas.iadbs import iadbs
 from vodkas.json import dump2json
 from vodkas.logging import store_parameters
+from vodkas.remote.sender import Sender
 from vodkas.xml_parser import print_parameters_file, create_params_file
-
 
 ap = argparse.ArgumentParser(description='Rerun search with iaDBs.',
                              epilog="WARNING: PREVIOUS '*_IA_Workflow.xml' SHALL BE DELETED ",
@@ -37,13 +37,18 @@ ap.add_argument('Pep3D_Spectrum', type=Path, nargs='+',
     help="Path(s) to outputs of Peptide3D. \
           If provided with a folder instead, \
           a recursive search for files matching '*_Pep3D_Spectrum.xml' is performed.")
+
 ap.add_argument('--log_file',
     type=lambda p: Path(p).expanduser().resolve(),
     help='Path to temporary outcome folder.',
     default= 'C:/SYMPHONY_VODKAS/temp_logs/research.log' if system() == 'Windows' else '~/SYMPHONY_VODKAS/research.log')
+
 ap.add_argument('--server_ip', type=str, help='IP of the server', default='0.0.0.0')
 
+
 args = ap.parse_args()
+
+
 parse_out_kwds = lambda p: {o: args.__dict__[n.replace('--','')] for n,o,h in p}
 iadbs_kwds = parse_out_kwds(iadbs_kwds)
 get_fastas_kwds = parse_out_kwds(get_fastas_kwds)
@@ -63,14 +68,19 @@ if args.fastas_prompt: # search file.
 logging.basicConfig(filename=args.log_file, level=logging.INFO,
                     format='%(asctime)s:%(name)s:%(levelname)s:%(message)s:')
 log = logging.getLogger('RESEARCH.py')
-logFun = store_parameters(log)
-iadbs = logFun(iadbs)
-create_params_file = logFun(create_params_file)
+sender = Sender('RESEARCH', args.server_ip)
+logFun = store_parameters(log, sender)
+
+# can this work???
+for foo in (iadbs, create_params_file, get_search_stats):
+    foo = logFun(foo)
+# iadbs = logFun(iadbs)
+# create_params_file = logFun(create_params_file)
+# iaDBsXMLparser = logFun(iaDBsXMLparser)
 
 xmls = list(find_suffixed_files(args.Pep3D_Spectrum, ['**/*_Pep3D_Spectrum.xml'], ['.xml']))
 print("analyzing folders:")
 pprint(xmls)
-# server = Sender('RESEARCH', server_ip)
 
 for xml in tqdm(xmls):
     log.info(f"researching: {str(xml)}")
@@ -80,7 +90,7 @@ for xml in tqdm(xmls):
         iadbs_out,_ = iadbs(**iadbs_kwds)
         apex_out = iadbs_out.parent/iadbs_out.name.replace('_IA_workflow.xml', '_Apex3D.xml')
         params = create_params_file(apex_out, xml, iadbs_out) # for projectizer2.0
-        search_stats = iaDBsXMLparser(iadbs_out).info()
+        search_stats = get_search_stats(iadbs_out)
         rows2csv(iadbs_out.parent/'stats.csv', [list(search_stats), list(search_stats.values())])
     except Exception as e:
         log.warning(repr(e))
