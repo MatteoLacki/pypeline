@@ -3,7 +3,7 @@ from pathlib import Path
 import sqlite3
 from collections import namedtuple
 
-LOG = namedtuple('log', 'date project_id process_name key value')
+LOG = namedtuple('log', 'date ip project_id process_name key value')
 
 
 class DB(object):
@@ -29,6 +29,7 @@ class DB(object):
         sql = \
         """CREATE TABLE IF NOT EXISTS 'logs' (
             insert_date TIMESTAMP,
+            ip TEXT,
             project_id INTEGER,
             process_name TEXT,
             data_key TEXT NOT NULL,
@@ -37,22 +38,23 @@ class DB(object):
         with self.conn as cur:
             cur.execute(sql)
 
-    def log(self, process_id, process_name, data_key, data_value):
+    def log(self, ip, project_id, process_name, data_key, data_value):
         with self.conn as cur:
             sql = """INSERT INTO 'logs'
-            ('insert_date', 'project_id', 'process_name', 'data_key', 'data_value')
-            VALUES (?,?,?,?,?)"""
+            ('insert_date','ip','project_id','process_name','data_key','data_value')
+            VALUES (?,?,?,?,?,?)"""
             cur.execute(sql, (datetime.now(),
-                              process_id,
+                              ip,
+                              project_id,
                               process_name,
                               data_key,
                               data_value))
 
     def get_free_project_id(self):
         with self.conn as cur:
-            sql = "SELECT * FROM 'logs' WHERE oid = (SELECT max(oid) FROM 'logs')"
+            sql = "SELECT project_id FROM 'logs' WHERE oid = (SELECT max(oid) FROM 'logs')"
             try:
-                _, project_id,_,_,_ = cur.execute(sql).fetchall()[0] 
+                project_id = cur.execute(sql).fetchall()[0][0] 
                 return project_id + 1
             except IndexError:
                 return 0

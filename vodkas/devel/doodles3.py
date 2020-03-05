@@ -1,36 +1,26 @@
 %load_ext autoreload
 %autoreload 2
-from vodkas.remote.sender import Sender
-from urllib.request import Request, urlopen
 import json
 from pathlib import Path
 import sqlite3
-import json
+import pandas as pd
 
 from vodkas.remote.db import DB
 from vodkas.json import dump2json
-
-Sender('test','0.0.0.0')
-
-request = Request(f"http://0.0.0.0:8745/test")
-request.add_header('Content-Type', 'application/json; charset=utf-8')
-with urlopen(request, '""'.encode()) as s:
-    print(json.loads(s.read()))
-
-request = Request(f"http://0.0.0.0:8745/getnumber")
-request.add_header('Content-Type', 'application/json; charset=utf-8')
-with urlopen(request) as s:
-    print(json.loads(s.read()))
-
-%load_ext autoreload
-%autoreload 2
 from vodkas.remote.sender import Sender, currentIP
 
 s = Sender('Test')
-s.getnumber('Test')
-s.query("SELECT name FROM sqlite_master WHERE type='table' AND name='{logs}';")
+s.project_id
+for i in range(100):
+    s.log('test', {'haha':i, 'path':Path(f'{i}'), 'str': 'asdaa'})
+logs = s.get_all_logs()
+log = logs[-1]
+log[:-1]
+
+df = s.all_logs_df()
 
 
+# s.query("SELECT name FROM sqlite_master WHERE type='table' AND name='{logs}';")
 
 
 db = DB(r'/home/matteo/SYMPHONY_VODKAS/simple.db')
@@ -41,8 +31,9 @@ db.drop_logs()
 db.tables()
 db.create_logs_if_aint_there()
 db.tables()
+
 for i in range(100):
-    db.log(i, 'test', 'input', dump2json({'haha':i, 'cipa':'tak'}))
+    db.log(currentIP, i, 'test', 'input', dump2json({'haha':i, 'cipa':'tak'}))
 list(db.iter_logs())
 
 del db

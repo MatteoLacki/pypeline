@@ -5,9 +5,10 @@ from pathlib import Path
 import pandas as pd
 import socket
 
+from vodkas.json import dump2json
+from vodkas.remote.db import LOG
 
 currentIP = socket.gethostbyname(socket.gethostname())
-
 
 class Sender(object):
     def __init__(self,
@@ -19,48 +20,53 @@ class Sender(object):
         self.port = port
         self.encoding = encoding
         self.name = name
-        self.id = self.getnumber(self.name)
-        # try:
-        #     self.id = self.__greet(self.name)
-        # except URLError:
-        #     raise URLError('IP not OK.')
+        self.project_id = self.__get_project_id()
 
-    def __socket(self, route, message):
+    def __sock(self, route, message=None):
         url = f"http://{self.host}:{self.port}/{route}"
         request = Request(url)
         request.add_header('Content-Type', 'application/json; charset=utf-8')
+        if message is None:
+            message = json.dumps(self.name).encode(self.encoding)
         return urlopen(request, message)
 
-    def getnumber(self, greeting):
-        """Greet the receiver."""
-        greeting = json.dumps(greeting).encode(self.encoding)
-        with self.__socket('getnumber', greeting) as s:
+    def __get_project_id(self):
+        with self.__sock('get_project_id') as s:
             return json.loads(s.read())
 
-    def query(self, sql):
-        sql = json.dumps(sql).encode(self.encoding)
-        with self.__socket('query', sql) as s:
-            return json.loads(s.read())        
+    def log(self, key, value):
+        """Log key-value.
+        
+        Args:
+            key (str): Parameter name.
+            value (obj): Any serializable object.
 
-    def send_df(self, df):
-        df['__project_id__'] = self.id
-        df['__name__'] = self.name
-        df_json = df.to_json(default_handler=str).encode(self.encoding) 
-        with self.__socket('updateDB', df_json) as s:
-            return json.loads(s.read())
+        Returns:
+            boolean: success?
+        """
+        _log = json.dumps((self.host, 
+                           self.project_id,
+                           self.name, 
+                           key, 
+                           dump2json(value))).encode(self.encoding)
+        with self.__sock('log', _log) as s:
+            return json.loads(s.read())            
 
-    def send_dict(self, d):
-        df = pd.DataFrame()
-        df = df.append(d, ignore_index=True)
-        self.send_df(df)
+    def get_all_logs(self):
+        with self.__sock('get_all_logs') as s:
+            logs = []
+            for date,ip,project_id,process_name,k,v in json.loads(s.read()):
+                log = LOG(date,ip,project_id,process_name,k,json.loads(v))
+                logs.append(log)
+            return logs
 
-    def send_pair(self, key, value):
-        self.send_dict({'key':key, 'value': json.dumps(value)})
-
-    def get_df(self):
-        with self.__socket('df', '""'.encode(self.encoding)) as s:
-            return pd.read_json(s.read())
-
+    def all_logs_df(self):
+        logs = self.get_all_logs()
+        info = pd.DataFrame((log[:-1] for log in logs))
+        log = logs[0]
+        info.columns = log._fields[:-1]
+        rest = pd.DataFrame((log.value) for log in logs)
+        return pd.concat([info, rest], axis=1)
 
 
 if __name__ == '__main__':
