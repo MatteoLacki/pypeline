@@ -66,14 +66,6 @@ def iadbs(input_file,
 
 
 
-
-# def test_iadbs():
-#     """Test the stupid iaDBs on Windows."""
-#     iadbs(Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput/O190302_01_Pep3D_Spectrum.bin"),
-#           Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput/"),
-#           Path("C:/Symphony/Search/human.fasta"),
-#           Path("C:/Symphony/Search/251.xml"))
-
 #TODO: this could be done rather with the XML module
 def write_params_xml_file(path, 
                           fasta_db='UNIPROT', 

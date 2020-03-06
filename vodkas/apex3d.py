@@ -79,11 +79,3 @@ def apex3d(raw_folder,
 
     return out_xml, pr
 
-
-# def test_apex3d():
-#     """test Apex3D."""
-#     apex3d(Path("C:/ms_soft/MasterOfPipelines/RAW/O1903/O190302_01.raw"),
-#            Path("C:/ms_soft/MasterOfPipelines/test/apex3doutput"))
-
-# if __name__ == "__main__":
-#     test_apex3d()
