@@ -6,9 +6,13 @@ import socket
 from vodkas.remote.db import DB
 from vodkas.json import dump2json
 
+
+DEBUG = True
+currentIP = socket.gethostbyname(socket.gethostname())
+
+############################################################### CLI 
 ap = argparse.ArgumentParser(description='Let the barman take care of the symphony of vodkas.',
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-currentIP = socket.gethostbyname(socket.gethostname())
 ap.add_argument('--host',
                 help="Host's IP.",
                 default=currentIP)
@@ -20,6 +24,9 @@ ap.add_argument('--DBpath',
                 help='Port to listen to.',
                 default=r'C:\SYMPHONY_VODKAS\simple.db' if OS() == 'Windows' else r'/home/matteo/SYMPHONY_VODKAS/simple.db')
 args = ap.parse_args()
+############################################################### Flask
+
+
 app  = Flask(__name__)
 
 def get_db():
@@ -42,7 +49,8 @@ def get_project_id():
 def log():
     if request.data:
         l = request.get_json()
-        print(l)
+        if DEBUG:
+            print(l)
         db = get_db()
         db.log(*l)
         return jsonify(True)
@@ -70,8 +78,9 @@ def close_connection(exception):
         del db
 
 
+############################################################### MAIN
 if __name__ == '__main__':
-    app.run(debug=True,
+    app.run(debug=DEBUG,
             host=args.host,
             port=args.port,
             threaded=True)

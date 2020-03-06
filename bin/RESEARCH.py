@@ -54,21 +54,20 @@ ap.add_argument('--server_ip',
 
 args = ap.parse_args()
 
+
 ######################################## Logging
 logging.basicConfig(filename=args.log_file, level=logging.INFO,
                     format='%(asctime)s:%(name)s:%(levelname)s:%(message)s:')
 log = logging.getLogger('RESEARCH.py')
-sender = Sender('RESEARCH', args.server_ip) # what to do, if server is down???
-print(sender.project_id)
-# from vodkas.logging import MockSender
-# sender = MockSender()
+sender = Sender('RESEARCH', args.server_ip)
 logFun = store_parameters(log, sender)
 iadbs = logFun(iadbs)
 create_params_file = logFun(create_params_file)
 get_search_stats = logFun(get_search_stats)
+# all of the functions use the paths, so we can get the info, if they are in a group.
 
 
-# ######################################## PROTO GUI
+######################################### Getting search parameters
 parse_out_kwds = lambda p: {o: args.__dict__[n.replace('--','')] for n,o,h in p}
 iadbs_kwds = parse_out_kwds(iadbs_kwds)
 get_fastas_kwds = parse_out_kwds(get_fastas_kwds)
@@ -86,12 +85,14 @@ if args.fastas_prompt: # search file.
     iadbs_kwds['parameters_file'] = input(f'OK? ENTER. Not OK? Provide path here and hit ENTER: ') or search_params
 
 
+
 ######################################## RESEARCH 
 xmls = list(find_suffixed_files(args.Pep3D_Spectrum, ['**/*_Pep3D_Spectrum.xml'], ['.xml']))
 print("analyzing folders:")
 pprint(xmls)
 
 for xml in tqdm(xmls):
+    sender.update_group(xml)
     log.info(f"researching: {str(xml)}")
     try:
         iadbs_kwds['input_file'] = xml

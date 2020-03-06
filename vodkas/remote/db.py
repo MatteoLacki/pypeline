@@ -3,7 +3,7 @@ from pathlib import Path
 import sqlite3
 from collections import namedtuple
 
-LOG = namedtuple('log', 'date ip project_id process_name key value')
+LOG = namedtuple('log', 'date ip project_id group process_name key value')
 
 
 class DB(object):
@@ -30,34 +30,38 @@ class DB(object):
     def create_logs_if_aint_there(self):
         sql = \
         """CREATE TABLE IF NOT EXISTS 'logs' (
-            insert_date TIMESTAMP,
-            ip TEXT,
-            project_id INTEGER,
-            process_name TEXT,
-            data_key TEXT NOT NULL,
-            data_value TEXT
+            'insert_date' TIMESTAMP,
+            'ip' TEXT,
+            'project_id' INTEGER,
+            'group' TEXT,
+            'process_name' TEXT,
+            'data_key' TEXT NOT NULL,
+            'data_value' TEXT
         );"""
         with self.conn as cur:
             cur.execute(sql)
 
-    def log(self, ip, project_id, process_name, data_key, data_value):
+    def log(self, ip, project_id, group, process_name, data_key, data_value):
         with self.conn as cur:
             sql = """INSERT INTO 'logs'
-            ('insert_date','ip','project_id','process_name','data_key','data_value')
-            VALUES (?,?,?,?,?,?)"""
+            ('insert_date','ip','project_id','group','process_name','data_key','data_value')
+            VALUES (?,?,?,?,?,?,?)"""
             cur.execute(sql, (datetime.now(),
                               ip,
                               project_id,
+                              group,
                               process_name,
                               data_key,
                               data_value))
 
     def get_free_project_id(self):
         with self.conn as cur:
+            # sql = "SELECT MAX(project_id) FROM 'logs'"
             sql = "SELECT project_id FROM 'logs' WHERE oid = (SELECT max(oid) FROM 'logs')"
-            sql = "SELECT MAX(project_id) FROM 'logs'"
             try:
-                project_id = cur.execute(sql).fetchall()[0][0] 
+                rows = cur.execute(sql).fetchall()
+                print(rows)
+                project_id = rows[0][0] 
                 return project_id + 1
             except IndexError:
                 return 0

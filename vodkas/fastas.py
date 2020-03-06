@@ -1,11 +1,15 @@
 from pathlib import Path
 from furious_fastas import fastas, Fastas
+from platform import system
 
 from .fs import move
 
 
+db_path = r'X:/SYMPHONY_VODKAS/fastas/latest' if system() == 'Windows' else r'/home/matteo/SYMPHONY_VODKAS/fastas/latest' 
+
+
 def get_fastas(path_or_tag='none',
-               db=r'X:/SYMPHONY_VODKAS/fastas/latest',
+               db=db_path,
                add_contaminants=True,
                reverse=True,
                prompt=False):

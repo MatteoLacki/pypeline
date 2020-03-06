@@ -2,7 +2,6 @@ from urllib.request import Request, urlopen
 from urllib.error import URLError
 import json
 from pathlib import Path
-import pandas as pd
 import socket
 
 from vodkas.json import dump2json
@@ -23,6 +22,7 @@ class Sender(object):
         self.name = name
         self.ip = socket.gethostbyname(socket.gethostname())
         self.project_id = self.__get_project_id()
+        self.group = name
 
     def __sock(self, route, message=None):
         url = f"http://{self.host}:{self.port}/{route}"
@@ -48,27 +48,19 @@ class Sender(object):
         """
         _log = json.dumps((self.ip, 
                            self.project_id,
-                           self.name, 
+                           self.name,
+                           self.group,
                            key, 
                            dump2json(value))).encode(self.encoding)
         with self.__sock('log', _log) as s:
             return json.loads(s.read())            
 
-    def get_all_logs(self):
-        with self.__sock('get_all_logs') as s:
-            logs = []
-            for date,ip,project_id,process_name,k,v in json.loads(s.read()):
-                log = LOG(date,ip,project_id,process_name,k,json.loads(v))
-                logs.append(log)
-            return logs
+    def update_group(self, group):
+        self.group = dump2json(group) # general.
 
-    def all_logs_df(self):
-        logs = self.get_all_logs()
-        info = pd.DataFrame((log[:-1] for log in logs))
-        log = logs[0]
-        info.columns = log._fields[:-1]
-        rest = pd.DataFrame((log.value) for log in logs)
-        return pd.concat([info, rest], axis=1)
+    def list_logs(self):
+        with self.__sock('get_all_logs') as s:
+            return [LOG(*log) for log in json.loads(s.read())]
 
 
 if __name__ == '__main__':
