@@ -1,7 +1,6 @@
 # from time import sleep
 from collections import defaultdict
 
-from docstr2argparse.parse import ParserDisambuigationEasy
 from fs_ops.csv import rows2csv
 from waters.parsers import iaDBsXMLparser
 
@@ -31,13 +30,10 @@ def plgs(fastas,
 
     Returns:
         dict: parsed parameters from the xml files.
-    """   
+    """
     a,_ = apex3d(raw_folder, out_folder, **apex3d_kwds) # this will make .bin only
     p,_ = peptide3d(a.with_suffix('.bin'), out_folder,**peptide3d_kwds) # this will make .xml only
     i,_ = iadbs(p, out_folder, fastas, **iadbs_kwds)
     create_params_file(a, p, i) # for projectizer2.0
     search_stats = iaDBsXMLparser(i).info()
     rows2csv(i.parent/'stats.csv', [list(search_stats), list(search_stats.values())])
-
-
-plgs.parsed = ParserDisambuigationEasy([apex3d, peptide3d, iadbs])

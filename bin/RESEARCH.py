@@ -46,7 +46,6 @@ ap.add_argument('--log_file',
     help='Path to temporary outcome folder.',
     default= 'C:/SYMPHONY_VODKAS/temp_logs/research.log' if system() == 'Windows' else '~/SYMPHONY_VODKAS/research.log')
 
-
 ap.add_argument('--server_ip', 
                 type=str, 
                 help='IP of the server',
@@ -64,7 +63,6 @@ logFun = store_parameters(log, sender)
 iadbs = logFun(iadbs)
 create_params_file = logFun(create_params_file)
 get_search_stats = logFun(get_search_stats)
-# all of the functions use the paths, so we can get the info, if they are in a group.
 
 
 ######################################### Getting search parameters

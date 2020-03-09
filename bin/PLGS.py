@@ -2,37 +2,52 @@ import argparse
 import logging
 from pprint import pprint
 from pathlib import Path
-import platform
+from platform import system
 import json
 
-from docstr2argparse.parse import foo2argparse
+from docstr2argparse.parse import FooParser
 
 from vodkas import plgs
 from vodkas.fastas import get_fastas
 from vodkas.fs import find_free_path, move_folder, network_drive_exists
 from vodkas.header_txt import parse_header_txt
-from vodkas.logging import get_logger
-from vodkas.remote.sender import Sender
+from vodkas.logging import store_parameters
+from vodkas.remote.sender import Sender, currentIP
 
 DEBUG = True
 
 ap = argparse.ArgumentParser(description='Analyze Waters Raw Data with PLGS.',
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-for n,_,h in foo2argparse(get_fastas, get_short=False):
+
+FooParser([get_fastas, apex3d, peptide3d, iadbs])
+
+get_fastas_kwds = foo2argparse(get_fastas, args_prefix='fastas_', get_short=False)
+for n,o,h in get_fastas_kwds:
+    if o == 'prompt':
+        h['action'] = "store_true"
     ap.add_argument(n, **h)
+
 ap.add_argument('raw_folders', type=Path, nargs='+',
                 help='Path(s) to raw folder(s).')
+
 ap.add_argument('--local_output_folder', type=Path,
                 help='Path to temporary outcome folder.',
-                default=r'C:/SYMPHONY_VODKAS/temp')
-ap.add_argument('--log_file', type=Path,
-                help='Path to temporary outcome folder.',
-                default={"Windows": 'C:/SYMPHONY_VODKAS/temp_logs/plgs.log',
-                          "Linux":  Path('~/plgs.log').expanduser(),
-                          "Darwin": Path('~/plgs.log').expanduser(),}[platform.system()])
+                default=r'C:/SYMPHONY_VODKAS/temp' if system() == 'Windows' else '~/SYMPHONY_VODKAS/temp')
+
+ap.add_argument('--log_file',
+    type=lambda p: Path(p).expanduser().resolve(),
+    help='Path to temporary outcome folder.',
+    default= 'C:/SYMPHONY_VODKAS/temp_logs/research.log' if system() == 'Windows' else '~/SYMPHONY_VODKAS/research.log')
+
 ap.add_argument('--net_folder', type=Path,
                 help=f"Network folder for results. Set to '' (empty word) if you want to skip copying.",
                 default='Y:/TESTRES2' if DEBUG else 'Y:/RES')
+
+ap.add_argument('--server_ip', 
+                type=str, 
+                help='IP of the server',
+                default=currentIP)
+
 for arg_name, arg_desc in plgs.parsed.a2d:
     ap.add_argument(arg_name,**arg_desc)
 args = ap.parse_args()
@@ -80,9 +95,6 @@ for raw_folder in args.raw_folders:
         sample_set = header_txt['Sample Description'][:8]
         #                   C:/SYMPHONY_PIPELINE/2019-008/O191017-04
         local_folder = args.local_output_folder/sample_set/acquired_name
-        # message = [str(fastas), str(raw_folder), str(local_folder), kwds]
-        # server.send(message)
-        
         plgs(fastas, raw_folder, local_folder, **kwds)
         if args.net_folder:
             #                     Y:/TESTRES/2019-008
