@@ -57,22 +57,24 @@ logging.basicConfig(filename=args.log_file, level=logging.INFO,
                     format='%(asctime)s:%(name)s:%(levelname)s:%(message)s:')
 log = logging.getLogger('RESEARCH.py')
 try:
+    print(args.server_ip)
     sender = Sender('RESEARCH', args.server_ip)
     logFun = store_parameters(log, sender)
-except URLError:
+except URLError as e:
     log.warning('Server down! Doing all things locally.')
-    print('Server down! Doing all things locally.')
+    print(e)
     logFun = store_parameters(log)
 iadbs, create_params_file, get_search_stats = [logFun(f) for f in [iadbs, create_params_file, get_search_stats]]
 
 
 fasta_file = fastas(**FP.kwds['fastas'])
 
+parameters_file = FP.kwds['iadbs']['parameters_file']
+del FP.kwds['iadbs']['parameters_file']
 if args.fastas_prompt: # search file.
-    search_params = iadbs_kwds['parameters_file']
-    print(f'Default search parameters {search_params}:')
-    print_parameters_file(search_params)
-    iadbs_kwds['parameters_file'] = input(f'OK? ENTER. Not OK? Provide path here and hit ENTER: ') or search_params
+    print(f'Default search parameters {parameters_file}:')
+    print_parameters_file(parameters_file)
+    parameters_file = input(f'OK? ENTER. Not OK? Provide path here and hit ENTER: ') or parameters_file
 
 
 ######################################## RESEARCH 
@@ -84,7 +86,7 @@ if xmls:
         sender.update_group(xml)
         log.info(f"researching: {str(xml)}")
         try:
-            iadbs_out,_ = iadbs(xml, xml.parent, fasta_file, **FP.kwds['iadbs'])
+            iadbs_out,_ = iadbs(xml, xml.parent, fasta_file, parameters_file, **FP.kwds['iadbs'])
             apex_out = iadbs_out.parent/iadbs_out.name.replace('_IA_workflow.xml', '_Apex3D.xml')
             params = create_params_file(apex_out, xml, iadbs_out) # for projectizer2.0
             search_stats = get_search_stats(iadbs_out)
