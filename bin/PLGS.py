@@ -4,6 +4,7 @@ from pprint import pprint
 from pathlib import Path
 from platform import system
 from tqdm import tqdm
+from urllib.error import URLError
 
 from docstr2argparse.parse import FooParser
 from fs_ops.csv import rows2csv
@@ -13,8 +14,10 @@ from vodkas.fastas import fastas
 from vodkas import apex3d, peptide3d, iadbs
 from vodkas.fs import find_free_path, move_folder, network_drive_exists
 from vodkas.header_txt import parse_header_txt
-from vodkas.logging import store_parameters
+from vodkas.logging import store_parameters, MockSender
 from vodkas.remote.sender import Sender, currentIP
+from vodkas.xml_parser import create_params_file
+
 
 DEBUG = True
 
@@ -61,12 +64,11 @@ FP.updateParser(ap)
 args = ap.parse_args()
 FP.parse_kwds(args.__dict__)
 
-
-if DEBUG:
-    print(args.raw_folders)
-    print(args.local_output_folder)
-    pprint(args.__dict__)
-    pprint(FP)
+# if DEBUG:
+    # print(args.raw_folders)
+    # print(args.local_output_folder)
+    # pprint(args.__dict__)
+    # pprint(FP)
 
 
 ######################################## Logging
@@ -79,13 +81,14 @@ try:
 except URLError:
     log.warning('Server down! Doing all things locally.')
     print('Server down! Doing all things locally.')
-    logFun = store_parameters(log)
+    sender = MockSender()
+    logFun = store_parameters(log, sender)
 
 apex3d, peptide3d, iadbs, create_params_file, get_search_stats = [logFun(f) for f in [apex3d, peptide3d, iadbs, create_params_file, get_search_stats]]
 
 
 ######################################## Network drives.
-if not args.net_folder == '' and not network_drive_exists(args.net_folder):
+if system() == 'Windows' and not args.net_folder == '' and not network_drive_exists(args.net_folder):
     log.warning(f"no network drive for {args.net_folder}: saving locally")
 
 if not network_drive_exists(args.fastas_db):
@@ -93,7 +96,7 @@ if not network_drive_exists(args.fastas_db):
 
 
 ###### translate fastas to NCBIgeneralFastas and store it on the server
-fastas = fastas(**FP.kwds['get_fastas'])
+fastas = fastas(**FP.kwds['fastas'])
 
 
 ######################################## PLGS 
@@ -101,12 +104,12 @@ log.info("analyzing folders:")
 pprint(args.raw_folders)
 
 for raw_folder in tqdm(args.raw_folders):
-    log.info(f"analyzing: {raw_folder}")
-    sender.update_group(raw_folder)
     try:
         if not raw_folder.is_dir():
             log.error(f"missing: {raw_folder}")
             continue
+        log.info(f"analyzing: {raw_folder}")
+        sender.update_group(raw_folder)
         acquired_name = raw_folder.stem
         header_txt = parse_header_txt(raw_folder/'_HEADER.TXT')
         sample_set = header_txt['Sample Description'][:8]

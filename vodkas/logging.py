@@ -50,12 +50,15 @@ def __print_out_params(f):
 
 class MockLog():
     def info(self, *args, **kwds):
-        print(*args, **kwds)
+        pass
 
 
 class MockSender():
     def log(self, *args, **kwds):
-        print(*args, **kwds)
+        pass
+
+    def update_group(self, *args, **kwds):
+        pass
 
 
 def store_parameters(log=MockLog(), sender=MockSender()):
