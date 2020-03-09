@@ -11,7 +11,7 @@ def peptide3d(input_file,
               write_binary=False,
               write_csv=False,
               write_binning=False,
-              path="C:/SYMPHONY_VODKAS/plgs/Peptide3D.exe",
+              exe_path="C:/SYMPHONY_VODKAS/plgs/Peptide3D.exe",
               timeout=60,
               mock=False):
     """Run Peptide3D.
@@ -24,7 +24,7 @@ def peptide3d(input_file,
         write_csv (boolean): Write the ions to csv file.
         write_binning (boolean): Write binning file.
         min_LEMHPlus (int): The minimal (M)ass of the (L)ow (E)nergy precursor with a single charge (H+).
-        path (str): Path to the "Peptide3D.exe" executable.
+        exe_path (str): Path to the "Peptide3D.exe" executable.
         timeout (float): Timeout in minutes.
         mock (bool): Run without calling Peptide3D.
 
@@ -41,7 +41,7 @@ def peptide3d(input_file,
     if mock:
         pr = None
     else:
-        algo = check_algo(path)
+        algo = check_algo(exe_path)
         cmd = ["powershell.exe", algo,
                 f"-inputFileName '{input_file}'",
                 f"-outputDirName '{output_dir}'",

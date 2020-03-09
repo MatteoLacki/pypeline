@@ -16,7 +16,7 @@ def apex3d(raw_folder,
            write_binary=True,
            write_csv=False,
            max_used_cores=get_coresNo(),
-           path="C:/SYMPHONY_VODKAS/plgs/Apex3D64.exe",
+           exe_path="C:/SYMPHONY_VODKAS/plgs/Apex3D64.exe",
            PLGS=True,
            cuda=True,
            unsupported_gpu=True,
@@ -36,7 +36,7 @@ def apex3d(raw_folder,
         write_binary (boolean): Write the binary output in an xml in the output folder.
         write_csv (boolean): Write the output in a csv in the output folder (doesn't work).
         max_used_cores (int): The maximal number of cores to use.
-        path (str): Path to the "Apex3D.exe" executable.
+        exe_path (str): Path to the "Apex3D.exe" executable.
         PLGS (boolean): No idea what it is.
         cuda (boolean): Use CUDA.
         unsupported_gpu (boolean): Try using an unsupported GPU for calculations. If it doesn't work, the pipeline switches to CPU which is usually much slower.
@@ -53,7 +53,7 @@ def apex3d(raw_folder,
     if mock:
         pr = None
     else:
-        algo = check_algo(path)
+        algo = check_algo(exe_path)
         cmd = ["powershell.exe", algo,
               f"-pRawDirName '{raw_folder}'",
               f"-outputDirName '{output_dir}'",

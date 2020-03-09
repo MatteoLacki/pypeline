@@ -4,6 +4,7 @@ from pathlib import Path
 from platform import system
 from pprint import pprint
 from tqdm import tqdm
+from urllib.error import URLError
 
 from docstr2argparse.parse import FooParser
 from fs_ops.paths import find_suffixed_files
@@ -29,7 +30,7 @@ if system() == 'Windows':
 else: # on Linux we can only mock.
     FP.set_to_store_true(['prompt'])
     FP.mock()
-    FP.del_args(['path'])
+    FP.del_args(['exe_path'])
 
 ap.add_argument('Pep3D_Spectrum', type=Path, nargs='+',
     help="Path(s) to outputs of Peptide3D. \
@@ -50,20 +51,22 @@ FP.updateParser(ap)
 args = ap.parse_args()
 FP.parse_kwds(args.__dict__)
 
+
 ######################################## Logging
 logging.basicConfig(filename=args.log_file, level=logging.INFO,
                     format='%(asctime)s:%(name)s:%(levelname)s:%(message)s:')
 log = logging.getLogger('RESEARCH.py')
-sender = Sender('RESEARCH', args.server_ip)
-logFun = store_parameters(log, sender)
+try:
+    sender = Sender('RESEARCH', args.server_ip)
+    logFun = store_parameters(log, sender)
+except URLError:
+    log.warning('Server down! Doing all things locally.')
+    print('Server down! Doing all things locally.')
+    logFun = store_parameters(log)
 iadbs, create_params_file, get_search_stats = [logFun(f) for f in [iadbs, create_params_file, get_search_stats]]
 
 
-try: # translate fastas to NCBIgeneralFastas and store it on the server.
-    fasta_file = fastas(**FP.kwds['fastas'])
-except FileNotFoundError:
-    log.error(f"fastas unreachable")
-    error()
+fasta_file = fastas(**FP.kwds['fastas'])
 
 if args.fastas_prompt: # search file.
     search_params = iadbs_kwds['parameters_file']
@@ -72,22 +75,24 @@ if args.fastas_prompt: # search file.
     iadbs_kwds['parameters_file'] = input(f'OK? ENTER. Not OK? Provide path here and hit ENTER: ') or search_params
 
 
-
 ######################################## RESEARCH 
 xmls = list(find_suffixed_files(args.Pep3D_Spectrum, ['**/*_Pep3D_Spectrum.xml'], ['.xml']))
-print("analyzing folders:")
-pprint(xmls)
-
-for xml in tqdm(xmls):
-    sender.update_group(xml)
-    log.info(f"researching: {str(xml)}")
-    try:
-        iadbs_out,_ = iadbs(xml, xml.parent, fasta_file, **FP.kwds['iadbs'])
-        apex_out = iadbs_out.parent/iadbs_out.name.replace('_IA_workflow.xml', '_Apex3D.xml')
-        params = create_params_file(apex_out, xml, iadbs_out) # for projectizer2.0
-        search_stats = get_search_stats(iadbs_out)
-        rows2csv(iadbs_out.parent/'stats.csv', [list(search_stats), list(search_stats.values())])
-    except Exception as e:
-        log.warning(repr(e))
-        print(e)
-log.info("Search redone.")
+if xmls:
+    print("analyzing folders:")
+    pprint(xmls)
+    for xml in tqdm(xmls):
+        sender.update_group(xml)
+        log.info(f"researching: {str(xml)}")
+        try:
+            iadbs_out,_ = iadbs(xml, xml.parent, fasta_file, **FP.kwds['iadbs'])
+            apex_out = iadbs_out.parent/iadbs_out.name.replace('_IA_workflow.xml', '_Apex3D.xml')
+            params = create_params_file(apex_out, xml, iadbs_out) # for projectizer2.0
+            search_stats = get_search_stats(iadbs_out)
+            rows2csv(iadbs_out.parent/'stats.csv', [list(search_stats), list(search_stats.values())])
+        except Exception as e:
+            log.warning(repr(e))
+            print(e)
+    log.info("Search redone.")
+else:
+    log.error('No xmls found.')
+    print('No xmls found.')

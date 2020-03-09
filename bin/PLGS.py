@@ -28,7 +28,7 @@ if system() == 'Windows':
 else: # on Linux we can only mock.
     FP.set_to_store_true(['prompt'])
     FP.mock()
-    FP.del_args(['path'])
+    FP.del_args(['exe_path'])
 
 ap.add_argument('raw_folders', type=Path, nargs='+',
                 help='Path(s) to raw folder(s).')
@@ -73,24 +73,27 @@ if DEBUG:
 logging.basicConfig(filename=args.log_file, level=logging.INFO,
                     format='%(asctime)s:%(name)s:%(levelname)s:%(message)s:')
 log = logging.getLogger('PLGS.py')
-sender = Sender('PLGS', args.server_ip)
-logFun = store_parameters(log, sender)
+try:
+    sender = Sender('PLGS', args.server_ip)
+    logFun = store_parameters(log, sender)
+except URLError:
+    log.warning('Server down! Doing all things locally.')
+    print('Server down! Doing all things locally.')
+    logFun = store_parameters(log)
+
 apex3d, peptide3d, iadbs, create_params_file, get_search_stats = [logFun(f) for f in [apex3d, peptide3d, iadbs, create_params_file, get_search_stats]]
 
 
 ######################################## Network drives.
 if not args.net_folder == '' and not network_drive_exists(args.net_folder):
     log.warning(f"no network drive for {args.net_folder}: saving locally")
+
 if not network_drive_exists(args.fastas_db):
     log.warning(f"network drive absent: {args.fastas_db}")
 
 
 ###### translate fastas to NCBIgeneralFastas and store it on the server
-try:
-    fastas = fastas(**FP.kwds['get_fastas'])
-except FileNotFoundError:
-    log.error(f"Fastas unreachable: {args.fastas_path}")
-    exit()
+fastas = fastas(**FP.kwds['get_fastas'])
 
 
 ######################################## PLGS 
@@ -118,7 +121,6 @@ for raw_folder in tqdm(args.raw_folders):
                 search_stats = get_search_stats(i)
                 rows2csv(i.parent/'stats.csv',
                          [list(search_stats), list(search_stats.values())])
-
         if args.net_folder:
             #                     Y:/TESTRES/2019-008
             net_set_folder = args.net_folder/sample_set

@@ -8,7 +8,7 @@ from .fs import move
 db_path = r'X:/SYMPHONY_VODKAS/fastas/latest' if system() == 'Windows' else r'/home/matteo/SYMPHONY_VODKAS/fastas/latest' 
 
 
-def fastas(path_or_tag='none',
+def fastas(path='none',
            db=db_path,
            add_contaminants=True,
            reverse=True,
@@ -16,7 +16,7 @@ def fastas(path_or_tag='none',
     """Get proper fastas.
 
     Args:
-        path_or_tag (str): path to fasta file or one of the standard proteomes used, e.g. 'human'.
+        path (str): path to fasta file or one of the standard proteomes used, e.g. 'human'.
         db (str): Path to fastas DB: used when supplying reduced fasta names, e.g. 'human'.
         add_contaminants (boolean): Should we add in contaminants.
         reverse (boolean):Should we reverse the fastas.
@@ -27,36 +27,39 @@ def fastas(path_or_tag='none',
     """
     standard_fastas = {p.stem.split('_')[0]:p for p in Path(db).glob(f"*/PLGS/*.fasta")}
     if prompt:
-        path_or_tag = input('fastas to use (human|wheat|..|custom path): ')
-        if str(path_or_tag) in standard_fastas:
-            print(f"Selected: {path_or_tag}: {standard_fastas[path_or_tag]}")
+        path = input('fastas to use (human|wheat|..|custom path): ')
+        if str(path) in standard_fastas:
+            print(f"Selected: {path}: {standard_fastas[path]}")
         else:
-            print(f"Selected: {path_or_tag}")
-            add_contaminants = input('Adding contaminants: to stop me write "no": ')
-            add_contaminants = add_contaminants.lower() != 'no'
-            print(f'Contaminants: {add_contaminants}')
-            reverse = input('Reversing fastas: to stop me write "no": ')
-            reverse = reverse.lower() != 'no'
-            print(f'Reversing fastas: {reverse}')
+            if Path(path).exists():
+                print(f"Selected: {path}")
+                add_contaminants = input('Adding contaminants: to stop me write "no": ')
+                add_contaminants = add_contaminants.lower() != 'no'
+                print(f'Contaminants: {add_contaminants}')
+                reverse = input('Reversing fastas: to stop me write "no": ')
+                reverse = reverse.lower() != 'no'
+                print(f'Reversing fastas: {reverse}')
+            else:
+                raise FileNotFoundError('Fastas are not found')
     else:
-        if path_or_tag == 'none':
+        if path == 'none':
             raise FileNotFoundError('You did not specify a path for fastas.')
-    if str(path_or_tag) in standard_fastas:
-        outpath = standard_fastas[path_or_tag]
+    if str(path) in standard_fastas:
+        outpath = standard_fastas[path]
     else:
-        path_or_tag = Path(path_or_tag)
-        if not path_or_tag.exists():
+        path = Path(path)
+        if not path.exists():
             raise FileNotFoundError('Path does not exist.')
         # TODO: if path is there, don't do all that!
-        final_name = path_or_tag.stem
+        final_name = path.stem
         if add_contaminants:
             final_name += "_contaminated"
         if reverse:
             final_name += "_reversed"
         final_name += "_pipelineFriendly.fasta"
-        outpath = path_or_tag.parent/final_name
+        outpath = path.parent/final_name
         if not outpath.exists():
-            fs = _fastas(path_or_tag)
+            fs = _fastas(path)
             if add_contaminants:
                 from furious_fastas.contaminants import contaminants
                 fs.extend(contaminants)
@@ -64,6 +67,6 @@ def fastas(path_or_tag='none',
             assert fs_gnl.same_fasta_types(), "Fastas are not in the same format."
             if reverse:
                 fs_gnl.reverse()
-            outpath = path_or_tag.parent/(path_or_tag.stem + '_contaminated_reversed_pipelineFriendly.fasta')
+            outpath = path.parent/(path.stem + '_contaminated_reversed_pipelineFriendly.fasta')
             fs_gnl.write(outpath)
     return outpath

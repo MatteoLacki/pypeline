@@ -12,7 +12,7 @@ def iadbs(input_file,
           write_xml=True,
           write_binary=False,
           write_csv=False,
-          path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
+          exe_path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
           timeout=60,
           mock=False):
     """Run iaDBs.
@@ -25,7 +25,7 @@ def iadbs(input_file,
         write_xml (boolean): Write the output in an xml in the output folder.
         write_binary (boolean): Write the binary output in an xml in the output folder.
         write_csv (boolean): Write the ions to csv file.
-        path (str): Path to the "iaDBs.exe" executable.
+        exe_path (str): Path to the "iaDBs.exe" executable.
         timeout (float): Timeout in minutes.
         mock (bool): Run without calling iaDBs.
 
@@ -41,7 +41,7 @@ def iadbs(input_file,
     if mock:
         pr = None 
     else:
-        algo = check_algo(path)
+        algo = check_algo(exe_path)
         cmd = [ "powershell.exe", algo,
                 f"-paraXMLFileName '{parameters_file}'",
                 f"-pep3DFileName '{input_file}'",
