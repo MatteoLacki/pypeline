@@ -60,7 +60,6 @@ class DB(object):
             sql = "SELECT project_id FROM 'logs' WHERE oid = (SELECT max(oid) FROM 'logs')"
             try:
                 rows = cur.execute(sql).fetchall()
-                print(rows)
                 project_id = rows[0][0] 
                 return project_id + 1
             except IndexError:

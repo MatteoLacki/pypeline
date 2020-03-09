@@ -42,6 +42,8 @@ def index():
 @app.route('/get_project_id', methods=['POST'])
 def get_project_id():
     if request.data:
+        if DEBUG:
+            print(request.data)
         db = get_db()
         return jsonify(db.get_free_project_id())
 
@@ -66,9 +68,7 @@ def get_all_logs():
 def query():
     if request.data:
         sql = request.get_json()
-        print(sql)
         out = queryDB(sql)
-        print(out)
         return jsonify(out)
 
 @app.teardown_appcontext
