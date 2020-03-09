@@ -8,7 +8,6 @@ from platform import system
 
 s = Sender('Test')
 
-
 if system()=='Windows':
     dbpath = r'C:\SYMPHONY_VODKAS\simple.db'
 else:
@@ -19,8 +18,10 @@ db.tables()
 db.table_exist('logs')
 
 X = pd.DataFrame(db.iter_logs())
+
 X.columns
 
+list(X[X.key =='iadbs:args'].value)
 
 
 # db.drop_logs()
