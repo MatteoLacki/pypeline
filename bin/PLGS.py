@@ -64,12 +64,6 @@ FP.updateParser(ap)
 args = ap.parse_args()
 FP.parse_kwds(args.__dict__)
 
-# if DEBUG:
-    # print(args.raw_folders)
-    # print(args.local_output_folder)
-    # pprint(args.__dict__)
-    # pprint(FP)
-
 
 ######################################## Logging
 logging.basicConfig(filename=args.log_file, level=logging.INFO,
@@ -115,11 +109,11 @@ for raw_folder in tqdm(args.raw_folders):
         sample_set = header_txt['Sample Description'][:8]
         #                   C:/SYMPHONY_PIPELINE/2019-008/O191017-04
         local_folder = args.local_output_folder/sample_set/acquired_name
-        a,_ = apex3d(raw_folder, local_folder,**FP.kwds['apex3d'])
+        a = apex3d(raw_folder, local_folder,**FP.kwds['apex3d'])
         if not args.no_peptide3d:
-            p,_ = peptide3d(a.with_suffix('.bin'), local_folder,**FP.kwds['peptide3d'])
+            p = peptide3d(a.with_suffix('.bin'), local_folder,**FP.kwds['peptide3d'])
             if not args.no_iadbs:
-                i,_ = iadbs(p, local_folder, fastas,**FP.kwds['iadbs'])
+                i= iadbs(p, local_folder, fastas,**FP.kwds['iadbs'])
                 create_params_file(a, p, i) # for projectizer2.0
                 search_stats = get_search_stats(i)
                 rows2csv(i.parent/'stats.csv',

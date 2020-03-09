@@ -7,7 +7,7 @@ from vodkas.remote.db import DB
 from platform import system
 
 s = Sender('Test')
-
+s = Sender('Test', '192.168.1.191')
 
 if system()=='Windows':
     dbpath = r'C:\SYMPHONY_VODKAS\simple.db'

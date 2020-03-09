@@ -29,7 +29,7 @@ def peptide3d(input_file,
         mock (bool): Run without calling Peptide3D.
 
     Returns:
-        tuple: path to the outcome xml file and the completed process (or None if mocking).
+        pathlib.Path: path to the outcome xml file.
     """
     input_file = Path(input_file)
     output_dir = Path(output_dir)
@@ -63,4 +63,4 @@ def peptide3d(input_file,
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("Peptide3D's output missing.")
     
-    return out_xml, pr
+    return out_xml
