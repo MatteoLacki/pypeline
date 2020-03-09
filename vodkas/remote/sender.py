@@ -13,7 +13,7 @@ currentIP = socket.gethostbyname(socket.gethostname())
 class Sender(object):
     def __init__(self,
                  name,
-                 host,
+                 host=currentIP,
                  port=8745, 
                  encoding="cp1251"):
         self.host = host
@@ -64,6 +64,6 @@ class Sender(object):
 
 
 if __name__ == '__main__':
-    s = Sender('Test', host=currentIP)
+    s = Sender('Test')
     print(s.project_id)
     print(s.all_logs_df())
