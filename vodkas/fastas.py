@@ -1,5 +1,5 @@
 from pathlib import Path
-from furious_fastas import fastas, Fastas
+from furious_fastas import fastas as _fastas, Fastas as _Fastas
 from platform import system
 
 from .fs import move
@@ -8,11 +8,11 @@ from .fs import move
 db_path = r'X:/SYMPHONY_VODKAS/fastas/latest' if system() == 'Windows' else r'/home/matteo/SYMPHONY_VODKAS/fastas/latest' 
 
 
-def get_fastas(path_or_tag='none',
-               db=db_path,
-               add_contaminants=True,
-               reverse=True,
-               prompt=False):
+def fastas(path_or_tag='none',
+           db=db_path,
+           add_contaminants=True,
+           reverse=True,
+           prompt=False):
     """Get proper fastas.
 
     Args:
@@ -56,11 +56,11 @@ def get_fastas(path_or_tag='none',
         final_name += "_pipelineFriendly.fasta"
         outpath = path_or_tag.parent/final_name
         if not outpath.exists():
-            fs = fastas(path_or_tag)
+            fs = _fastas(path_or_tag)
             if add_contaminants:
                 from furious_fastas.contaminants import contaminants
                 fs.extend(contaminants)
-            fs_gnl = Fastas(f.to_ncbi_general() for f in fs)
+            fs_gnl = _Fastas(f.to_ncbi_general() for f in fs)
             assert fs_gnl.same_fasta_types(), "Fastas are not in the same format."
             if reverse:
                 fs_gnl.reverse()

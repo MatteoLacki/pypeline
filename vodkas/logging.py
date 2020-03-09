@@ -70,20 +70,19 @@ def store_parameters(log=MockLog(), sender=MockSender()):
             default_args['__name__'] = foo.__name__
         @wraps(foo)
         def wrapper(*args, **kwds):
-            log.info(f"Logging {foo.__name__}. Input: {store_input}. Runtime: {store_runtime}. Output: {store_output}.")
             if store_input:
                 all_args = default_args.copy()
                 all_args.update(sig.bind(*args,**kwds).arguments)
-                log.info(dump2json(all_args))
+                log.info(f"{foo.__name__}:args:{dump2json(all_args)}")
                 sender.log(f'{foo.__name__}:args', all_args)
             T0 = time()
             res = foo(*args, **kwds)
             T1 = time()
             if store_runtime:
-                log.info(f"{foo.__name__} took: {T1-T0}")
+                log.info(f"{foo.__name__}:runtime:{T1-T0}")
                 sender.log(f'{foo.__name__}:runtime', T1-T0)
             if store_output:
-                log.info(dump2json(res))
+                log.info(f"{foo.__name__}:output:{dump2json(res)}")
                 sender.log(f'{foo.__name__}:output', res)
             return res
         return wrapper

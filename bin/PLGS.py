@@ -3,12 +3,14 @@ import logging
 from pprint import pprint
 from pathlib import Path
 from platform import system
-import json
+from tqdm import tqdm
 
 from docstr2argparse.parse import FooParser
+from fs_ops.csv import rows2csv
+from waters.parsers import get_search_stats
 
-from vodkas import plgs
-from vodkas.fastas import get_fastas
+from vodkas.fastas import fastas
+from vodkas import apex3d, peptide3d, iadbs
 from vodkas.fs import find_free_path, move_folder, network_drive_exists
 from vodkas.header_txt import parse_header_txt
 from vodkas.logging import store_parameters
@@ -16,16 +18,17 @@ from vodkas.remote.sender import Sender, currentIP
 
 DEBUG = True
 
+######################################## CLI
 ap = argparse.ArgumentParser(description='Analyze Waters Raw Data with PLGS.',
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-FooParser([get_fastas, apex3d, peptide3d, iadbs])
-
-get_fastas_kwds = foo2argparse(get_fastas, args_prefix='fastas_', get_short=False)
-for n,o,h in get_fastas_kwds:
-    if o == 'prompt':
-        h['action'] = "store_true"
-    ap.add_argument(n, **h)
+FP = FooParser([fastas, apex3d, peptide3d, iadbs])
+if system() == 'Windows': 
+    FP.set_to_store_true(['mock','prompt'])
+else: # on Linux we can only mock.
+    FP.set_to_store_true(['prompt'])
+    FP.mock()
+    FP.del_args(['path'])
 
 ap.add_argument('raw_folders', type=Path, nargs='+',
                 help='Path(s) to raw folder(s).')
@@ -41,52 +44,63 @@ ap.add_argument('--log_file',
 
 ap.add_argument('--net_folder', type=Path,
                 help=f"Network folder for results. Set to '' (empty word) if you want to skip copying.",
-                default='Y:/TESTRES2' if DEBUG else 'Y:/RES')
+                default=('Y:/TESTRES2' if DEBUG else 'Y:/RES') if system() == 'Windows' else '')
+
+ap.add_argument('--no_peptide3d', action='store_true',
+                help='Do not run peptide3d.')
+
+ap.add_argument('--no_iadbs', action='store_true',
+                help='Do not run iadbs.')
 
 ap.add_argument('--server_ip', 
                 type=str, 
                 help='IP of the server',
                 default=currentIP)
 
-for arg_name, arg_desc in plgs.parsed.a2d:
-    ap.add_argument(arg_name,**arg_desc)
+FP.updateParser(ap)
 args = ap.parse_args()
-kwds = {k+"_kwds":v for k,v in plgs.parsed.parsed2kwds(args.__dict__).items()}
+FP.parse_kwds(args.__dict__)
 
 
-print(args.raw_folders)
-print(args.local_output_folder)
-pprint(kwds)
+if DEBUG:
+    print(args.raw_folders)
+    print(args.local_output_folder)
+    pprint(args.__dict__)
+    pprint(FP)
 
 
-# setting up logger
-log_format = '%(asctime)s:%(name)s:%(levelname)s:%(message)s:'
-logging.basicConfig(filename=args.log_file,
-                    format=log_format,
-                    level=logging.INFO)
-log = get_logger('PLGS', log_format)
+######################################## Logging
+logging.basicConfig(filename=args.log_file, level=logging.INFO,
+                    format='%(asctime)s:%(name)s:%(levelname)s:%(message)s:')
+log = logging.getLogger('PLGS.py')
+sender = Sender('PLGS', args.server_ip)
+logFun = store_parameters(log, sender)
+apex3d, peptide3d, iadbs, create_params_file, get_search_stats = [logFun(f) for f in [apex3d, peptide3d, iadbs, create_params_file, get_search_stats]]
 
 
+######################################## Network drives.
 if not args.net_folder == '' and not network_drive_exists(args.net_folder):
     log.warning(f"no network drive for {args.net_folder}: saving locally")
 if not network_drive_exists(args.fastas_db):
     log.warning(f"network drive absent: {args.fastas_db}")
 
 
-try: # translate fastas to NCBIgeneralFastas and store it on the server.
-    fastas = get_fastas(args.fastas_path)
+###### translate fastas to NCBIgeneralFastas and store it on the server
+try:
+    fastas = fastas(**FP.kwds['get_fastas'])
 except FileNotFoundError:
     log.error(f"Fastas unreachable: {args.fastas_path}")
     exit()
 
-# setting up connection with the server DB.
-# server = Sender()
- 
+
+######################################## PLGS 
 log.info("analyzing folders:")
 pprint(args.raw_folders)
-for raw_folder in args.raw_folders:
+
+for raw_folder in tqdm(args.raw_folders):
+    log.info(f"analyzing: {raw_folder}")
+    sender.update_group(raw_folder)
     try:
-        log.info(f"analyzing: {raw_folder}")
         if not raw_folder.is_dir():
             log.error(f"missing: {raw_folder}")
             continue
@@ -95,7 +109,16 @@ for raw_folder in args.raw_folders:
         sample_set = header_txt['Sample Description'][:8]
         #                   C:/SYMPHONY_PIPELINE/2019-008/O191017-04
         local_folder = args.local_output_folder/sample_set/acquired_name
-        plgs(fastas, raw_folder, local_folder, **kwds)
+        a,_ = apex3d(raw_folder, local_folder,**FP.kwds['apex3d'])
+        if not args.no_peptide3d:
+            p,_ = peptide3d(a.with_suffix('.bin'), local_folder,**FP.kwds['peptide3d'])
+            if not args.no_iadbs:
+                i,_ = iadbs(p, local_folder, fastas,**FP.kwds['iadbs'])
+                create_params_file(a, p, i) # for projectizer2.0
+                search_stats = get_search_stats(i)
+                rows2csv(i.parent/'stats.csv',
+                         [list(search_stats), list(search_stats.values())])
+
         if args.net_folder:
             #                     Y:/TESTRES/2019-008
             net_set_folder = args.net_folder/sample_set
@@ -109,12 +132,12 @@ for raw_folder in args.raw_folders:
                 move_folder(local_folder, net_folder)
                 if local_folder.parent.exists() and not local_folder.parent.glob('*'):
                     local_folder.parent.rmdir()
-                log.info("moved results to the server.")
+                log.info(f"moved {raw_folder} to {net_folder}")
             except RuntimeError as e:
                 log.warning(f"not copied '{raw_folder}': {repr(e)}")
         else:
-            log.warning(f"saved '{raw_folder}' locally") 
-        log.info(f"Finished: '{raw_folder}'")
+            log.info(f"saved '{raw_folder}' locally") 
     except Exception as e:
         log.error(f"error: {repr(e)}")
+
 log.info('PLGS finished.')
