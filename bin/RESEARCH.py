@@ -86,7 +86,7 @@ if xmls:
         sender.update_group(xml)
         log.info(f"researching: {str(xml)}")
         try:
-            iadbs_out,_ = iadbs(xml, xml.parent, fasta_file, parameters_file, **FP.kwds['iadbs'])
+            iadbs_out = iadbs(xml, xml.parent, fasta_file, parameters_file, **FP.kwds['iadbs'])
             apex_out = iadbs_out.parent/iadbs_out.name.replace('_IA_workflow.xml', '_Apex3D.xml')
             params = create_params_file(apex_out, xml, iadbs_out) # for projectizer2.0
             search_stats = get_search_stats(iadbs_out)

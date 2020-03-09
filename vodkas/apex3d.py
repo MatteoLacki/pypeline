@@ -44,7 +44,7 @@ def apex3d(raw_folder,
         mock (bool): Run without calling apex3D64.
 
     Returns:
-        tuple: path to the outcome xml and the completed process (or None if mocking).
+        pathlib.Path: Path to the outcome xml.
     """
     raw_folder = Path(raw_folder)
     output_dir = Path(output_dir)
@@ -77,5 +77,5 @@ def apex3d(raw_folder,
     if not out_bin.exists() and not out_xml.exists():
         raise RuntimeError("Apex3D's output missing.")
 
-    return out_xml, pr
+    return out_xml
 
