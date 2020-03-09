@@ -1,11 +1,8 @@
 import xml.etree.cElementTree as ET
 from itertools import chain
 import json
-import logging
 from pathlib import Path
 
-
-logger = logging.getLogger(__name__)
 
 
 def parse_xml_params(path, prefix=""):
@@ -45,12 +42,10 @@ def parse_xmls(apex_xml, pept_xml, work_xml):
     x = {'apex3d':    d_parse(apex_xml),
          'peptide3d': d_parse(pept_xml),
          'iadbs':     d_parse(work_xml)}
-
     flat = {p+k:v for p,w in 
             (('apex:','apex3d'),
              ('spec:','peptide3d'),
              ('work:','iadbs')) for k,v in x[w].items()}
-
     return x, flat
     
 
@@ -58,27 +53,22 @@ def create_params_file(apex_xml, pept_xml, work_xml):
     """Create a params.json file for Projectizer2.0.
 
     This facilitates the creation of proper input for the IsoQuant (and PysoQuant).
-    """
-    logger.info('Parsing xml files for Projectizer2.0.')
-    
+    """    
     d_parse = lambda p: dict(parse_xml_params(p))
     x = {'apex3d':    d_parse(apex_xml),
          'peptide3d': d_parse(pept_xml),
          'iadbs':     d_parse(work_xml)}
-
     params = {p+k:v for p,w in 
               (('apex:','apex3d'),
                ('spec:','peptide3d'),
                ('work:','iadbs')) for k,v in x[w].items()}
-    
     p = Path(apex_xml).parent/"params.json"
     with open(p, 'w') as f:
         json.dump(params, f, indent=2)
-    
-    logger.info(json.dumps(params))
+    return params
 
 
-def parse_parameters_file(parameters_file):
+def print_parameters_file(parameters_file):
     tree = ET.parse(parameters_file)
     root = tree.getroot()
     for h in root.iter('*'):

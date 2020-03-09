@@ -27,11 +27,11 @@ setup(
                       'furious_fastas',
                       'fs_ops',
                       'waters',
-                      'flask'],
+                      'flask',
+                      'tqdm'],
     # include_package_data=True,
     # package_data={'data': ['data/contaminants_uniprot_format.fasta']},
     scripts = ["bin/PLGS.py",
                "bin/RESEARCH.py",
-               "bin/_RESEARCH.py",
-               "bin/receiver.py"]
+               "bin/barman.py"]
 )
