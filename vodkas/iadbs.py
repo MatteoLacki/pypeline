@@ -4,6 +4,8 @@ from time import time
 from .fs import check_algo
 from .subproc import run_win_proc
 
+from .xml_parser import print_parameters_file
+
 
 def iadbs(input_file,
           output_dir,
@@ -64,6 +66,11 @@ def iadbs(input_file,
 
     return out_xml
 
+
+def parameters_gui(parameters_file):
+    print(f'Default search parameters {parameters_file}:')
+    print_parameters_file(parameters_file)
+    return input(f'OK? ENTER. Not OK? Provide path here and hit ENTER: ') or parameters_file
 
 
 #TODO: this could be done rather with the XML module

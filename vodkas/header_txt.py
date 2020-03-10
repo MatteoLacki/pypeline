@@ -1,11 +1,6 @@
 import json
 from pathlib import Path
 
-from .logging import get_logger
-
-
-logger = get_logger(__name__)
-
 
 # TODO this should be mostly used by a script for Folder Synchronization.
 def parse_header_txt(path, 
@@ -13,8 +8,6 @@ def parse_header_txt(path,
                   'Sample Description', 'Bottle Number',
                   'Inlet Method', 'MS Method', 'Tune Method')):
     """Parse the _HEADER.TXT file."""
-    logger.info('Parsing _HEADER.TXT')
-
     path = Path(path)
     assert path.name == '_HEADER.TXT', "Wrong path."
     params = {}
@@ -26,9 +19,6 @@ def parse_header_txt(path,
             k = k[3:]
             if k in valid_keys:
                 params[k] = v
-
-    logger.info(json.dumps(params))
-
     return params
 
 
