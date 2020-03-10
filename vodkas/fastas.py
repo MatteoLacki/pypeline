@@ -8,11 +8,36 @@ from .fs import move
 db_path = r'X:/SYMPHONY_VODKAS/fastas/latest' if system() == 'Windows' else r'/home/matteo/SYMPHONY_VODKAS/fastas/latest' 
 
 
-def fastas(path='none',
+
+def fastas_gui(db=db_path):
+    """A terminal proto-gui for the fastas."""
+    standard_fastas = {p.stem.split('_')[0]:p for p in Path(db).glob(f"*/PLGS/*.fasta")}
+    path = input('fastas to use (human|wheat|..|custom path): ')
+    if str(path) in standard_fastas:
+        print(f"Selected: {path}: {standard_fastas[path]}")
+        out_path = standard_fastas[path]
+        reverse = False
+        add_contaminants = False
+    else:
+        if Path(path).exists():
+            out_path = path
+            print(f"Selected: {path}")
+            add_contaminants = input('Adding contaminants: to stop me write "no": ')
+            add_contaminants = add_contaminants.lower() != 'no'
+            print(f'Contaminants: {add_contaminants}')
+            reverse = input('Reversing fastas: to stop me write "no": ')
+            reverse = reverse.lower() != 'no'
+            print(f'Reversing fastas: {reverse}')
+        else:
+            raise FileNotFoundError('Fastas are not found')    
+    return out_path, add_contaminants, reverse
+
+
+
+def fastas(path,
            db=db_path,
            add_contaminants=True,
-           reverse=True,
-           prompt=False):
+           reverse=True):
     """Get proper fastas.
 
     Args:
@@ -20,7 +45,6 @@ def fastas(path='none',
         db (str): Path to fastas DB: used when supplying reduced fasta names, e.g. 'human'.
         add_contaminants (boolean): Should we add in contaminants.
         reverse (boolean):Should we reverse the fastas.
-        prompt (boolean): Prompt users for input.
 
     Returns:
         Path: path to the fastas.

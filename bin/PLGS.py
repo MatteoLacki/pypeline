@@ -8,6 +8,7 @@ from urllib.error import URLError
 
 from docstr2argparse.parse import FooParser
 from fs_ops.csv import rows2csv
+from fs_ops.paths import find_folders
 from waters.parsers import get_search_stats
 
 from vodkas.fastas import fastas
@@ -17,6 +18,7 @@ from vodkas.header_txt import parse_header_txt
 from vodkas.logging import store_parameters, MockSender
 from vodkas.remote.sender import Sender, currentIP
 from vodkas.xml_parser import create_params_file
+from vodkas.json import dump2json
 
 
 DEBUG = True
@@ -34,7 +36,7 @@ else: # on Linux we can only mock.
     FP.del_args(['exe_path'])
 
 ap.add_argument('raw_folders', type=Path, nargs='+',
-                help='Path(s) to raw folder(s).')
+                help='Path(s) to raw folder(s), or paths that will be recursively searched for ".raw" folders.')
 
 ap.add_argument('--local_output_folder', type=Path,
                 help='Path to temporary outcome folder.',
@@ -43,7 +45,7 @@ ap.add_argument('--local_output_folder', type=Path,
 ap.add_argument('--log_file',
     type=lambda p: Path(p).expanduser().resolve(),
     help='Path to temporary outcome folder.',
-    default= 'C:/SYMPHONY_VODKAS/temp_logs/research.log' if system() == 'Windows' else '~/SYMPHONY_VODKAS/research.log')
+    default= 'C:/SYMPHONY_VODKAS/temp_logs/plgs.log' if system() == 'Windows' else '~/SYMPHONY_VODKAS/plgs.log')
 
 ap.add_argument('--net_folder', type=Path,
                 help=f"Network folder for results. Set to '' (empty word) if you want to skip copying.",
@@ -90,14 +92,16 @@ if not network_drive_exists(args.fastas_db):
 
 
 ###### translate fastas to NCBIgeneralFastas and store it on the server
-fastas = fastas(**FP.kwds['fastas'])
+if not args.no_iadbs:
+    fastas = fastas(**FP.kwds['fastas'])
 
 
 ######################################## PLGS 
-log.info("analyzing folders:")
-pprint(args.raw_folders)
+raw_folders = list(find_folders(args.raw_folders))
+log.info(f"analyzing folders: {dump2json(raw_folders)}")
+pprint(raw_folders)
 
-for raw_folder in tqdm(args.raw_folders):
+for raw_folder in tqdm(raw_folders):
     try:
         if not raw_folder.is_dir():
             log.error(f"missing: {raw_folder}")

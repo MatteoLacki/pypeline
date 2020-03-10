@@ -65,6 +65,11 @@ def iadbs(input_file,
     return out_xml
 
 
+def parameters_gui(parameters_file):
+    print(f'Default search parameters {parameters_file}:')
+    print_parameters_file(parameters_file)
+    return input(f'OK? ENTER. Not OK? Provide path here and hit ENTER: ') or parameters_file
+
 
 #TODO: this could be done rather with the XML module
 def write_params_xml_file(path, 

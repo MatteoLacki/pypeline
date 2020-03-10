@@ -9,3 +9,5 @@ wheat Y:\TESTRAW\O1903\O190302_17.raw
 
 RESEARCH --fastas wheat Y:\TESTRES2\2019-013
 RESEARCH --prompt Y:\TESTRES2\2019-013
+
+J:\collab_uni_Gutenberg
