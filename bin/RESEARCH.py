@@ -16,7 +16,7 @@ from vodkas.fastas import fastas, fastas_gui
 from vodkas.iadbs import iadbs, parameters_gui
 from vodkas.logging import store_parameters
 from vodkas.remote.sender import Sender, currentIP
-from vodkas.xml_parser import print_parameters_file, create_params_file
+from vodkas.xml_parser import create_params_file
 
 
 prompt = False

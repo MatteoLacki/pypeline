@@ -4,6 +4,8 @@ from time import time
 from .fs import check_algo
 from .subproc import run_win_proc
 
+from .xml_parser import print_parameters_file
+
 
 def iadbs(input_file,
           output_dir,
