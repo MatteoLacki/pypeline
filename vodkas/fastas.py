@@ -14,7 +14,7 @@ def fastas_gui(db=db_path):
     path = input('fastas to use (human|wheat|..|custom path): ')
     if str(path) in standard_fastas:
         print(f"Selected: {path}: {standard_fastas[path]}")
-        out_path = standard_fastas[path]
+        out_path = path
         reverse = False
         add_contaminants = False
     else:

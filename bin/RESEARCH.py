@@ -27,8 +27,8 @@ except IndexError:
     pass
 
 if prompt:
-    server_ip, log_file, parameters_file = sys.argv[2:5]
-    Pep3D_Spectrum = sys.argv[5:]
+    server_ip, log_file, parameters_file, mock = sys.argv[2:6]
+    Pep3D_Spectrum = sys.argv[6:]
 else:
     ap = argparse.ArgumentParser(description='Rerun search with iaDBs.',
                                  epilog="WARNING: PREVIOUS '*_IA_Workflow.xml' SHALL BE DELETED ",
@@ -82,7 +82,7 @@ iadbs, create_params_file, get_search_stats = [logFun(f) for f in [iadbs, create
 if prompt:
     fasta_file = fastas(*fastas_gui())
     parameters_file = parameters_gui(parameters_file)
-    iadbs_kwds = {}
+    iadbs_kwds = {'mock': mock == 'mock'}
 else:
     fasta_file = fastas(**FP.kwds['fastas'])
     iadbs_kwds = FP.kwds['iadbs']
@@ -100,7 +100,7 @@ if xmls:
         sender.update_group(xml)
         log.info(f"researching: {str(xml)}")
         try:
-            iadbs_out = iadbs(xml, xml.parent, fasta_file, parameters_file, **FP.kwds['iadbs'])
+            iadbs_out = iadbs(xml, xml.parent, fasta_file, parameters_file, **iadbs_kwds)
             apex_out = iadbs_out.parent/iadbs_out.name.replace('_IA_workflow.xml', '_Apex3D.xml')
             params = create_params_file(apex_out, xml, iadbs_out) # for projectizer2.0
             search_stats = get_search_stats(iadbs_out)
