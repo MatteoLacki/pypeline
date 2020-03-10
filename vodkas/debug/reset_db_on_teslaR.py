@@ -19,7 +19,6 @@ db.tables()
 db.table_exist('logs')
 
 X = pd.DataFrame(db.iter_logs())
-
 X.columns
 
 list(X[X.key =='iadbs:args'].value)
@@ -29,3 +28,13 @@ list(X[X.key =='iadbs:args'].value)
 # db.tables()
 # db.create_logs_if_aint_there()
 # db.tables()
+Y = X[X.key.str.contains('runtime')]
+
+Y = X.key.str.split(':', expand=True)
+Y.columns = 'algo', 'what'
+Z = pd.concat([X,Y], axis=1)
+Z = Z[Z.what == 'runtime']
+
+import matplotlib.pyplot as plt
+plt.plot(Z.value)
+plt.show()
