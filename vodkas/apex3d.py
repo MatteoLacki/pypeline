@@ -20,7 +20,7 @@ def apex3d(raw_folder,
            PLGS=True,
            cuda=True,
            unsupported_gpu=True,
-           timeout=60,
+           timeout=180,
            mock=False):
     """Analyze a Waters Raw Folder with Apex3D.
     

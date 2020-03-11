@@ -62,9 +62,6 @@ def create_params_file(apex_xml, pept_xml, work_xml):
               (('apex:','apex3d'),
                ('spec:','peptide3d'),
                ('work:','iadbs')) for k,v in x[w].items()}
-    p = Path(apex_xml).parent/"params.json"
-    with open(p, 'w') as f:
-        json.dump(params, f, indent=2)
     return params
 
 

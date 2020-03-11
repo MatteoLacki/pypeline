@@ -12,7 +12,7 @@ def peptide3d(input_file,
               write_csv=False,
               write_binning=False,
               exe_path="C:/SYMPHONY_VODKAS/plgs/Peptide3D.exe",
-              timeout=60,
+              timeout=180,
               mock=False):
     """Run Peptide3D.
     
