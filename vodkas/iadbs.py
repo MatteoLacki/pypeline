@@ -15,7 +15,7 @@ def iadbs(input_file,
           write_binary=False,
           write_csv=False,
           exe_path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
-          timeout=60,
+          timeout=180,
           mock=False):
     """Run iaDBs.
     
@@ -70,7 +70,9 @@ def iadbs(input_file,
 def parameters_gui(parameters_file):
     print(f'Default search parameters {parameters_file}:')
     print_parameters_file(parameters_file)
-    return input(f'OK? ENTER. Not OK? Provide path here and hit ENTER: ') or parameters_file
+    out = input(f'OK? ENTER. Not OK? Provide path here and hit ENTER: ') or parameters_file
+    print()
+    return out
 
 
 #TODO: this could be done rather with the XML module

@@ -1,4 +1,5 @@
 import argparse
+import json
 import logging
 from pathlib import Path
 from platform import system
@@ -14,21 +15,32 @@ from waters.parsers import get_search_stats
 
 from vodkas.fastas import fastas, fastas_gui
 from vodkas.iadbs import iadbs, parameters_gui
-from vodkas.logging import store_parameters
+from vodkas.json import dump2json
+from vodkas.logging import store_parameters, MockSender
 from vodkas.remote.sender import Sender, currentIP
 from vodkas.xml_parser import create_params_file
 
 
-prompt = False
+# defaults
+parameters_file = r'X:\SYMPHONY_VODKAS\search\215.xml'
+log_file = 'C:/SYMPHONY_VODKAS/temp_logs/research.log' if system() == 'Windows' else '~/SYMPHONY_VODKAS/research.log'
 
+mock = False
+if mock:
+    print('We are only mocking doing the RESEARCH!')
+
+
+# CLIs
+prompt = False # prompting only when using sendto/RESEARCH
 try:
-    prompt = sys.argv[1] == 'prompt_me_and_i_will_tell_you_the_future'
+    prompt = sys.argv[1] == '_prompt_input_'
 except IndexError:
     pass
 
+
 if prompt:
-    server_ip, log_file, parameters_file, mock = sys.argv[2:6]
-    Pep3D_Spectrum = sys.argv[6:]
+    server_ip = sys.argv[2]
+    Pep3D_Spectrum = sys.argv[3:]
 else:
     ap = argparse.ArgumentParser(description='Rerun search with iaDBs.',
                                  epilog="WARNING: PREVIOUS '*_IA_Workflow.xml' SHALL BE DELETED ",
@@ -41,6 +53,9 @@ else:
         FP.mock()
         FP.del_args(['exe_path'])
 
+    ap.add_argument('fastas', type=Path,
+                    help='Path to fastas, or a short tag (human, wheat, ...).')
+
     ap.add_argument('Pep3D_Spectrum', type=Path, nargs='+',
         help="Path(s) to outputs of Peptide3D. \
               If provided with a folder instead, \
@@ -49,7 +64,7 @@ else:
     ap.add_argument('--log_file',
         type=lambda p: Path(p).expanduser().resolve(),
         help='Path to temporary outcome folder.',
-        default= 'C:/SYMPHONY_VODKAS/temp_logs/research.log' if system() == 'Windows' else '~/SYMPHONY_VODKAS/research.log')
+        default=log_file)
 
     ap.add_argument('--server_ip', 
                     type=str, 
@@ -58,10 +73,15 @@ else:
 
     FP.updateParser(ap)
     args = ap.parse_args()
+    if args.iadbs_mock:
+        print('We are only mocking doing the RESEARCH!')
+
     FP.parse_kwds(args.__dict__)
-    log_file = args.log_file
-    server_ip = args.server_ip
-    Pep3D_Spectrum = args.Pep3D_Spectrum
+
+    server_ip       = args.server_ip
+    log_file        = args.log_file
+    fasta_file_tag  = args.fastas
+    Pep3D_Spectrum  = args.Pep3D_Spectrum
     
 
 ######################################## Logging
@@ -75,16 +95,18 @@ try:
 except URLError as e:
     log.warning('Server down! Doing all things locally.')
     print(e)
-    logFun = store_parameters(log)
+    sender = MockSender()
+    logFun = store_parameters(log, sender)
+
 iadbs, create_params_file, get_search_stats = [logFun(f) for f in [iadbs, create_params_file, get_search_stats]]
 
 
 if prompt:
     fasta_file = fastas(*fastas_gui())
     parameters_file = parameters_gui(parameters_file)
-    iadbs_kwds = {'mock': mock == 'mock'}
+    iadbs_kwds = {'mock': mock}
 else:
-    fasta_file = fastas(**FP.kwds['fastas'])
+    fasta_file = fastas(fasta_file_tag, **FP.kwds['fastas'])
     iadbs_kwds = FP.kwds['iadbs']
     parameters_file = iadbs_kwds['parameters_file']
     del iadbs_kwds['parameters_file']
@@ -103,6 +125,8 @@ if xmls:
             iadbs_out = iadbs(xml, xml.parent, fasta_file, parameters_file, **iadbs_kwds)
             apex_out = iadbs_out.parent/iadbs_out.name.replace('_IA_workflow.xml', '_Apex3D.xml')
             params = create_params_file(apex_out, xml, iadbs_out) # for projectizer2.0
+            with open(iadbs_out.parent/"params.json", 'w') as f:
+                json.dump(params, f)
             search_stats = get_search_stats(iadbs_out)
             rows2csv(iadbs_out.parent/'stats.csv', [list(search_stats), list(search_stats.values())])
         except Exception as e:
