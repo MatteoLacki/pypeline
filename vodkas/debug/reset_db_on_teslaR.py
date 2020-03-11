@@ -21,6 +21,10 @@ db.table_exist('logs')
 X = pd.DataFrame(db.iter_logs())
 X.columns
 
+
+
+json.load)y)y
+
 list(X[X.key =='iadbs:args'].value)
 
 

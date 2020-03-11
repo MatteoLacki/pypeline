@@ -35,6 +35,9 @@ else: # on Linux we can only mock.
     FP.mock()
     FP.del_args(['exe_path'])
 
+ap.add_argument('path_to_fastas', 
+                help='Fucking fastas.')
+
 ap.add_argument('raw_folders', type=Path, nargs='+',
                 help='Path(s) to raw folder(s), or paths that will be recursively searched for ".raw" folders.')
 
@@ -93,7 +96,7 @@ if not network_drive_exists(args.fastas_db):
 
 ###### translate fastas to NCBIgeneralFastas and store it on the server
 if not args.no_iadbs:
-    fastas = fastas(**FP.kwds['fastas'])
+    fastas = fastas(args.path_to_fastas, **FP.kwds['fastas'])
 
 
 ######################################## PLGS 
