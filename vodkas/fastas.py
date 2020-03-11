@@ -16,6 +16,7 @@ def fastas_gui(db=db_path):
     add_contaminants = False
     if str(path) in standard_fastas:
         print(f"Selected: {path}: {standard_fastas[path]}")
+        print()
     else:
         path = Path(path)
         if path.exists():
