@@ -44,15 +44,11 @@ def apex3d(raw_folder,
     Returns:
         pathlib.Path or None: Path to the outcome xml. None, if not running.
     """
-    raw_folder = Path(raw_folder)
-    output_dir = Path(output_dir)
-    apex_stdout = output_dir/'apex3d.log'
+    if timeout >= 0:
+        raw_folder = Path(raw_folder)
+        output_dir = Path(output_dir)
+        apex_stdout = output_dir/'apex3d.log'
 
-    if timeout == 0:
-        pr = None
-    elif timeout < 0:
-        return None
-    else:
         algo = check_algo(exe_path)
         cmd = ["powershell.exe", algo,
               f"-pRawDirName '{raw_folder}'",
@@ -69,13 +65,15 @@ def apex3d(raw_folder,
               f"-PLGS {int(PLGS)}",
               f"-bEnableCuda {int(cuda)}",
               f"-bEnableUnsupportedGPUs {int(unsupported_gpu)}"]
-        pr,_ = run_win_proc(cmd, timeout, apex_stdout)
+        run_win_proc(cmd, timeout, apex_stdout)
 
-    out_bin = output_dir/(raw_folder.stem + "_Apex3D.bin")
-    out_xml = out_bin.with_suffix('.xml')
+        out_bin = output_dir/(raw_folder.stem + "_Apex3D.bin")
+        out_xml = out_bin.with_suffix('.xml')
 
-    if not out_bin.exists() and not out_xml.exists():
-        raise RuntimeError("Apex3D's output missing.")
+        if not out_bin.exists() and not out_xml.exists():
+            raise RuntimeError("Apex3D's output missing.")
 
-    return out_xml
+        return out_xml
+    else:
+        return None
 

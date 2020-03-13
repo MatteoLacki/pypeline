@@ -27,22 +27,18 @@ def iadbs(input_file,
         write_binary (boolean): Write the binary output in an xml in the output folder.
         write_csv (boolean): Write the ions to csv file.
         exe_path (str): Path to the "iaDBs.exe" executable.
-        timeout (float): Timeout in minutes.
+        timeout (float): Timeout in minutes. Passing 0 will mock the process. Passing negative value will not run the process.
 
     Returns:
         pathlib.Path: path to the outcome xml file.
     """
-    input_file = Path(input_file)
-    output_dir = Path(output_dir)
-    fasta_file = Path(fasta_file)
-    parameters_file = Path(parameters_file)
-    iadbs_stdout = output_dir/'iadbs.log'
+    if timeout >= 0:
+        input_file = Path(input_file)
+        output_dir = Path(output_dir)
+        fasta_file = Path(fasta_file)
+        parameters_file = Path(parameters_file)
+        iadbs_stdout = output_dir/'iadbs.log'
 
-    if timeout == 0:
-        pr = None
-    elif timeout < 0:
-        return None 
-    else:
         algo = check_algo(exe_path)
         cmd = [ "powershell.exe", algo,
                 f"-paraXMLFileName '{parameters_file}'",
@@ -52,19 +48,22 @@ def iadbs(input_file,
                 f"-WriteXML {int(write_xml)}",
                 f"-WriteBinary {int(write_binary)}",
                 f"-bDeveloperCSVOutput {int(write_csv)}" ]
-        pr, _ = run_win_proc(cmd, timeout, iadbs_stdout)
+        run_win_proc(cmd, timeout, iadbs_stdout) # timeout==0: mocking!
 
-    if '_Pep3D_Spectrum' in input_file.stem:
-        out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
+        if '_Pep3D_Spectrum' in input_file.stem:
+            out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')
+        else:
+            out = output_dir/(input_file.stem+"_IA_workflow")
+        out_bin = out.with_suffix('.bin')
+        out_xml = out.with_suffix('.xml')
+
+        if not out_bin.exists() and not out_xml.exists():
+            raise RuntimeError("iaDBs' output missing.")
+
+        return out_xml
     else:
-        out = output_dir/(input_file.stem+"_IA_workflow")
-    out_bin = out.with_suffix('.bin')
-    out_xml = out.with_suffix('.xml')
+        return None
 
-    if not out_bin.exists() and not out_xml.exists():
-        raise RuntimeError("iaDBs' output missing.")
-
-    return out_xml
 
 
 def parameters_gui(parameters_file):

@@ -58,3 +58,10 @@ def test_get_defaults():
     def foo2(a, b, c=10, d=23, *args, **kwds):
         pass
     assert get_defaults(foo2) == {'c':10, 'd':23}
+
+
+def prompt_timeout(algo, default=180):
+        try:
+            return int(input(f"{algo} [{default} minutes]: "))
+        except ValueError:
+            return default

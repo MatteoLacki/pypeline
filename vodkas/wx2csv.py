@@ -39,9 +39,7 @@ def wx2csv(input_file,
            f"-jar {algo}",
            f"-b -o {output_file}",
            f"-i {input_file}"]
-
-    print(cmd)
-    pr, runtime = run_win_proc(cmd, 60, wx2csv_stdout)
+    run_win_proc(cmd, 60, wx2csv_stdout)
 
     if not output_file.exists():
         raise RuntimeError("wx2csv failed: output is missing")
@@ -49,5 +47,5 @@ def wx2csv(input_file,
 
     logger.info(f'wx2csv took {runtime} minutes.')
 
-    return out, pr
+    return out
 
