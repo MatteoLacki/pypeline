@@ -159,7 +159,6 @@ if system() == 'Windows' and not net_folder == '' and not network_drive_exists(n
     log.warning(f"no network drive for {net_folder}: saving locally")
 
 
-
 ######################################## PLGS 
 assert len(raw_folders), "No raw folders passed!!!"
 raw_folders = list(find_folders(raw_folders))
