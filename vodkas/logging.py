@@ -4,11 +4,12 @@ import logging
 from pathlib import Path
 import sys
 from time import time
+from urllib.error import URLError
 
 from docstr2argparse.parse import defaults
 
 from .json import dump2json
-
+from .remote.sender import Sender, MockSender, currentIP
 
 def get_task_no(log_file):
     """Parse the log file to get the task number."""
@@ -53,14 +54,6 @@ class MockLog():
         pass
 
 
-class MockSender():
-    def log(self, *args, **kwds):
-        pass
-
-    def update_group(self, *args, **kwds):
-        pass
-
-
 def store_parameters(log=MockLog(), sender=MockSender()):
     """Store parameters of a function."""
     def wrapping(foo, 
@@ -92,3 +85,12 @@ def store_parameters(log=MockLog(), sender=MockSender()):
     return wrapping
 
 
+def get_sender_n_log_Fun(log, server_ip):
+    try:
+        print(f"Connecting to: {server_ip}")
+        sender = Sender('RESEARCH', server_ip)
+    except URLError as e:
+        log.warning('Server down! Doing all things locally.')
+        print('Server down! Doing all things locally.')
+        sender = MockSender()
+    return sender, store_parameters(log, sender)

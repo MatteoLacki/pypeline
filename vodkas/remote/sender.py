@@ -63,6 +63,16 @@ class Sender(object):
             return [LOG(*log) for log in json.loads(s.read())]
 
 
+
+class MockSender():
+    def log(self, *args, **kwds):
+        pass
+
+    def update_group(self, *args, **kwds):
+        pass
+
+
+
 if __name__ == '__main__':
     s = Sender('Test')
     print(s.project_id)

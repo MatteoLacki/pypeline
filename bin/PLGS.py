@@ -3,7 +3,7 @@ import json
 import logging
 from pprint import pprint
 from pathlib import Path
-from platform import system
+import platform
 from tqdm import tqdm
 from subprocess import TimeoutExpired
 import sys
@@ -20,19 +20,19 @@ from vodkas.fs import find_free_path, move_folder, network_drive_exists
 from vodkas.iadbs import parameters_gui
 from vodkas.json import dump2json
 from vodkas.header_txt import parse_header_txt
-from vodkas.logging import store_parameters, MockSender
+from vodkas.logging import get_sender_n_log_Fun
 from vodkas.misc import prompt_timeout
-from vodkas.remote.sender import Sender, currentIP
+
 from vodkas.xml_parser import create_params_file
 
 
 DEBUG = True
+on_windows = platform.system() == 'Windows'
 
 # defaults
-parameters_file = Path(r'X:\SYMPHONY_VODKAS\search\215.xml')
-local_output_folder = Path(r'C:/SYMPHONY_VODKAS/temp' if system() == 'Windows' else '~/SYMPHONY_VODKAS/temp')
-log_file = Path('C:/SYMPHONY_VODKAS/temp_logs/plgs.log' if system() == 'Windows' else '~/SYMPHONY_VODKAS/plgs.log')
-net_folder = Path(('Y:/TESTRES2' if DEBUG else 'Y:/RES') if system() == 'Windows' else '')
+local_output_folder = Path(r'C:/SYMPHONY_VODKAS/temp' if on_windows else '~/SYMPHONY_VODKAS/temp').expanduser().resolve()
+log_file = Path('C:/SYMPHONY_VODKAS/temp_logs/plgs.log' if on_windows else '~/SYMPHONY_VODKAS/plgs.log').expanduser().resolve()
+net_folder = Path('Y:/TESTRES2') if on_windows else ''
 
 # CLIs
 prompt = False
@@ -41,14 +41,14 @@ try:
 except IndexError:
     pass
 
+FP = FooParser([fastas, apex3d, peptide3d, iadbs])
+
 if prompt:
     server_ip = sys.argv[2]
     raw_folders = sys.argv[3:]
 else:
     ap = argparse.ArgumentParser(description='Analyze Waters Raw Data with PLGS.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-    FP = FooParser([fastas, apex3d, peptide3d, iadbs])
 
     ap.add_argument('fastas', type=Path,
                     help='Path to fastas, or a short tag (human, wheat, ...).')
@@ -66,7 +66,7 @@ else:
         help='Path to temporary outcome folder.',
         default=log_file)
 
-    ap.add_argument('--net_folder', type=Path,
+    ap.add_argument('--net_folder',
                     help=f"Network folder for results. Set to '' (empty word) if you want to skip copying.",
                     default=net_folder)
 
@@ -75,7 +75,7 @@ else:
                     help='IP of the server',
                     default=currentIP)
 
-    F P.updateParser(ap)
+    FP.updateParser(ap)
     args = ap.parse_args()
     FP.parse_kwds(args.__dict__)
 
@@ -87,29 +87,19 @@ else:
     server_ip       = args.server_ip
 
 
-######################################## Logging
+
+
 logging.basicConfig(filename=log_file, level=logging.INFO,
                     format='%(asctime)s:%(name)s:%(levelname)s:%(message)s:')
 log = logging.getLogger('PLGS.py')
-try:
-    print(f"Connecting to: {server_ip}")
-    sender = Sender('PLGS', server_ip)
-    logFun = store_parameters(log, sender)
-except URLError as e:
-    log.warning('Server down! Doing all things locally.')
-    print(e)
-    sender = MockSender()
-    logFun = store_parameters(log, sender)
-
-apex3d, peptide3d, iadbs, create_params_file, get_search_stats = [logFun(f) for f in [apex3d, peptide3d, iadbs, create_params_file, get_search_stats]]
+sender, logFun = get_sender_n_log_Fun(log, server_ip)
+apex3d, peptide3d, iadbs, create_params_file, get_search_stats = \
+    [logFun(f) for f in [apex3d, peptide3d, iadbs, create_params_file, get_search_stats]]
 
 
-######################################## Fastas
+
 if prompt:
-    print('Setting timeouts in minutes for software.')
-    print('Set to 0 to mock the run and -1 to not run anything.')
-    print('Press ENTER to confirm.')
-    
+    print('Set timeouts [in minutes]:')  
     apex3d_kwds = {'timeout': prompt_timeout('Apex3D', 180)}
     assert apex3d_kwds['timeout'] >= 0, "If you are not running Apex3D, then why do you select raw folders?"
     peptide3d_kwds = {'timeout': prompt_timeout('Peptide3D', 180)}
@@ -118,27 +108,31 @@ if prompt:
     else:
         iadbs_kwds = {'timeout': 0}
 else:
-    apex3d_kwds = FP.kwds['apex3d']
-    peptide3d_kwds = FP.kwds['peptide3d']
-    iadbs_kwds = FP.kwds['iadbs']
+    apex3d_kwds     = FP.kwds['apex3d']
+    peptide3d_kwds  = FP.kwds['peptide3d']
+    iadbs_kwds      = FP.kwds['iadbs']
+
+
 
 if iadbs_kwds['timeout'] >= 0:
-    parameters_file = iadbs_kwds['parameters_file']
     if prompt:
         fasta_file = fastas(*fastas_gui())
-        parameters_file = parameters_gui(parameters_file)
+        parameters_file = parameters_gui(FP['iadbs']['parameters_file'].info['default'])
     else:
         fasta_file = fastas(fasta_file_tag, **FP.kwds['fastas'])
+        parameters_file = iadbs_kwds['parameters_file']
         del iadbs_kwds['parameters_file']
 
 
-######################################## Network drives.
-if system() == 'Windows' and not net_folder == '' and not network_drive_exists(net_folder):
+
+if on_windows and not net_folder == '' and not network_drive_exists(net_folder):
     log.warning(f"no network drive for {net_folder}: saving locally")
+else:
+    net_folder = Path('net_folder')
 
 
 
-######################################## PLGS 
+
 assert len(raw_folders), "No raw folders passed!!!"
 raw_folders = list(find_folders(raw_folders))
 assert len(raw_folders), "No raw folders found!!!"

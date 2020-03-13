@@ -1,5 +1,5 @@
 from pathlib import Path
-from time import time
+from platform import system
 
 from .fs import check_algo
 from .subproc import run_win_proc
@@ -10,11 +10,11 @@ from .xml_parser import print_parameters_file
 def iadbs(input_file,
           output_dir,
           fasta_file,
-          parameters_file="X:/SYMPHONY_VODKAS/search/215.xml",
+          parameters_file="X:/SYMPHONY_VODKAS/search/215.xml" if system()=='Windows' else "~/SYMPHONY_VODKAS/search/215.xml",
           write_xml=True,
           write_binary=False,
           write_csv=False,
-          exe_path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
+          exe_path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe" if system()=='Windows' else 'none',
           timeout=180):
     """Run iaDBs.
     
@@ -48,7 +48,7 @@ def iadbs(input_file,
                 f"-WriteXML {int(write_xml)}",
                 f"-WriteBinary {int(write_binary)}",
                 f"-bDeveloperCSVOutput {int(write_csv)}" ]
-        run_win_proc(cmd, timeout, iadbs_stdout) # timeout==0: mocking!
+        run_win_proc(cmd, timeout, iadbs_stdout)
 
         if '_Pep3D_Spectrum' in input_file.stem:
             out = output_dir/input_file.stem.replace('_Pep3D_Spectrum','_IA_workflow')

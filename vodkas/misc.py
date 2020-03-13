@@ -61,7 +61,16 @@ def test_get_defaults():
 
 
 def prompt_timeout(algo, default=180):
+        print(f"{algo} default = {default}")
         try:
-            return int(input(f"{algo} [{default} minutes]: "))
+            out = int(input('Enter a better value, or hit ENTER: '))
+            if out == 0:
+                print(f"Mocking {algo}.")
+            if out < 0:
+                print(f"Not running {algo}.")
+            print()
+            return out 
         except ValueError:
+            print(f'Using default = {default} minutes.')
+            print()
             return default

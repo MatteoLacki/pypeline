@@ -1,4 +1,5 @@
 from pathlib import Path
+from platform import system
 
 from .fs import check_algo
 from .misc import get_coresNo, call_info
@@ -16,7 +17,7 @@ def apex3d(raw_folder,
            write_binary=True,
            write_csv=False,
            max_used_cores=get_coresNo(),
-           exe_path="C:/SYMPHONY_VODKAS/plgs/Apex3D64.exe",
+           exe_path="C:/SYMPHONY_VODKAS/plgs/Apex3D64.exe" if system()=='Windows' else 'none',
            PLGS=True,
            cuda=True,
            unsupported_gpu=True,

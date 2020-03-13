@@ -1,4 +1,5 @@
 from pathlib import Path
+from platform import system
 
 from .fs import check_algo
 from .subproc import run_win_proc
@@ -11,7 +12,7 @@ def peptide3d(input_file,
               write_binary=False,
               write_csv=False,
               write_binning=False,
-              exe_path="C:/SYMPHONY_VODKAS/plgs/Peptide3D.exe",
+              exe_path="C:/SYMPHONY_VODKAS/plgs/Peptide3D.exe" if system()=='Windows' else 'none',
               timeout=180):
     """Run Peptide3D.
     
