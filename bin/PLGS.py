@@ -111,7 +111,7 @@ else:
     iadbs_kwds      = FP.kwds['iadbs']
 
 
-
+fasta_file = ''
 if iadbs_kwds['timeout'] >= 0:
     if prompt:
         fasta_file = fastas(*fastas_gui())
@@ -123,12 +123,8 @@ if iadbs_kwds['timeout'] >= 0:
 
 
 
-if on_windows and not net_folder == '' and not network_drive_exists(net_folder):
+if on_windows and net_folder and not network_drive_exists(net_folder):
     log.warning(f"no network drive for {net_folder}: saving locally")
-else:
-    net_folder = Path('net_folder')
-
-
 
 
 assert len(raw_folders), "No raw folders passed!!!"
@@ -150,9 +146,9 @@ for raw_folder in tqdm(raw_folders):
         #                   C:/SYMPHONY_PIPELINE/2019-008/O191017-04
         local_folder = local_output_folder/sample_set/acquired_name
         a = apex3d(raw_folder, local_folder,**apex3d_kwds)
-        if a is not None:                                # None == not running
+        if peptide3d_kwds['timeout'] >= 0:
             p = peptide3d(a.with_suffix('.bin'), local_folder,**peptide3d_kwds)
-            if p is not None:                            # None == not running
+            if iadbs_kwds['timeout'] >= 0:
                 i = iadbs(p, local_folder, fasta_file, parameters_file, **iadbs_kwds)
                 if i is not None: 
                     params = create_params_file(a, p, i) # for projectizer2.0
@@ -163,18 +159,18 @@ for raw_folder in tqdm(raw_folders):
                              [list(search_stats), list(search_stats.values())])
         if net_folder:
             #                     Y:/TESTRES/2019-008
-            net_set_folder = net_folder/sample_set
+            net_set_folder = Path(net_folder)/sample_set
             net_set_folder.mkdir(parents=True, exist_ok=True)
             # if reanalysing, the old folder is preserved, 
             # and a version number appended to the new one
             # e.g.              Y:/TESTRES/2019-008/O191017-04
             # replaced with:    Y:/TESTRES/2019-008/O191017-04__v1
-            net_folder = find_free_path(net_folder/sample_set/acquired_name)
+            final_net_folder = find_free_path(net_set_folder/acquired_name)
             try:
-                move_folder(local_folder, net_folder)
+                move_folder(local_folder, final_net_folder)
                 if local_folder.parent.exists() and not local_folder.parent.glob('*'):
                     local_folder.parent.rmdir()
-                log.info(f"moved {raw_folder} to {net_folder}")
+                log.info(f"moved {raw_folder} to {final_net_folder}")
             except RuntimeError as e:
                 log.warning(f"not copied '{raw_folder}': {repr(e)}")
         else:
