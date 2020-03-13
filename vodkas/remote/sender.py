@@ -4,10 +4,10 @@ import json
 from pathlib import Path
 import socket
 
-from vodkas.json import dump2json
-from vodkas.remote.db import LOG
+from ..json import dump2json
+from .db import LOG
+from vodkas import currentIP
 
-currentIP = socket.gethostbyname(socket.gethostname())
 
 
 class Sender(object):

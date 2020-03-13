@@ -13,14 +13,15 @@ from fs_ops.paths import find_suffixed_files
 from fs_ops.csv import rows2csv
 from waters.parsers import get_search_stats
 
+from vodkas import currentIP, on_windows
 from vodkas.fastas import fastas, fastas_gui
 from vodkas.iadbs import iadbs, parameters_gui
 from vodkas.json import dump2json
 from vodkas.logging import get_sender_n_log_Fun
+from vodkas.misc import prompt_timeout
 from vodkas.xml_parser import create_params_file
 
 
-on_windows = platform.system() == 'Windows'
 log_file = Path('C:/SYMPHONY_VODKAS/temp_logs/plgs.log' if on_windows else '~/SYMPHONY_VODKAS/plgs.log').expanduser().resolve()
 
 prompt = False # prompting only when using sendto/RESEARCH

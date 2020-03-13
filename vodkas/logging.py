@@ -9,7 +9,8 @@ from urllib.error import URLError
 from docstr2argparse.parse import defaults
 
 from .json import dump2json
-from .remote.sender import Sender, MockSender, currentIP
+from .remote.sender import Sender, MockSender
+from . import currentIP
 
 def get_task_no(log_file):
     """Parse the log file to get the task number."""

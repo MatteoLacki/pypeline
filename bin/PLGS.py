@@ -3,7 +3,6 @@ import json
 import logging
 from pprint import pprint
 from pathlib import Path
-import platform
 from tqdm import tqdm
 from subprocess import TimeoutExpired
 import sys
@@ -14,7 +13,7 @@ from fs_ops.csv import rows2csv
 from fs_ops.paths import find_folders
 from waters.parsers import get_search_stats
 
-from vodkas import apex3d, peptide3d, iadbs
+from vodkas import apex3d, peptide3d, iadbs, on_windows, currentIP
 from vodkas.fastas import fastas, fastas_gui
 from vodkas.fs import find_free_path, move_folder, network_drive_exists
 from vodkas.iadbs import parameters_gui
@@ -27,7 +26,6 @@ from vodkas.xml_parser import create_params_file
 
 
 DEBUG = True
-on_windows = platform.system() == 'Windows'
 
 # defaults
 local_output_folder = Path(r'C:/SYMPHONY_VODKAS/temp' if on_windows else '~/SYMPHONY_VODKAS/temp').expanduser().resolve()
