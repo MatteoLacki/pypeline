@@ -20,8 +20,7 @@ def apex3d(raw_folder,
            PLGS=True,
            cuda=True,
            unsupported_gpu=True,
-           timeout=180,
-           mock=False):
+           timeout=180):
     """Analyze a Waters Raw Folder with Apex3D.
     
     Args:
@@ -40,18 +39,19 @@ def apex3d(raw_folder,
         PLGS (boolean): No idea what it is.
         cuda (boolean): Use CUDA.
         unsupported_gpu (boolean): Try using an unsupported GPU for calculations. If it doesn't work, the pipeline switches to CPU which is usually much slower.
-        timeout (float): Timeout in minutes.
-        mock (bool): Run without calling apex3D64.
+        timeout (float): Timeout in minutes. Passing 0 will mock the process. Passing negative value will not run the process.
 
     Returns:
-        pathlib.Path: Path to the outcome xml.
+        pathlib.Path or None: Path to the outcome xml. None, if not running.
     """
     raw_folder = Path(raw_folder)
     output_dir = Path(output_dir)
     apex_stdout = output_dir/'apex3d.log'
 
-    if mock:
+    if timeout == 0:
         pr = None
+    elif timeout < 0:
+        return None
     else:
         algo = check_algo(exe_path)
         cmd = ["powershell.exe", algo,

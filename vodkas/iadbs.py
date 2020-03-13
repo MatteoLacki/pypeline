@@ -15,8 +15,7 @@ def iadbs(input_file,
           write_binary=False,
           write_csv=False,
           exe_path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe",
-          timeout=180,
-          mock=False):
+          timeout=180):
     """Run iaDBs.
     
     Args:
@@ -29,7 +28,6 @@ def iadbs(input_file,
         write_csv (boolean): Write the ions to csv file.
         exe_path (str): Path to the "iaDBs.exe" executable.
         timeout (float): Timeout in minutes.
-        mock (bool): Run without calling iaDBs.
 
     Returns:
         pathlib.Path: path to the outcome xml file.
@@ -40,8 +38,10 @@ def iadbs(input_file,
     parameters_file = Path(parameters_file)
     iadbs_stdout = output_dir/'iadbs.log'
 
-    if mock:
-        pr = None 
+    if timeout == 0:
+        pr = None
+    elif timeout < 0:
+        return None 
     else:
         algo = check_algo(exe_path)
         cmd = [ "powershell.exe", algo,

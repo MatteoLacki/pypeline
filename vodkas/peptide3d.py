@@ -12,8 +12,7 @@ def peptide3d(input_file,
               write_csv=False,
               write_binning=False,
               exe_path="C:/SYMPHONY_VODKAS/plgs/Peptide3D.exe",
-              timeout=180,
-              mock=False):
+              timeout=180):
     """Run Peptide3D.
     
     Args:
@@ -26,7 +25,6 @@ def peptide3d(input_file,
         min_LEMHPlus (int): The minimal (M)ass of the (L)ow (E)nergy precursor with a single charge (H+).
         exe_path (str): Path to the "Peptide3D.exe" executable.
         timeout (float): Timeout in minutes.
-        mock (bool): Run without calling Peptide3D.
 
     Returns:
         pathlib.Path: path to the outcome xml file.
@@ -38,8 +36,10 @@ def peptide3d(input_file,
     if input_file.suffix != '.bin':
         raise RuntimeError("Peptide3D failed: it accepts 'bin' input files only.")
 
-    if mock:
+    if timeout == 0:
         pr = None
+    elif timeout < 0:
+        return None
     else:
         algo = check_algo(exe_path)
         cmd = ["powershell.exe", algo,

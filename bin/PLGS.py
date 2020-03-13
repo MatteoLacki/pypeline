@@ -135,16 +135,19 @@ if prompt:
         no_iadbs = True
 
 
+if prompt:
+    apex3d_kwds = {'mock': mock_apex3d}
+else:
+    apex3d_kwds = FP.kwds['apex3d']
+
 if not no_peptide3d and not no_iadbs:
     if prompt:
         fasta_file = fastas(*fastas_gui())
         parameters_file = parameters_gui(parameters_file)
-        apex3d_kwds = {'mock': mock_apex3d}
         peptide3d_kwds = {'mock': mock_peptide3d}
         iadbs_kwds = {'mock': mock_iadbs}
     else:
         fasta_file = fastas(fasta_file_tag, **FP.kwds['fastas'])
-        apex3d_kwds = FP.kwds['apex3d']
         peptide3d_kwds = FP.kwds['peptide3d']
         iadbs_kwds = FP.kwds['iadbs']
         parameters_file = iadbs_kwds['parameters_file']
@@ -177,16 +180,17 @@ for raw_folder in tqdm(raw_folders):
     #                   C:/SYMPHONY_PIPELINE/2019-008/O191017-04
     local_folder = local_output_folder/sample_set/acquired_name
     a = apex3d(raw_folder, local_folder,**apex3d_kwds)
-    if not no_peptide3d:
+    if a is not None:                                # None == not running
         p = peptide3d(a.with_suffix('.bin'), local_folder,**peptide3d_kwds)
-        if not no_iadbs:
-            i= iadbs(p, local_folder, fasta_file, parameters_file, **iadbs_kwds)
-            params = create_params_file(a, p, i) # for projectizer2.0
-            with open(a.parent/"params.json", 'w') as f:
-                json.dump(params, f)
-            search_stats = get_search_stats(i)
-            rows2csv(i.parent/'stats.csv',
-                     [list(search_stats), list(search_stats.values())])
+        if p is not None:                            # None == not running
+            i = iadbs(p, local_folder, fasta_file, parameters_file, **iadbs_kwds)
+            if i is not None: 
+                params = create_params_file(a, p, i) # for projectizer2.0
+                with open(a.parent/"params.json", 'w') as f:
+                    json.dump(params, f)
+                search_stats = get_search_stats(i)
+                rows2csv(i.parent/'stats.csv',
+                         [list(search_stats), list(search_stats.values())])
     if net_folder:
         #                     Y:/TESTRES/2019-008
         net_set_folder = net_folder/sample_set
