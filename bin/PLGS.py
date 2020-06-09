@@ -166,7 +166,7 @@ for raw_folder in tqdm(raw_folders):
             # e.g.              Y:/TESTRES/2019-008/O191017-04
             # replaced with:    Y:/TESTRES/2019-008/O191017-04__v1
             final_net_folder = find_free_path(net_set_folder/acquired_name)
-            try:
+            try: #replace that with the general save moving routine with check-sums
                 move_folder(local_folder, final_net_folder)
                 if local_folder.parent.exists() and not local_folder.parent.glob('*'):
                     local_folder.parent.rmdir()

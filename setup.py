@@ -33,5 +33,8 @@ setup(
     # package_data={'data': ['data/contaminants_uniprot_format.fasta']},
     scripts = ["bin/PLGS.py",
                "bin/RESEARCH.py",
-               "bin/barman.py"]
+               "bin/barman.py",
+               "bin/update_plgs_csv.py",
+               "bin/_PLGS.bat",
+               "bin/_RESEARCH.bat"]
 )
