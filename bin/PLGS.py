@@ -30,7 +30,7 @@ DEBUG = True
 # defaults
 local_output_folder = Path(r'C:/SYMPHONY_VODKAS/temp' if on_windows else '~/SYMPHONY_VODKAS/temp').expanduser().resolve()
 log_file = Path('C:/SYMPHONY_VODKAS/temp_logs/plgs.log' if on_windows else '~/SYMPHONY_VODKAS/plgs.log').expanduser().resolve()
-net_folder = Path('Y:/TESTRES2') if on_windows else ''
+net_folder = Path('Y:/RES_reprocessed') if on_windows else ''
 
 # CLIs
 prompt = False
