@@ -1,0 +1,16 @@
+To reprocess raw folders:
+1. select the folders you want to reprocess in explorer or a containing folder (then all folders inside will get analysed).
+2. right click , click send to, click on _PLGS.
+3. follow the instructions
+
+The terminal will ask you for fastas.
+Write in a single value from the following possibilities:
+human, ecoli, hye, leishmania, mouse, wheat, yeast
+OR
+provide a valid absolute windows path
+(you can drag'n'drop a file from explorer).
+
+To reprocess symphony results
+1. select the folders (with the xml files from symphony, not the raw folders) you want to reprocess in explorer or a containing folder (then all folders inside will get analysed).
+2. right click , click send to, click on _REPROCESS.
+3. follow the instructions
