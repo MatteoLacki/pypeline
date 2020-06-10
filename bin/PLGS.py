@@ -1,9 +1,7 @@
 import argparse
 import json
 import logging
-from pprint import pprint
 from pathlib import Path
-from tqdm import tqdm
 from subprocess import TimeoutExpired
 import sys
 from urllib.error import URLError
@@ -89,6 +87,9 @@ else:
 
 logging.basicConfig(filename=log_file, level=logging.INFO,
                     format='%(asctime)s:%(name)s:%(levelname)s:%(message)s:')
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+logging.getLogger('').addHandler(console)
 log = logging.getLogger('PLGS.py')
 sender, logFun = get_sender_n_log_Fun(log, server_ip)
 apex3d, peptide3d, iadbs, create_params_file, get_search_stats = \
@@ -131,9 +132,8 @@ assert len(raw_folders), "No raw folders passed!!!"
 raw_folders = list(find_folders(raw_folders))
 assert len(raw_folders), "No raw folders found!!!"
 log.info(f"analyzing folders: {dump2json(raw_folders)}")
-pprint(raw_folders)
 
-for raw_folder in tqdm(raw_folders):
+for raw_folder in raw_folders:
     try:
         if not raw_folder.is_dir():
             log.error(f"missing: {raw_folder}")
