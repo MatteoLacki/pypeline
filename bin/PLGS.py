@@ -28,7 +28,7 @@ DEBUG = True
 # defaults
 local_output_folder = Path(r'C:/SYMPHONY_VODKAS/temp' if on_windows else '~/SYMPHONY_VODKAS/temp').expanduser().resolve()
 log_file = Path('C:/SYMPHONY_VODKAS/temp_logs/plgs.log' if on_windows else '~/SYMPHONY_VODKAS/plgs.log').expanduser().resolve()
-net_folder = Path('Y:/RES_reprocessed') if on_windows else ''
+net_folder = Path('Y:/RES') if on_windows else ''
 
 # CLIs
 prompt = False
@@ -158,13 +158,13 @@ for raw_folder in raw_folders:
                     rows2csv(i.parent/'stats.csv',
                              [list(search_stats), list(search_stats.values())])
         if net_folder:
-            #                     Y:/TESTRES/2019-008
+            #                     Y:/RES/2019-008
             net_set_folder = Path(net_folder)/sample_set
             net_set_folder.mkdir(parents=True, exist_ok=True)
             # if reanalysing, the old folder is preserved, 
             # and a version number appended to the new one
-            # e.g.              Y:/TESTRES/2019-008/O191017-04
-            # replaced with:    Y:/TESTRES/2019-008/O191017-04__v1
+            # e.g.              Y:/RES/2019-008/O191017-04
+            # replaced with:    Y:/RES/2019-008/O191017-04__v1
             final_net_folder = find_free_path(net_set_folder/acquired_name)
             try: #replace that with the general save moving routine with check-sums
                 move_folder(local_folder, final_net_folder)
