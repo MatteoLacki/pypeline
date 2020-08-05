@@ -18,7 +18,7 @@ from vodkas.iadbs import parameters_gui
 from vodkas.json import dump2json
 from vodkas.header_txt import parse_header_txt
 from vodkas.logging import get_sender_n_log_Fun
-from vodkas.misc import prompt_timeout
+from vodkas.misc import prompt_timeout, samplename2networkpath
 
 from vodkas.xml_parser import create_params_file
 
@@ -71,12 +71,20 @@ else:
                     help='IP of the server',
                     default=currentIP)
 
+    ap.add_argument('--pipeline',
+                    help='Are we running a pipeline?',
+                    action='store_true')
+
     FP.updateParser(ap)
     args = ap.parse_args()
     FP.parse_kwds(args.__dict__)
 
     fasta_file_tag  = args.fastas
     raw_folders     = args.raw_folders
+    if args.pipeline:
+        # need to translate the paths.
+        raw_folders = [samplename2networkpath(rf, acceptableDriveNames=('I','O')) for rf in raw_folders]
+
     local_output_folder = args.local_output_folder
     log_file        = args.log_file
     net_folder      = args.net_folder

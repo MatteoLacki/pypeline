@@ -74,3 +74,14 @@ def prompt_timeout(algo, default=180):
             print(f'Using default = {default} minutes.')
             print()
             return default
+
+
+def samplename2networkpath(samplename, acceptableDriveNames=("I","O")):
+    samplename = str(samplename)
+    drive = samplename[0]
+    assert drive in acceptableDriveNames, f"NOT FOLLOWING CONVENTION ERROR: SAMPLENAME MUST START WITH A LETTER IN {acceptableDriveNames}"
+    assert len(samplename) >= 5, f"NOT FOLLOWING CONVENTION ERROR: SAMPLENAME MUST BE LONGER THAN 5 LETTERS."
+    folder = samplename[:5]
+    res = Path(f"{drive}://")/'RAW'/folder/samplename
+    res = res.with_suffix('.raw')
+    return res
