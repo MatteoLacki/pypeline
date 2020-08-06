@@ -4,16 +4,16 @@ import json
 from pathlib import Path
 import socket
 
-from vodkas.json import dump2json
-from vodkas.remote.db import LOG
+from ..json import dump2json
+from .db import LOG
+from vodkas import currentIP
 
-currentIP = socket.gethostbyname(socket.gethostname())
 
 
 class Sender(object):
     def __init__(self,
                  name,
-                 host,
+                 host=currentIP,
                  port=8745, 
                  encoding="cp1251"):
         self.host = host
@@ -63,7 +63,17 @@ class Sender(object):
             return [LOG(*log) for log in json.loads(s.read())]
 
 
+
+class MockSender():
+    def log(self, *args, **kwds):
+        pass
+
+    def update_group(self, *args, **kwds):
+        pass
+
+
+
 if __name__ == '__main__':
-    s = Sender('Test', host=currentIP)
+    s = Sender('Test')
     print(s.project_id)
     print(s.all_logs_df())

@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 setup(
     name='vodkas',
     packages=find_packages(),
-    version='0.0.3',
+    version='0.0.4',
     description='Syntactic sugar around Waters LC/IMS/MS pypeline.',
     long_description='A simple, once for all pythonic middle finger in face of Waters. Works under fucking Windows only.',
     author='Mateusz Krzysztof Łącki',
@@ -27,13 +27,13 @@ setup(
                       'furious_fastas',
                       'fs_ops',
                       'waters',
-                      'flask',
-                      'tqdm',
-                      'tables' # needed for hdf5 support
-                      ],
+                      'flask'],
     # include_package_data=True,
     # package_data={'data': ['data/contaminants_uniprot_format.fasta']},
     scripts = ["bin/PLGS.py",
                "bin/RESEARCH.py",
-               "bin/barman.py"]
+               "bin/barman.py",
+               "bin/update_plgs_csv.py",
+               "bin/_PLGS.bat",
+               "bin/_RESEARCH.bat"]
 )

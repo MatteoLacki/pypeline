@@ -1,29 +1,31 @@
 import argparse
 from flask import g, Flask, jsonify, request
-from platform import system as OS
+import platform
 import socket
 
 from vodkas.remote.db import DB
 from vodkas.json import dump2json
 
-
-DEBUG = True
-currentIP = socket.gethostbyname(socket.gethostname())
+on_Windows = platform.system() == "Windows"
 
 ############################################################### CLI 
 ap = argparse.ArgumentParser(description='Let the barman take care of the symphony of vodkas.',
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 ap.add_argument('--host',
                 help="Host's IP.",
-                default=currentIP)
+                default=socket.gethostbyname(socket.gethostname()) if on_Windows else "0.0.0.0")
 ap.add_argument('--port', 
                 help='Port to listen to.', 
                 default=8745, 
                 type=int)
 ap.add_argument('--DBpath',
                 help='Port to listen to.',
-                default=r'C:\SYMPHONY_VODKAS\simple.db' if OS() == 'Windows' else r'/home/matteo/SYMPHONY_VODKAS/simple.db')
+                default=r'C:\SYMPHONY_VODKAS\simple.db' if on_Windows else r'/home/matteo/SYMPHONY_VODKAS/simple.db')
+ap.add_argument('--debug',
+                help='Run in debug mode.',
+                action='store_true')
 args = ap.parse_args()
+DEBUG = args.debug
 ############################################################### Flask
 
 

@@ -1,6 +1,6 @@
 import subprocess
 from pathlib import Path
-import platform
+from platform import system
 from filecmp import dircmp
 
 
@@ -15,7 +15,7 @@ def __cp(source, target, fcmd):
         fcmd (lambda): function returning a string with command for the subprocess.
     """
     s, t = Path(source), Path(target)
-    assert platform.system() == 'Windows', "This command works only on Windows, as Symphony does."
+    assert system() == 'Windows', "This command works only on Windows, as Symphony does."
     if not s:
         raise FileNotFoundError("Source folder missing.")
     if not t.parents[0].exists():
@@ -49,7 +49,7 @@ def move(source, target):
         source (Path or str): Path to the source.
         target (Path or str): Path to the target.
     """
-    if platform.system() == 'Windows':
+    if system() == 'Windows':
         return __cp(source, target, lambda s,t: f"robocopy {str(s.parent)} {str(t)} {str(s.name)} /move")
     else:
         import shutil
@@ -57,7 +57,7 @@ def move(source, target):
 
 
 def test_cp():
-    if platform.system() == 'Windows':
+    if system() == 'Windows':
         cp('C:/test_s/test.ref', 'C:/test_t')
         assert next(Path('C:/test_t').iterdir()) == Path('C:/test_t/test.ref')
         Path('C:/test_t/test.ref').unlink()
@@ -82,8 +82,9 @@ def random_folder_name(k=20):
 
 def check_algo(path_to_algorithm):
     """Check if the algorithm's executable is there."""
-    algo = Path(path_to_algorithm)
-    assert algo.exists(), f"No '{algo}' found!"
+    if system() == 'Windows':
+        algo = Path(path_to_algorithm)
+        assert algo.exists(), f"No '{algo}' found!"
     return str(algo)
 
 

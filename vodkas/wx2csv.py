@@ -2,11 +2,7 @@ import subprocess
 from pathlib import Path
 import pandas as pd
 
-from .logging_alco import get_logger
 from .subproc import run_win_proc
-
-
-logger = get_logger(__name__)
 
 
 def wx2csv(input_file,
@@ -25,8 +21,6 @@ def wx2csv(input_file,
     Returns:
         pandas.Dataframe
     """
-    logger.info('Running wx2csv.')
-
     algo = Path(path_to_wx2csv)
     assert algo.exists(), "Executable is missing! '{}' not found.".format(algo)
     input_file, output_file = Path(input_file), Path(output_file)
@@ -39,15 +33,11 @@ def wx2csv(input_file,
            f"-jar {algo}",
            f"-b -o {output_file}",
            f"-i {input_file}"]
-
-    print(cmd)
-    pr, runtime = run_win_proc(cmd, 60, wx2csv_stdout)
+    run_win_proc(cmd, 60, wx2csv_stdout)
 
     if not output_file.exists():
         raise RuntimeError("wx2csv failed: output is missing")
     out = pd.read_csv(output_file)
 
-    logger.info(f'wx2csv took {runtime} minutes.')
-
-    return out, pr
+    return out
 
