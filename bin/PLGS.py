@@ -14,7 +14,7 @@ from vodkas.fastas import fastas
 from vodkas import apex3d, peptide3d, iadbs
 from vodkas.fs import find_free_path, move_folder, network_drive_exists
 from vodkas.header_txt import parse_header_txt
-from vodkas.logging import store_parameters, MockSender
+from vodkas.logging_alco import store_parameters, MockSender
 from vodkas.remote.sender import Sender, currentIP
 from vodkas.xml_parser import create_params_file
 
@@ -96,6 +96,7 @@ if not network_drive_exists(args.fastas_db):
 
 
 ###### translate fastas to NCBIgeneralFastas and store it on the server
+###### if it exists and is compatible, do nothing.
 fastas = fastas(**FP.kwds['fastas'])
 
 
@@ -109,7 +110,8 @@ for raw_folder in tqdm(args.raw_folders):
             log.error(f"missing: {raw_folder}")
             continue
         log.info(f"analyzing: {raw_folder}")
-        sender.update_group(raw_folder)
+
+        sender.update_group(raw_folder) # wtf??? change name ....
         acquired_name = raw_folder.stem
         header_txt = parse_header_txt(raw_folder/'_HEADER.TXT')
         sample_set = header_txt['Sample Description'][:8]

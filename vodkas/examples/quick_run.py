@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 
 from vodkas import plgs, get_fastas
-from vodkas.logging import get_task_no, get_logger
+from vodkas.logging_algo import get_task_no, get_logger
 
 fastas = get_fastas('human')
 raw_folder = Path(r"X:/SYMPHONY_VODKAS/standard_data/O190302_01.raw")

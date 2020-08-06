@@ -13,7 +13,7 @@ from waters.parsers import get_search_stats
 
 from vodkas.fastas import fastas
 from vodkas.iadbs import iadbs
-from vodkas.logging import store_parameters
+from vodkas.logging_alco import store_parameters
 from vodkas.remote.sender import Sender, currentIP
 from vodkas.xml_parser import print_parameters_file, create_params_file
 

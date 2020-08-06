@@ -15,6 +15,10 @@ def fastas(path='none',
            prompt=False):
     """Get proper fastas.
 
+    Can prompt for usage.
+    If not, simply finds out if the fastas are among the standard ones.
+    If they ain't, you can choose to add in contaminants, reverse them, and make them altogether useable for iaDBs.
+
     Args:
         path (str): path to fasta file or one of the standard proteomes used, e.g. 'human'.
         db (str): Path to fastas DB: used when supplying reduced fasta names, e.g. 'human'.

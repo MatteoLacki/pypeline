@@ -2,7 +2,7 @@ import subprocess
 from pathlib import Path
 import pandas as pd
 
-from .logging import get_logger
+from .logging_alco import get_logger
 from .subproc import run_win_proc
 
 

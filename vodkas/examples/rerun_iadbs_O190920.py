@@ -5,7 +5,7 @@ import logging
 
 from vodkas import iadbs
 from vodkas.fastas import get_fastas
-from vodkas.logging import get_logger
+from vodkas.logging_algo import get_logger
 
 symphony_local = Path(r"C:/SYMPHONY_VODKAS")
 logging.basicConfig(filename=symphony_local/"iadbs.log",

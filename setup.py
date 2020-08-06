@@ -28,7 +28,9 @@ setup(
                       'fs_ops',
                       'waters',
                       'flask',
-                      'tqdm'],
+                      'tqdm',
+                      'tables' # needed for hdf5 support
+                      ],
     # include_package_data=True,
     # package_data={'data': ['data/contaminants_uniprot_format.fasta']},
     scripts = ["bin/PLGS.py",

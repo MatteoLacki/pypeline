@@ -14,7 +14,7 @@ from pathlib import Path
 from pprint import pprint
 
 from vodkas import plgs
-from vodkas.logging import get_logger
+from vodkas.logging_alco import get_logger
 
 fastas = Path(r"X:/SYMPHONY_VODKAS/fastas/custom/horny_mouse/20180515_up_mouse_reviewed_16970entries_and_171contaminants+hNECAB1+2_reverese.fasta")
 raw_folder = Path(r"O:/RAW/O1909/O190906_06.raw")

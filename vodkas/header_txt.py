@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from .logging import get_logger
+from .logging_alco import get_logger
 
 
 logger = get_logger(__name__)

@@ -2,7 +2,7 @@ from pathlib import Path
 from subprocess import Popen, TimeoutExpired, run, PIPE
 from time import time
 
-from .logging import get_logger
+from .logging_alco import get_logger
 
 
 logger = get_logger(__name__)
