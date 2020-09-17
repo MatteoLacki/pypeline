@@ -22,7 +22,7 @@ from vodkas.misc import prompt_timeout
 from vodkas.xml_parser import create_params_file
 
 
-log_file = Path('C:/SYMPHONY_VODKAS/temp_logs/plgs.log' if on_windows else '~/SYMPHONY_VODKAS/plgs.log').expanduser().resolve()
+log_file = Path('C:/SYMPHONY_VODKAS/temp_logs/research.log' if on_windows else '~/SYMPHONY_VODKAS/plgs.log').expanduser().resolve()
 
 prompt = False # prompting only when using sendto/RESEARCH
 try:
@@ -71,11 +71,13 @@ else:
 
 logging.basicConfig(filename=log_file, level=logging.INFO,
                     format='%(asctime)s:%(name)s:%(levelname)s:%(message)s:')
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+logging.getLogger('').addHandler(console)
 log = logging.getLogger('RESEARCH.py')
 sender, logFun = get_sender_n_log_Fun(log, server_ip)
 iadbs, create_params_file, get_search_stats = \
     [logFun(f) for f in [iadbs, create_params_file, get_search_stats]]
-
 
 
 if prompt:
