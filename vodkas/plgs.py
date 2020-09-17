@@ -2,7 +2,7 @@
 from collections import defaultdict
 
 from fs_ops.csv import rows2csv
-from waters.parsers import iaDBsXMLparser
+from waters.parsers import get_search_stats
 
 from . import apex3d, peptide3d, iadbs
 from .xml_parser import create_params_file
@@ -35,5 +35,5 @@ def plgs(fastas,
     p,_ = peptide3d(a.with_suffix('.bin'), out_folder,**peptide3d_kwds) # this will make .xml only
     i,_ = iadbs(p, out_folder, fastas, **iadbs_kwds)
     create_params_file(a, p, i) # for projectizer2.0
-    search_stats = iaDBsXMLparser(i).info()
+    search_stats = get_search_stats()
     rows2csv(i.parent/'stats.csv', [list(search_stats), list(search_stats.values())])

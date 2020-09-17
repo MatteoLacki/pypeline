@@ -5,12 +5,10 @@ from vodkas.remote.sender import Sender
 from pathlib import Path
 import pandas as pd
 import json
-from vodkas.simple_db import SimpleDB
+# from vodkas.simple_db import SimpleDB
 
 s = Sender('Test', '0.0.0.0')
-
-
-s = Sender('Test', '192.168.1.191')
+s = Sender('Test', '192.168.1.214')
 X = s.get_df()
 
 X.columns
