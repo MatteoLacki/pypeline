@@ -17,7 +17,7 @@ from vodkas.fs import find_free_path, move_folder, network_drive_exists
 from vodkas.iadbs import parameters_gui
 from vodkas.json import dump2json
 from vodkas.header_txt import parse_header_txt
-from vodkas.logging_alco import store_parameters, MockSender
+from vodkas.logging_alco import get_sender_n_log_Fun
 from vodkas.remote.sender import Sender, currentIP
 from vodkas.xml_parser import create_params_file
 

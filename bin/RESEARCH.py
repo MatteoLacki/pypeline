@@ -13,9 +13,10 @@ from fs_ops.paths import find_suffixed_files
 from fs_ops.csv import rows2csv
 from waters.parsers import get_search_stats
 
+from vodkas import on_windows
 from vodkas.fastas import fastas
 from vodkas.iadbs import iadbs
-from vodkas.logging_alco import store_parameters
+from vodkas.logging_alco import get_sender_n_log_Fun
 from vodkas.remote.sender import Sender, currentIP
 from vodkas.xml_parser import print_parameters_file, create_params_file
 
