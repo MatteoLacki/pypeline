@@ -1,3 +1,4 @@
+.python_version
 __pycache__
 *.egg-info
 dist
