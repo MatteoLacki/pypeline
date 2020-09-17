@@ -17,8 +17,8 @@ from vodkas import on_windows
 from vodkas.fastas import fastas, fastas_gui
 from vodkas.iadbs import iadbs, parameters_gui
 from vodkas.logging_alco import get_sender_n_log_Fun
-from vodkas.remote.sender import Sender, currentIP
-from vodkas.xml_parser import print_parameters_file, create_params_file
+from vodkas.remote.sender import currentIP
+from vodkas.xml_parser import create_params_file
 from vodkas.misc import prompt_timeout
 
 log_file = Path('C:/SYMPHONY_VODKAS/temp_logs/research.log' if on_windows else '~/SYMPHONY_VODKAS/plgs.log').expanduser().resolve()
@@ -30,7 +30,6 @@ except IndexError:
     pass
 
 FP = FooParser([fastas, iadbs])
-
 
 if prompt:
     server_ip = sys.argv[2]
