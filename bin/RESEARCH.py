@@ -31,6 +31,7 @@ except IndexError:
 
 FP = FooParser([fastas, iadbs])
 
+
 if prompt:
     server_ip = sys.argv[2]
     Pep3D_Spectrum = sys.argv[3:]
