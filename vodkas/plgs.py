@@ -7,8 +7,6 @@ from waters.parsers import get_search_stats
 from . import apex3d, peptide3d, iadbs
 from .xml_parser import create_params_file
 
-MOCK = True
-
 
 def plgs(fastas,
          raw_folder,
