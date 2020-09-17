@@ -4,11 +4,12 @@ import logging
 from pathlib import Path
 import sys
 from time import time
+from urllib.error import URLError
 
 from docstr2argparse.parse import defaults
 
 from .json import dump2json
-
+from .remote.sender import Sender, MockSender
 
 def get_task_no(log_file):
     """Parse the log file to get the task number."""
@@ -51,15 +52,6 @@ def __print_out_params(f):
 class MockLog():
     def info(self, *args, **kwds):
         pass
-
-
-class MockSender():
-    def log(self, *args, **kwds):
-        pass
-
-    def update_group(self, *args, **kwds):
-        pass
-
 
 def store_parameters(log=MockLog(), sender=MockSender()):
     """Store parameters of a function."""
