@@ -80,7 +80,9 @@ iadbs, create_params_file, get_search_stats = \
 
 
 if prompt:
-    print('Set timeouts [in minutes]:')
+    print('WARNING: THIS SCRIPT OVERWRITES PREVIOUS *_IA_workflow.xml FILES, params.json, AND stats.csv')
+    print()
+    print('Set timeouts [in minutes] for iaDBS:')
     iadbs_kwds = {'timeout': prompt_timeout('iaDBs', 180)}
     fasta_file = fastas(*fastas_gui())
     parameters_file = parameters_gui(FP['iadbs']['parameters_file'].info['default'])
@@ -113,4 +115,5 @@ for xml in tqdm(xmls):
     except Exception as e:
         log.warning(repr(e))
         print(e)
+    print()
 log.info("Search redone.")
