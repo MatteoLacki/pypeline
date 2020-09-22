@@ -19,7 +19,7 @@ from vodkas.json import dump2json
 from vodkas.header_txt import parse_header_txt
 from vodkas.misc import prompt_timeout
 from vodkas.logging_alco import get_sender_n_log_Fun
-from vodkas.remote.sender import wcurrentIP
+from vodkas.remote.sender import currentIP
 from vodkas.xml_parser import create_params_file
 
 DEBUG = True
@@ -131,14 +131,14 @@ if iadbs_kwds['timeout'] >= 0:
 
 
 
-<<<<<<< HEAD
-###### translate fastas to NCBIgeneralFastas and store it on the server
-###### if it exists and is compatible, do nothing.
-fastas = fastas(**FP.kwds['fastas'])
-=======
+# <<<<<<< HEAD
+# ###### translate fastas to NCBIgeneralFastas and store it on the server
+# ###### if it exists and is compatible, do nothing.
+# fastas = fastas(**FP.kwds['fastas'])
+# =======
 if on_windows and net_folder and not network_drive_exists(net_folder):
     log.warning(f"no network drive for {net_folder}: saving locally")
->>>>>>> c77f833267b6cb61c22f6b21acb30079742a2954
+# >>>>>>> c77f833267b6cb61c22f6b21acb30079742a2954
 
 
 assert len(raw_folders), "No raw folders passed!!!"
