@@ -2,8 +2,6 @@ from pathlib import Path
 from furious_fastas import fastas as _fastas, Fastas as _Fastas
 from platform import system
 
-from .fs import move
-
 
 db_path = r'X:/SYMPHONY_VODKAS/fastas/latest' if system() == 'Windows' else r'/home/matteo/SYMPHONY_VODKAS/fastas/latest' 
 
