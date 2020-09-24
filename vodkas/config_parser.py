@@ -45,7 +45,9 @@ class AdvConfigParser(configparser.ConfigParser):
         return ip, port
 
     def get_log_file(self):
-        return pathlib.Path(self['logging']['log_file']).expanduser().resolve()
+        log_file = pathlib.Path(self['logging']['log_file']).expanduser().resolve()
+        log_file.parent.mkdir(parents=True, exist_ok=True)
+        return log_file
 
     def get_fasta_path(self, verbose=False):
         fasta_file_kwds = self.get_foo_args(fasta_file)

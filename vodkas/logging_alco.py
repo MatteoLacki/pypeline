@@ -84,10 +84,10 @@ def store_parameters(log=MockLog(), sender=MockSender()):
     return wrapping
 
 
-def get_sender_n_log_Fun(log, server_ip):
+def get_sender_n_log_Fun(log, name, ip, port):
     try:
-        print(f"Connecting to: {server_ip}")
-        sender = Sender('RESEARCH', server_ip)
+        print(f"Connecting to: {ip}:{port}")
+        sender = Sender(name, ip, port)
     except URLError as e:
         log.warning('Server down! Doing all things locally.')
         print('Server down! Doing all things locally.')

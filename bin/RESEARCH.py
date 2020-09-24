@@ -58,7 +58,7 @@ ip, port   = config.get_ip_port()
 log_file   = config.get_log_file()
 fasta_path = config.get_fasta_path()
 iadbs_kwds = config.get_foo_args(iadbs)
- 
+
 logging.basicConfig(filename = log_file,
                     level    = logging.INFO,
                     format   = '%(asctime)s:%(name)s:%(levelname)s:%(message)s:')
@@ -66,7 +66,7 @@ console = logging.StreamHandler()
 console.setLevel(logging.INFO)
 logging.getLogger('').addHandler(console)
 log = logging.getLogger('RESEARCH.py')
-sender, logFun = get_sender_n_log_Fun(log, server_ip)
+sender, logFun = get_sender_n_log_Fun(log, 'RESEARCH', ip, port)
 
 # logging input-output of these functions:
 iadbs, create_params_file, get_search_stats = \
