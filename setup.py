@@ -10,10 +10,10 @@ setup(
     author='Mateusz Krzysztof Łącki',
     author_email='matteo.lacki@gmail.com',
     url='https://github.com/MatteoLacki/vodkas',
-    keywords=[  'Mass Spectrometry',
-                'Waters'
-                'Symphony Pipeline',
-                'fucking pipeline'],
+    keywords=['Mass Spectrometry',
+              'Waters'
+              'Symphony Pipeline',
+              'fucking pipeline'],
     classifiers=[   'Development Status :: 1 - Planning',
                     'License :: OSI Approved :: BSD License',
                     'Intended Audience :: Science/Research',
@@ -23,18 +23,15 @@ setup(
                     'Programming Language :: Python :: 3.8'],
     license="GPL-3.0-or-later",
     install_requires=['pandas',
-                      'docstr2argparse',
                       'furious_fastas',
                       'fs_ops',
                       'waters',
                       'flask',
-		      'tqdm'],
+        		      'tqdm'],
     # include_package_data=True,
     # package_data={'data': ['data/contaminants_uniprot_format.fasta']},
     scripts = ["bin/PLGS.py",
                "bin/RESEARCH.py",
                "bin/barman.py",
-               "bin/update_plgs_csv.py",
-               "bin/_PLGS.bat",
-               "bin/_RESEARCH.bat"]
+               "bin/update_plgs_csv.py"]
 )

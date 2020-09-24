@@ -1,93 +1,60 @@
 import argparse
 import json
 import logging
-from pathlib import Path
-import platform
-from pprint import pprint
-import sys
-from tqdm import tqdm
-from urllib.error import URLError
+import pathlib
+import pprint
+import tqdm
 
-from docstr2argparse.parse import FooParser
 from fs_ops.paths import find_suffixed_files
 from fs_ops.csv import rows2csv
 from waters.parsers import get_search_stats
+from furious_fastas.protogui import fasta_path_gui, prepare_fasta_file
 
-from vodkas import on_windows
-from vodkas.fastas import fastas, fastas_gui
 from vodkas.iadbs import iadbs, parameters_gui
 from vodkas.logging_alco import get_sender_n_log_Fun
-from vodkas.remote.sender import currentIP
 from vodkas.xml_parser import create_params_file
-from vodkas.misc import prompt_timeout
 
-log_file = Path('C:/SYMPHONY_VODKAS/temp_logs/research.log' if on_windows else '~/SYMPHONY_VODKAS/plgs.log').expanduser().resolve()
+ap = argparse.ArgumentParser(description='Rerun search with iaDBs.',
+                             epilog="WARNING: PREVIOUS '*_IA_Workflow.xml' SHALL BE DELETED ",
+                             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-prompt = False # prompting only when using sendto/RESEARCH
-try:
-    prompt = sys.argv[1] == '_prompt_input_'
-except IndexError:
-    pass
+ap.add_argument('Pep3D_Spectrum_xml',
+                type=pathlib.Path,
+                nargs='+',
+                help="Path(s) to outputs of Peptide3D. \
+          If provided with a folder instead, \
+          a recursive search for files matching '*_Pep3D_Spectrum.xml' is performed.")
+ap.add_argument('--config_path',
+                help="Path to the proper 'config.ini' file",
+                default='')
+args = ap.parse_args()
 
-FP = FooParser([fastas, iadbs])
-
-if prompt:
-    server_ip = sys.argv[2]
-    Pep3D_Spectrum = sys.argv[3:]
-else:
-    ap = argparse.ArgumentParser(description='Rerun search with iaDBs.',
-                                 epilog="WARNING: PREVIOUS '*_IA_Workflow.xml' SHALL BE DELETED ",
-                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-    ap.add_argument('fastas', type=Path,
-                    help='Path to fastas, or a short tag (human, wheat, ...).')
-
-    ap.add_argument('Pep3D_Spectrum', type=Path, nargs='+',
-        help="Path(s) to outputs of Peptide3D. \
-              If provided with a folder instead, \
-              a recursive search for files matching '*_Pep3D_Spectrum.xml' is performed.")
-
-    ap.add_argument('--log_file',
-        type=lambda p: Path(p).expanduser().resolve(),
-        help='Path to temporary outcome folder.',
-        default=log_file)
-
-    ap.add_argument('--server_ip', 
-                    type=str, 
-                    help='IP of the server',
-                    default=currentIP)
-
-    FP.updateParser(ap)
-    args = ap.parse_args()
-    FP.parse_kwds(args.__dict__)
-
-    server_ip       = args.server_ip
-    log_file        = args.log_file
-    fasta_file_tag  = args.fastas
-    Pep3D_Spectrum  = args.Pep3D_Spectrum
+fasta_file_tag  = args.fastas
+Pep3D_Spectrum  = args.Pep3D_Spectrum
     
-
-
-logging.basicConfig(filename=log_file, level=logging.INFO,
-                    format='%(asctime)s:%(name)s:%(levelname)s:%(message)s:')
+logging.basicConfig(filename = log_file,
+                    level    = logging.INFO,
+                    format   = '%(asctime)s:%(name)s:%(levelname)s:%(message)s:')
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
 logging.getLogger('').addHandler(console)
 log = logging.getLogger('RESEARCH.py')
 sender, logFun = get_sender_n_log_Fun(log, server_ip)
+# logging input-output of these functions:
 iadbs, create_params_file, get_search_stats = \
     [logFun(f) for f in [iadbs, create_params_file, get_search_stats]]
 
-
 if prompt:
-    print('WARNING: THIS SCRIPT OVERWRITES PREVIOUS *_IA_workflow.xml FILES, params.json, AND stats.csv')
-    print()
+    print('WARNING: THIS SCRIPT WILL OVERWRITE PREVIOUS *_IA_workflow.xml FILES, params.json, AND stats.csv')
+    print('IT IS YOUR RESPONSIBILITY TO SAVE THEM IF YOU NEED THEM.')
+    print('AMEN\n')
     print('Set timeouts [in minutes] for iaDBS:')
     iadbs_kwds = {'timeout': prompt_timeout('iaDBs', 180)}
     fasta_file = fastas(*fastas_gui())
     parameters_file = parameters_gui(FP['iadbs']['parameters_file'].info['default'])
 else:
-    fasta_file = fastas(fasta_file_tag, **FP.kwds['fastas'])
+    fasta_file = fasta_path_gui()
+    fastas(fasta_file_tag, **FP.kwds['fastas'])
     iadbs_kwds = FP.kwds['iadbs']
     parameters_file = iadbs_kwds['parameters_file']
     del iadbs_kwds['parameters_file']
@@ -99,8 +66,8 @@ log.error('No xmls found.')
 
 
 print("analyzing folders:")
-pprint(xmls)
-for xml in tqdm(xmls):
+pprint.pprint(xmls)
+for xml in tqdm.tqdm(xmls):
     sender.update_group(xml)
     log.info(f"researching: {str(xml)}")
     try:

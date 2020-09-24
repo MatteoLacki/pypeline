@@ -6,14 +6,11 @@ import socket
 
 from ..json import dump2json
 from .db import LOG
-from vodkas import currentIP
-
-
 
 class Sender(object):
     def __init__(self,
                  name,
-                 host=currentIP,
+                 host,
                  port=8745, 
                  encoding="cp1251"):
         self.host = host
