@@ -1,3 +1,14 @@
+"""
+Run RESEARCH with the symphony pipeline.
+
+Convention: for the AdvConfigParser to work properly, it must be the case that
+the doc-string of the iadbs and fasta_file must contain any of the entries in the config file, under the proper section.
+
+E.g. section 'fasta_file' has 'updated_fastas_folder'.
+This means, that 'updated_fastas_folder' should also be and argument of the 'fastas_file' function.
+
+If some parameter ain't mentioned in the config file, then the default is used or the user is prompted for input.
+"""
 import argparse
 import json
 import logging
@@ -47,7 +58,7 @@ ip, port   = config.get_ip_port()
 log_file   = config.get_log_file()
 fasta_path = config.get_fasta_path()
 iadbs_kwds = config.get_foo_args(iadbs)
-    
+ 
 logging.basicConfig(filename = log_file,
                     level    = logging.INFO,
                     format   = '%(asctime)s:%(name)s:%(levelname)s:%(message)s:')
