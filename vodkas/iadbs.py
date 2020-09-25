@@ -5,6 +5,8 @@ from .fs import check_algo
 from .subproc import run_win_proc
 
 from .xml_parser import print_parameters_file
+from .paths import path_check
+
 
 
 def iadbs(input_file,
@@ -15,7 +17,8 @@ def iadbs(input_file,
           write_binary=False,
           write_csv=False,
           exe_path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe" if system()=='Windows' else '',
-          timeout=180):
+          timeout=180,
+          verbose=False):
     """Run iaDBs.
     
     Args:
@@ -34,10 +37,15 @@ def iadbs(input_file,
     """
     print(exe_path)
     if timeout >= 0:
-        input_file = Path(input_file)
-        output_dir = Path(output_dir)
-        fasta_file = Path(fasta_file)
-        parameters_file = Path(parameters_file)
+        if verbose:
+            print(input_file)
+            print(output_dir)
+            print(fasta_file)
+            print(parameters_file)
+        input_file = path_check(input_file)
+        output_dir = path_check(output_dir)
+        fasta_file = path_check(fasta_file)
+        parameters_file = path_check(parameters_file)
         iadbs_stdout = output_dir/'iadbs.log'
 
         algo = check_algo(exe_path)

@@ -28,15 +28,11 @@ from vodkas.logging_alco import get_sender_n_log_Fun
 from vodkas.xml_parser import create_params_file
 
 
-DEBUG = True
-
-
 ap = argparse.ArgumentParser(description='Rerun search with iaDBs.',
                              epilog="WARNING: PREVIOUS '*_IA_Workflow.xml' SHALL BE DELETED ",
                              formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 ap.add_argument('config_path',
                 help="Path to a config file with pipeline parameters.")
-
 ap.add_argument('Pep3D_Spectrum_xml',
                 type=pathlib.Path,
                 nargs='+',
@@ -46,8 +42,12 @@ ap.add_argument('Pep3D_Spectrum_xml',
 ap.add_argument('--verbose',
                 help='Be verbose.',
                 action='store_true')
+ap.add_argument('--DEBUG',
+                help='DEBUG.',
+                action='store_true')
 ap = ap.parse_args()
-if DEBUG:
+
+if ap.DEBUG:
     print('Args:')
     pprint.pprint(ap.__dict__)
     print()
@@ -61,7 +61,7 @@ assert len(ap.Pep3D_Spectrum_xml), "Missing Peptide3D spectra."
 xmls = list(find_suffixed_files(ap.Pep3D_Spectrum_xml, 
                                 ['**/*_Pep3D_Spectrum.xml'],
                                 ['.xml']))
-if DEBUG:
+if ap.DEBUG:
     print('xmls:')
     pprint.pprint(xmls)
     print()
@@ -95,7 +95,7 @@ for xml in tqdm.tqdm(xmls):
     sender.update_group(xml)
     log.info(f"researching: {str(xml)}")
     try:
-        iadbs_xml = iadbs(xml, xml.parent, fasta_path, **iadbs_kwds)
+        iadbs_xml = iadbs(xml, xml.parent, fasta_path, verbose=ap.DEBUG, **iadbs_kwds)
         if iadbs_xml is not None:
             apex_out = iadbs_xml.parent/iadbs_xml.name.replace('_IA_workflow.xml', '_Apex3D.xml')
             params = create_params_file(apex_out, xml, iadbs_xml) # for projectizer2.0
