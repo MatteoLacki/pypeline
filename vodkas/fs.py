@@ -82,9 +82,8 @@ def random_folder_name(k=20):
 
 def check_algo(path_to_algorithm):
     """Check if the algorithm's executable is there."""
-    if system() == 'Windows':
-        algo = Path(path_to_algorithm)
-        assert algo.exists(), f"No '{algo}' found!"
+    algo = Path(path_to_algorithm)
+    assert algo.exists(), f"No '{algo}' found!"
     return str(algo)
 
 

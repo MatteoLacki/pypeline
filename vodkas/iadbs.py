@@ -14,7 +14,7 @@ def iadbs(input_file,
           write_xml=True,
           write_binary=False,
           write_csv=False,
-          exe_path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe" if system()=='Windows' else 'none',
+          exe_path="C:/SYMPHONY_VODKAS/plgs/iaDBs.exe" if system()=='Windows' else '',
           timeout=180):
     """Run iaDBs.
     
@@ -32,6 +32,7 @@ def iadbs(input_file,
     Returns:
         pathlib.Path: path to the outcome xml file.
     """
+    print(exe_path)
     if timeout >= 0:
         input_file = Path(input_file)
         output_dir = Path(output_dir)

@@ -34,4 +34,5 @@ def run_win_proc(cmd,
 
         if timeout_expired:
             raise TimeoutExpired(' '.join(cmd), timeout)
-
+    else:
+        print('Mocking!')

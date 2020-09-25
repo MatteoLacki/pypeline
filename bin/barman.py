@@ -80,6 +80,7 @@ def close_connection(exception):
         del db
 
 
+
 ############################################################### MAIN
 if __name__ == '__main__':
     app.run(debug=DEBUG,
