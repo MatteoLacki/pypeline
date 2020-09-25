@@ -93,3 +93,21 @@ def get_sender_n_log_Fun(log, name, ip, port):
         print('Server down! Doing all things locally.')
         sender = MockSender()
     return sender, store_parameters(log, sender)
+
+
+def get_log_sender_logFun(filename,
+                          loggerName,
+                          serverName,
+                          ip,
+                          port,
+                          level=logging.INFO,
+                          output2console=True,
+                          logformat='%(asctime)s:%(name)s:%(levelname)s:%(message)s:'):
+    logging.basicConfig(filename=filename, level=level, format=logformat)
+    if output2console:
+        console = logging.StreamHandler()
+        console.setLevel(level)
+        logging.getLogger('').addHandler(console)
+    log = logging.getLogger(loggerName)
+    sender, logFun = get_sender_n_log_Fun(log, serverName, ip, port)
+    return log, sender, logFun

@@ -2,7 +2,7 @@ import argparse
 import json
 import logging
 from pathlib import Path
-from subprocess import TimeoutExpired
+from subprocess
 import sys
 from urllib.error import URLError
 
@@ -22,7 +22,6 @@ from vodkas.logging_alco import get_sender_n_log_Fun
 from vodkas.remote.sender import currentIP
 from vodkas.xml_parser import create_params_file
 
-DEBUG = True
 
 # defaults
 local_output_folder = Path(r'C:/SYMPHONY_VODKAS/temp' if on_windows else '~/SYMPHONY_VODKAS/temp').expanduser().resolve()
@@ -72,6 +71,10 @@ else:
 
     ap.add_argument('--pipeline',
                     help='Are we running a pipeline?',
+                    action='store_true')
+
+    ap.add_argument('--DEBUG',
+                    help='DEBUG',
                     action='store_true')
 
     FP.updateParser(ap)
@@ -189,7 +192,7 @@ for raw_folder in raw_folders:
                 log.warning(f"not copied '{raw_folder}': {repr(e)}")
         else:
             log.info(f"saved '{raw_folder}' locally") 
-    except TimeoutExpired as e:
+    except subprocess.TimeoutExpired as e:
         log.error(f"Timeout: {repr(e)}")
     except Exception as e:
         log.error(f"error: {repr(e)}")

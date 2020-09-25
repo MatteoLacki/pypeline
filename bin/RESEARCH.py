@@ -14,6 +14,7 @@ import json
 import logging
 import pathlib
 import pprint
+import subprocess
 import tqdm
 
 from fs_ops.paths import find_suffixed_files
@@ -23,7 +24,7 @@ from waters.parsers import get_search_stats
 
 from vodkas.config_parser import AdvConfigParser
 from vodkas.iadbs import iadbs
-from vodkas.logging_alco import get_sender_n_log_Fun
+from vodkas.logging_alco import get_log_sender_logFun
 #TODO; move this to waters package
 from vodkas.xml_parser import create_params_file
 
@@ -66,24 +67,18 @@ if ap.DEBUG:
     pprint.pprint(xmls)
     print()
 
-# p = pathlib.Path('/home/matteo/Projects/vodkas')
-# path = p/'tests/research_linux2.ini'
-# config     = AdvConfigParser(path)
 config     = AdvConfigParser(ap.config_path)
 ip, port   = config.get_ip_port()
 log_file   = config.get_log_file()
 fasta_path = config.get_fasta_path()
 iadbs_kwds = config.get_foo_args(iadbs)
 
-logging.basicConfig(filename = log_file,
-                    level    = logging.INFO,
-                    format   = '%(asctime)s:%(name)s:%(levelname)s:%(message)s:')
-console = logging.StreamHandler()
-console.setLevel(logging.INFO)
-logging.getLogger('').addHandler(console)
-log = logging.getLogger('RESEARCH.py')
-sender, logFun = get_sender_n_log_Fun(log, 'RESEARCH', ip, port)
 
+log, sender, logFun = get_log_sender_logFun(log_file,
+                                            'RESEARCH.py',
+                                            'RESEARCH' if not ap.DEBUG else 'RESEARCH_DEBUG',
+                                            ip,
+                                            port)
 # logging input-output of these functions:
 iadbs, create_params_file, get_search_stats = \
     [logFun(f) for f in [iadbs, create_params_file, get_search_stats]]
@@ -98,14 +93,19 @@ for xml in tqdm.tqdm(xmls):
         iadbs_xml = iadbs(xml, xml.parent, fasta_path, verbose=ap.DEBUG, **iadbs_kwds)
         if iadbs_xml is not None:
             apex_out = iadbs_xml.parent/iadbs_xml.name.replace('_IA_workflow.xml', '_Apex3D.xml')
+            #TODO: all of the below code should be done by a function
+            # in the 'waters' package that would parse only the headers of the
+            # bloody 'xmls'.
             params = create_params_file(apex_out, xml, iadbs_xml) # for projectizer2.0
             with open(iadbs_xml.parent/"params.json", 'w') as f:
                 json.dump(params, f)
             search_stats = get_search_stats(iadbs_xml)
             rows2csv(iadbs_xml.parent/'stats.csv',
                      [list(search_stats), list(search_stats.values())])
+            # UP TILL HERE!
+            log.info(f'Analyzed {str(xml)}.')
+    except subprocess.TimeoutExpired as e:
+        log.error(f"Reached timeout: {repr(e)}") 
     except Exception as e:
         log.warning(repr(e))
-        print(e)
-    print()
 log.info("Search redone.")
