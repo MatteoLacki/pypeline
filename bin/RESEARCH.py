@@ -73,6 +73,13 @@ log_file   = config.get_log_file()
 fasta_path = config.get_fasta_path()
 iadbs_kwds = config.get_foo_args(iadbs)
 
+# log, sender = get_log_sender_logFun(log_file,
+#                                     'RESEARCH.py',
+#                                     'RESEARCH' if not ap.DEBUG else 'RESEARCH_DEBUG',
+#                                     ip,
+#                                     port,
+#                                     foos=[iadbs, create_params_file, get_search_stats])
+
 
 log, sender, logFun = get_log_sender_logFun(log_file,
                                             'RESEARCH.py',
@@ -82,6 +89,8 @@ log, sender, logFun = get_log_sender_logFun(log_file,
 # logging input-output of these functions:
 iadbs, create_params_file, get_search_stats = \
     [logFun(f) for f in [iadbs, create_params_file, get_search_stats]]
+
+
 
 assert len(xmls), log.error('No Peptide3D spectra xmls found.')
 

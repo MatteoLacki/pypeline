@@ -1,4 +1,4 @@
-%load_ext autoreload
+%load_ext auutoreload
 %autoreload 2
 from collections import defaultdict
 import configparser
@@ -28,3 +28,6 @@ dict(config['fasta_file'])
 config['fastas']['add_contaminants']
 
 write_params_xml_file('/home/matteo/SYMPHONY_PIPELINE/215.xml')
+
+
+
