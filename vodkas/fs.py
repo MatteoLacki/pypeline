@@ -80,13 +80,6 @@ def random_folder_name(k=20):
     return ''.join(choice(ascii_letters+digits) for n in range(int(k)))
 
 
-def check_algo(path_to_algorithm):
-    """Check if the algorithm's executable is there."""
-    algo = Path(path_to_algorithm)
-    assert algo.exists(), f"No '{algo}' found!"
-    return str(algo)
-
-
 def find_free_path(p):
     """Find the first free path for storing data by modifying the sample_set_no.
 

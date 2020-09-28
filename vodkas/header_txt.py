@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+import codecs # how I hate windows.
 
 # TODO this should be mostly used by a script for Folder Synchronization.
 def parse_header_txt(path, 
@@ -11,7 +12,7 @@ def parse_header_txt(path,
     path = Path(path)
     assert path.name == '_HEADER.TXT', "Wrong path."
     params = {}
-    with open(path, 'r') as f:
+    with codecs.open(path, 'r', encoding='cp1252') as f:
         for l in f:
             l = l.strip()
             k = l.split(':')[0]

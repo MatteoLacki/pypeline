@@ -1,7 +1,6 @@
 from pathlib import Path
 from platform import system
 
-from .fs import check_algo
 from .subproc import run_win_proc
 
 
@@ -37,8 +36,7 @@ def peptide3d(input_file,
         # if input_file.suffix != '.bin':
         #     raise RuntimeError("Peptide3D failed: it accepts 'bin' input files only.")
 
-        algo = check_algo(exe_path)
-        cmd = ["powershell.exe", algo,
+        cmd = ["powershell.exe", exe_path,
                 f"-inputFileName '{input_file}'",
                 f"-outputDirName '{output_dir}'",
                 f"-WriteXML {int(write_xml)}",

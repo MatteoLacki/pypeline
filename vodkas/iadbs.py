@@ -1,7 +1,6 @@
 from pathlib import Path
 from platform import system
 
-from .fs import check_algo
 from .subproc import run_win_proc
 
 from .xml_parser import print_parameters_file
@@ -48,8 +47,7 @@ def iadbs(input_file,
         parameters_file = path_check(parameters_file)
         iadbs_stdout = output_dir/'iadbs.log'
 
-        algo = check_algo(exe_path)
-        cmd = [ "powershell.exe", algo,
+        cmd = [ "powershell.exe", exe_path,
                 f"-paraXMLFileName '{parameters_file}'",
                 f"-pep3DFileName '{input_file}'",
                 f"-proteinFASTAFileName '{fasta_file}'",

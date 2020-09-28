@@ -40,12 +40,12 @@ class AdvConfigParser(configparser.ConfigParser):
         return foo_args
 
     def get_ip_port(self):
-        ip, port = self['logging']['log_server_ip_port'].split(':', 1)
+        ip, port = self['general_settings']['log_server_ip_port'].split(':', 1)
         port = int(port)
         return ip, port
 
     def get_log_file(self):
-        log_file = pathlib.Path(self['logging']['log_file']).expanduser().resolve()
+        log_file = pathlib.Path(self['general_settings']['log_file']).expanduser().resolve()
         log_file.parent.mkdir(parents=True, exist_ok=True)
         return log_file
 

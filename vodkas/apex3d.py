@@ -1,7 +1,6 @@
 from pathlib import Path
 from platform import system
 
-from .fs import check_algo
 from .misc import get_coresNo, call_info
 from .subproc import run_win_proc
 
@@ -50,8 +49,7 @@ def apex3d(raw_folder,
         output_dir = Path(output_dir)
         apex_stdout = output_dir/'apex3d.log'
 
-        algo = check_algo(exe_path)
-        cmd = ["powershell.exe", algo,
+        cmd = ["powershell.exe", exe_path,
               f"-pRawDirName '{raw_folder}'",
               f"-outputDirName '{output_dir}'",
               f"-lockMassZ2 {lock_mass_z2}",
