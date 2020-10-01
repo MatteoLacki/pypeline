@@ -5,7 +5,7 @@ import pathlib
 import pprint
 import sys
 
-from fs_ops import mv, cp, rm
+from fs_ops import mv
 from fs_ops.base import version_folder 
 from fs_ops.csv import rows2csv
 from fs_ops.paths import find_folders
@@ -17,8 +17,6 @@ from vodkas.config_parser import AdvConfigParser
 from vodkas.header_txt import parse_header_txt
 from vodkas.logging_alco import get_log_sender_logFun
 from vodkas.xml_parser import create_params_file
-
-
 
 ap = argparse.ArgumentParser(description='Analyze Waters Raw Data with PLGS.',
                              formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -120,10 +118,12 @@ for raw_folder in raw_folders:
             # and a version number appended to the new one
             # e.g.              Y:/RES/2019-008/O191017-04
             # replaced with:    Y:/RES/2019-008/O191017-04__v1
-            final_net_folder = find_free_path(net_set_folder/acquired_name)
-            
+            final_net_folder = version_folder(net_set_folder/acquired_name)
+            print(final_net_folder)
+            print(final_net_folder)
+            print(final_net_folder)
             try: 
-                move_folder(local_folder, final_net_folder)
+                mv(local_folder, final_net_folder)
                 if local_folder.parent.exists() and not local_folder.parent.glob('*'):
                     local_folder.parent.rmdir()
                 log.info(f"moved {raw_folder} to {final_net_folder}")
