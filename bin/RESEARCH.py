@@ -35,7 +35,7 @@ ap = argparse.ArgumentParser(description='Rerun search with iaDBs.',
 ap.add_argument('config_path',
                 help="Path to a config file with pipeline parameters.")
 ap.add_argument('Pep3D_Spectrum_xml',
-                type=pathlib.Path,
+                type=lambda p: pathlib.Path(p).expanduser().resolve(),
                 nargs='+',
                 help="Path(s) to outputs of Peptide3D. \
           If provided with a folder instead, \
@@ -58,13 +58,15 @@ if ap.verbose:
     print('IT IS YOUR RESPONSIBILITY TO SAVE THEM IF YOU NEED THEM.')
     print('In nomine proteomii, amen!\n')
 
-xmls = list(find_suffixed_files(ap.Pep3D_Spectrum_xml, 
+peptide3d_xmls = list(find_suffixed_files(ap.Pep3D_Spectrum_xml, 
                                 ['**/*_Pep3D_Spectrum.xml'],
                                 ['.xml']))
 if ap.DEBUG:
-    print('xmls:')
-    pprint.pprint(xmls)
+    print('peptide3d_xmls:')
+    pprint.pprint(peptide3d_xmls)
     print()
+
+
 
 config     = AdvConfigParser(ap.config_path)
 ip, port   = config.get_ip_port()
@@ -77,34 +79,47 @@ log, sender, logFun = get_log_sender_logFun(log_file,
                                             'RESEARCH' if not ap.DEBUG else 'RESEARCH_DEBUG',
                                             ip,
                                             port)
+
+assert len(peptide3d_xmls), log.error('No Peptide3D spectra xmls found.')
+
+
 # logging input-output of these functions:
 iadbs, create_params_file, get_search_stats = \
     [logFun(f) for f in [iadbs, create_params_file, get_search_stats]]
 
+log.info(f"Analyzing folders: {' '.join(str(x) for x in peptide3d_xmls)}")
+for peptide3d_xml in tqdm.tqdm(peptide3d_xmls):
+    sender.update_group(peptide3d_xml)
+    log.info(f"researching: {str(peptide3d_xml)}")
+    local_folder = peptide3d_xml.parent
 
-assert len(xmls), log.error('No Peptide3D spectra xmls found.')
-
-log.info(f"Analyzing folders: {' '.join(str(x) for x in xmls)}")
-for xml in tqdm.tqdm(xmls):
-    sender.update_group(xml)
-    log.info(f"researching: {str(xml)}")
     try:
-        iadbs_xml = iadbs(xml, xml.parent, fasta_path, verbose=ap.DEBUG, **iadbs_kwds)
+        iadbs_xml = iadbs(peptide3d_xml,
+                          local_folder,
+                          fasta_path,
+                          verbose=ap.DEBUG,
+                          **iadbs_kwds)
+
         if iadbs_xml is not None:
-            apex_out = iadbs_xml.parent/iadbs_xml.name.replace('_IA_workflow.xml', '_Apex3D.xml')
+            apex_xml = local_folder/iadbs_xml.name.replace('_IA_workflow.xml', '_Apex3D.xml')
+
             #TODO: all of the below code should be done by a function
             # in the 'waters' package that would parse only the headers of the
             # bloody 'xmls'.
-            params = create_params_file(apex_out, xml, iadbs_xml) # for projectizer2.0
-            with open(iadbs_xml.parent/"params.json", 'w') as f:
+            params = create_params_file(apex_xml, peptide3d_xml, iadbs_xml) # for projectizer2.0
+            with open(local_folder/"params.json", 'w') as f:
                 json.dump(params, f)
             search_stats = get_search_stats(iadbs_xml)
-            rows2csv(iadbs_xml.parent/'stats.csv',
+            rows2csv(local_folder/'stats.csv',
                      [list(search_stats), list(search_stats.values())])
             # UP TILL HERE!
-            log.info(f'Analyzed {str(xml)}.')
+            log.info(f'Analyzed {str(peptide3d_xml)}.')
+
     except subprocess.TimeoutExpired as e:
         log.error(f"Reached timeout: {repr(e)}") 
+
     except Exception as e:
         log.warning(repr(e))
+
+
 log.info("Search redone.")

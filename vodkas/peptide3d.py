@@ -18,11 +18,11 @@ def peptide3d(input_file,
     Args:
         input_file (str): a path to the file containing Apex3D's outcomes (a binary file, with extension '.bin' preferentially).
         output_dir (str): Path to where to place the output.
+        min_LEMHPlus (int): The minimal (M)ass of the (L)ow (E)nergy precursor with a single charge (H+).
         write_xml (boolean): Write the output in an xml in the output folder.
         write_binary (boolean): Write the binary output in an xml in the output folder.
         write_csv (boolean): Write the ions to csv file.
         write_binning (boolean): Write binning file.
-        min_LEMHPlus (int): The minimal (M)ass of the (L)ow (E)nergy precursor with a single charge (H+).
         exe_path (str): Path to the "Peptide3D.exe" executable.
         timeout (float): Timeout in minutes. Passing 0 will mock the process. Passing negative value will not run the process.
 

@@ -52,3 +52,11 @@ class AdvConfigParser(configparser.ConfigParser):
     def get_fasta_path(self, verbose=False):
         fasta_file_kwds = self.get_foo_args(fasta_file)
         return fasta_file(**fasta_file_kwds)
+
+    def get_output_folder(self):
+        temp = pathlib.Path(self['general_settings']['local_output_folder']).expanduser().resolve()
+        temp.mkdir(parents=True, exist_ok=True)
+        return temp
+
+    def get_net_folder(self):
+        return pathlib.Path(self['general_settings']['net_folder']).expanduser().resolve()
