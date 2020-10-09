@@ -1,3 +1,12 @@
+"""Bigger idea: this can be called from the terminal.
+
+Maybe, this should be a function? Maybe I really miss-use the logging module.
+Maybe I should set it up inside the function as everyone does?
+I need to learn how to do that.
+
+The idea would be, that this would potentially generalize what we do with the function.
+"""
+
 import argparse
 import json
 import logging
@@ -119,9 +128,6 @@ for raw_folder in raw_folders:
             # e.g.              Y:/RES/2019-008/O191017-04
             # replaced with:    Y:/RES/2019-008/O191017-04__v1
             final_net_folder = version_folder(net_set_folder/acquired_name)
-            print(final_net_folder)
-            print(final_net_folder)
-            print(final_net_folder)
             try: 
                 mv(local_folder, final_net_folder)
                 if local_folder.parent.exists() and not local_folder.parent.glob('*'):

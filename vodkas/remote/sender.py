@@ -7,6 +7,7 @@ import socket
 from ..json import dump2json
 from .db import LOG
 
+
 class Sender(object):
     def __init__(self,
                  name,
@@ -21,6 +22,7 @@ class Sender(object):
         self.project_id = self.__get_project_id()
         self.group = name
 
+
     def __sock(self, route, message=None):
         url = f"http://{self.host}:{self.port}/{route}"
         request = Request(url)
@@ -29,9 +31,11 @@ class Sender(object):
             message = json.dumps(self.name).encode(self.encoding)
         return urlopen(request, message)
 
+
     def __get_project_id(self):
         with self.__sock('get_project_id') as s:
             return json.loads(s.read())
+
 
     def log(self, key, value):
         """Log key-value.
@@ -52,8 +56,10 @@ class Sender(object):
         with self.__sock('log', _log) as s:
             return json.loads(s.read())            
 
+
     def update_group(self, group):
         self.group = dump2json(group) # general.
+
 
     def list_logs(self):
         with self.__sock('get_all_logs') as s:
